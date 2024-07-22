@@ -1,6 +1,7 @@
 import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position'
 import { produce } from 'immer'
 import { Pos, Route, Marker, LocateFile } from 'packages/app/types/type'
+import React from 'react'
 
 const ADD_MARKER = 'ADD_MARKER'
 const REMOVE_MARKER = 'REMOVE_MARKER'
@@ -9,6 +10,9 @@ const ADD_ROUTE = 'ADD_ROUTE'
 const REMOVE_ROUTE = 'REMOVE_ROUTE'
 const EDIT_ROUTE = 'EDIT_ROUTE'
 const APPEND_POS = 'APPEND_POS'
+
+export const fileDispatch = React.createContext<React.Dispatch<LocateFileActions>>(() => null)
+export const fileState = React.createContext<LocateFile | null>(null)
 
 interface AddMarkerAction {
   type: typeof ADD_MARKER

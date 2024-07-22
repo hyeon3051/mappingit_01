@@ -5,8 +5,10 @@ import BackgroundGeolocation, {
   Subscription,
 } from 'react-native-background-geolocation'
 import { LocateFile, Pos } from '../types/type'
+import { fileDispatch } from '../contexts/mapData/fileReducer'
 const MIN_DISTANCE = 0.0001
 const useBackgroundGeolocation = () => {
+  const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
   const [location, setLocation] = useState<Pos>([[36.97344, 127.93205], ''])
   const locateLngLat = useRef<[number, number]>([36.97344, 127.93205])
@@ -66,8 +68,7 @@ const useBackgroundGeolocation = () => {
   }, [enabled])
 
   useEffect(() => {
-    const locationUpdate = () => {}
-    locationUpdate()
+    dispatch({ type: 'APPEND_POS', payload: { pos: location } })
   }, [location])
 
   return { enabled, location, setEnabled }
