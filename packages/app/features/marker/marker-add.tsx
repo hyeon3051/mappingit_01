@@ -26,14 +26,12 @@ export function AddMarkerView() {
           <PinOff size="$6" />
           <PinOff size="$6" />
           <PinOff size="$6" />
-          <PinOff size="$6" />
         </XStack>
       </Stack>
       <Stack p="$2" gap="$5" jc="center" alignContent="center" borderRadius="$10" mt="$2">
         <Paragraph>마커</Paragraph>
         <XStack gap="$3">
           <PinOff size="$6" />
-          <Piano size="$6" />
           <Eraser size="$6" />
           <AArrowUp size="$6" />
           <PinOff size="$6" />
@@ -42,7 +40,6 @@ export function AddMarkerView() {
           <PinOff size="$6" />
           <Piano size="$6" />
           <Eraser size="$6" />
-          <AArrowUp size="$6" />
           <PinOff size="$6" />
         </XStack>
         <XStack gap="$3">
@@ -59,14 +56,12 @@ export function AddMarkerView() {
           <Square size="$6" backgroundColor="$red10" elevation="$5" />
           <Square size="$6" backgroundColor="$blue10" />
           <Square size="$6" backgroundColor="$purple10" />
-          <Square size="$6" backgroundColor="$yellow10" />
           <Square size="$6" backgroundColor="$green10" />
         </XStack>
         <XStack gap="$3">
           <Square size="$6" backgroundColor="$red10" />
           <Square size="$6" backgroundColor="$blue10" />
           <Square size="$6" backgroundColor="$purple10" />
-          <Square size="$6" backgroundColor="$yellow10" />
           <Square size="$6" backgroundColor="$green10" />
         </XStack>
       </Stack>
