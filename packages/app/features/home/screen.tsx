@@ -34,7 +34,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const [state, dispatch] = useReducer(fileReducer, initalData)
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
   const linkProps = useLink({
-    href: `${linkTarget}/nate`,
+    href: `/marker/marker`,
   })
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
