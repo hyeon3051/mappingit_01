@@ -18,7 +18,6 @@ const TamaIcon = ({
     <IconComponent
       size={size}
       color={color}
-      animation="bouncy"
       backgroundColor={backgroundColor}
       borderRadius={borderRadius}
     />

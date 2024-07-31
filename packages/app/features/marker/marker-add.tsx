@@ -8,7 +8,9 @@ import {
   Stack,
   Square,
   ButtonIcon,
+  useEvent,
 } from '@my/ui'
+import { Scale } from '@tamagui/lucide-icons'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
@@ -19,8 +21,6 @@ export function AddMarkerView() {
     color: '',
   })
 
-  const iconRef = useRef('')
-  const colorRef = useRef('')
   const router = useRouter()
 
   const linkProps = useLink({
@@ -40,9 +40,6 @@ export function AddMarkerView() {
               key={index}
               size="$7"
               circular
-              focusStyle={{
-                backgroundColor: 'black',
-              }}
               iconAfter={<TamaIcon iconName={iconName} size="$6" />}
               onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
             />
@@ -51,7 +48,7 @@ export function AddMarkerView() {
       </Stack>
       <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
         <Paragraph>마커</Paragraph>
-        <XStack gap="$5" jc="space-around" flexWrap="wrap">
+        <XStack gap="$2" jc="space-around" flexWrap="wrap">
           {[
             'PinOff',
             'Eraser',
@@ -64,17 +61,11 @@ export function AddMarkerView() {
           ].map((iconName, index) => (
             <Button
               key={index}
-              size="$6"
+              size="$7"
+              animation="medium"
               circular
-              animation="bouncy"
-              animatePresence
-              iconAfter={
-                <TamaIcon
-                  iconName={iconName}
-                  size="$6"
-                  color={iconName === markerIcon.icon ? '$gray10' : undefined}
-                />
-              }
+              backgroundColor={iconName === markerIcon.icon ? '$purple10' : '$white0'}
+              icon={<TamaIcon iconName={iconName} size="$6" />}
               onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
             />
           ))}
@@ -87,6 +78,12 @@ export function AddMarkerView() {
             <Square
               key={index}
               size="$8"
+              hoverStyle={{
+                scale: 1.5,
+              }}
+              pressStyle={{
+                scale: 0.9,
+              }}
               onPress={() =>
                 setMarkerIcon({
                   ...markerIcon,
