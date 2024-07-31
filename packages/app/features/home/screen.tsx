@@ -33,8 +33,11 @@ const initalData = {
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const [state, dispatch] = useReducer(fileReducer, initalData)
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
-  const linkProps = useLink({
+  const markerLinkProps = useLink({
     href: `/marker/marker`,
+  })
+  const routeLinkProps = useLink({
+    href: `/route/route`,
   })
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
@@ -43,11 +46,8 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
     <fileState.Provider value={state}>
       <fileDispatch.Provider value={dispatch}>
         <MapBoxComponent location={location} />
-        <Button {...linkProps}>Link to user</Button>
-        <YStack f={1} jc="center" ai="center" gap="$8" p="$4">
-          <SheetDemo />
-        </YStack>
-        <SwitchRouterButton pagesMode={pagesMode} />
+        <Button {...markerLinkProps}>marker</Button>
+        <Button {...routeLinkProps}>route</Button>
       </fileDispatch.Provider>
     </fileState.Provider>
   )
