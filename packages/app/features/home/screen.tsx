@@ -20,18 +20,8 @@ import { useState, useReducer } from 'react'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/navigation'
 import fileReducer from 'packages/app/contexts/mapData/fileReducer'
-import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-
-const initalData = {
-  title: '',
-  routes: [],
-  markers: [],
-  isRecord: false,
-  currentRoute: [],
-}
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
-  const [state, dispatch] = useReducer(fileReducer, initalData)
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
   const markerLinkProps = useLink({
     href: `/marker/marker`,
@@ -43,13 +33,11 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
 
   return (
-    <fileState.Provider value={state}>
-      <fileDispatch.Provider value={dispatch}>
-        <MapBoxComponent location={location} />
-        <Button {...markerLinkProps}>marker</Button>
-        <Button {...routeLinkProps}>route</Button>
-      </fileDispatch.Provider>
-    </fileState.Provider>
+    <>
+      <MapBoxComponent location={location} />
+      <Button {...markerLinkProps}>marker</Button>
+      <Button {...routeLinkProps}>route</Button>
+    </>
   )
 }
 
