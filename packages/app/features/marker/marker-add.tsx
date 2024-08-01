@@ -9,110 +9,66 @@ import {
   Square,
   ButtonIcon,
   useEvent,
+  Input,
+  TextArea,
+  H1,
+  H3,
+  H6,
+  H5,
+  TextAreaFrame,
+  Image,
 } from '@my/ui'
 import { Scale } from '@tamagui/lucide-icons'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
+import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 
 export function AddMarkerView() {
   const [markerIcon, setMarkerIcon] = useState({
     icon: '',
-    color: '',
+    color: '$white0',
   })
+
+  const userInfo = useContext(fileState)
 
   const router = useRouter()
 
   const linkProps = useLink({
-    href: `/marker/addMarker`,
+    href: `/marker`,
   })
   useEffect(() => {
-    console.log(markerIcon)
-  }, [markerIcon])
+    console.log(userInfo?.currentRoute)
+  }, [])
 
   return (
-    <YStack f={1} ai="center" gap="$0" w="100%" h="100%" jc="flex-start">
-      <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
-        <Paragraph>즐겨찾기</Paragraph>
-        <XStack gap="$3" jc="space-around">
-          {['PinOff', 'PinOff', 'PinOff', 'PinOff'].map((iconName, index) => (
-            <Button
-              key={index}
-              size="$7"
-              circular
-              iconAfter={<TamaIcon iconName={iconName} size="$6" />}
-              onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
-            />
-          ))}
-        </XStack>
-      </Stack>
-      <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
-        <Paragraph>마커</Paragraph>
-        <XStack gap="$2" jc="space-around" flexWrap="wrap">
-          {[
-            'PinOff',
-            'Eraser',
-            'AArrowUp',
-            'MapPinOff',
-            'MapPin',
-            'Pin',
-            'TreePine',
-            'ShoppingBag',
-          ].map((iconName, index) => (
-            <Button
-              key={index}
-              size="$7"
-              animation="medium"
-              circular
-              backgroundColor={iconName === markerIcon.icon ? '$purple10' : '$white0'}
-              icon={<TamaIcon iconName={iconName} size="$6" />}
-              onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
-            />
-          ))}
-        </XStack>
-      </Stack>
-      <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
-        <Paragraph>색상</Paragraph>
-        <XStack gap="$3" jc="space-around">
-          {['$red10', '$blue10', '$purple10', '$green10'].map((color, index) => (
-            <Square
-              key={index}
-              size="$8"
-              hoverStyle={{
-                scale: 1.5,
-              }}
-              pressStyle={{
-                scale: 0.9,
-              }}
-              onPress={() =>
-                setMarkerIcon({
-                  ...markerIcon,
-                  color,
-                })
-              }
-              backgroundColor={color}
-              elevation={color === '$red10' ? '$5' : undefined}
-            />
-          ))}
-        </XStack>
-        <XStack gap="$3" jc="space-around">
-          {['$red10', '$blue10', '$purple10', '$green10'].map((color, index) => (
-            <Square
-              key={index}
-              size="$8"
-              onPress={() =>
-                setMarkerIcon({
-                  ...markerIcon,
-                  color,
-                })
-              }
-              backgroundColor={color}
-              elevation={color === '$red10' ? '$5' : undefined}
-            />
-          ))}
-        </XStack>
-      </Stack>
-      <XStack f={2} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
+    <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
+      <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
+        <Button
+          size="$7"
+          circular
+          iconAfter={<TamaIcon iconName="AArrowUp" size="$6" />}
+          backgroundColor="$red10"
+        />
+        <YStack>
+          <H3>Marker1</H3>
+          <H6>Lorem ipsum</H6>
+        </YStack>
+      </XStack>
+      <YStack gap="$4" p="$2" w="80%" m={20}>
+        <H5>name</H5>
+        <Input value="hello" />
+      </YStack>
+      <YStack gap="$4" p="$2" w="80%" ml={20}>
+        <H5>description</H5>
+        <TextArea />
+      </YStack>
+      <YStack gap="$4" p="$2" w="80%" ml={20}>
+        <H5>Picture</H5>
+        <Image />
+      </YStack>
+
+      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
         <Button {...linkProps} icon={<TamaIcon iconName="PlusCircle" />}></Button>
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
         <Button icon={<TamaIcon iconName="Trash" />} onPress={() => router.back()}></Button>
