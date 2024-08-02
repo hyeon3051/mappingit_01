@@ -2,6 +2,10 @@ import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position'
 
 export type Pos = [Position, string]
 
+export type selectedIcon = {
+  color: string
+  icon: string
+}
 export type Route = {
   id: number
   path: Pos[]

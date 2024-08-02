@@ -15,7 +15,7 @@ const MapBoxComponent = ({ location }: { location: Pos }) => {
   }, [location])
   return (
     <>
-      <MapboxGL.MapView style={{ flex: 1, zIndex: 0 }}>
+      <MapboxGL.MapView style={{ flex: 1, zIndex: 1 }}>
         <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
         <MapboxGL.Camera ref={camera} zoomLevel={11} />
       </MapboxGL.MapView>
