@@ -21,24 +21,46 @@ import {
 import { Scale } from '@tamagui/lucide-icons'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useReducer, useRef, useState } from 'react'
-import { useLink, useRouter } from 'solito/navigation'
+import { useLink, useParams, useRouter, useSearchParams } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
+import { selectedIcon } from 'packages/app/types/type'
 
 export function AddMarkerView() {
-  const [markerIcon, setMarkerIcon] = useState({
-    icon: '',
-    color: '$white0',
+  const userInfo = useContext(fileState)
+  const params = useParams<selectedIcon>()
+
+  const [markerInfo, setMarkerInfo] = useState({
+    name: '',
+    description: '',
   })
 
-  const userInfo = useContext(fileState)
+  const { name, description } = markerInfo
 
   const router = useRouter()
 
   const linkProps = useLink({
     href: `/marker`,
   })
+
+  const onNameChange = (text) => {
+    setMarkerInfo((prev) => ({
+      ...prev,
+      name: text,
+    }))
+  }
+  const onDescriptionChange = (text) => {
+    setMarkerInfo((prev) => ({
+      ...prev,
+      description: text,
+    }))
+  }
+
+  const handleChange = () => {
+    console.log(markerInfo)
+  }
   useEffect(() => {
     console.log(userInfo?.currentRoute)
+    console.log(params)
   }, [])
 
   return (
@@ -47,21 +69,21 @@ export function AddMarkerView() {
         <Button
           size="$7"
           circular
-          iconAfter={<TamaIcon iconName="AArrowUp" size="$6" />}
-          backgroundColor="$red10"
+          iconAfter={<TamaIcon iconName={params.icon} size="$6" />}
+          backgroundColor={params.color}
         />
         <YStack>
-          <H3>Marker1</H3>
+          <H3>{name || 'example'}</H3>
           <H6>Lorem ipsum</H6>
         </YStack>
       </XStack>
       <YStack gap="$4" p="$2" w="80%" m={20}>
         <H5>name</H5>
-        <Input value="hello" />
+        <Input onChangeText={onNameChange} value={name} />
       </YStack>
       <YStack gap="$4" p="$2" w="80%" ml={20}>
         <H5>description</H5>
-        <TextArea />
+        <TextArea onChange={onDescriptionChange} value={description} />
       </YStack>
       <YStack gap="$4" p="$2" w="80%" ml={20}>
         <H5>Picture</H5>
@@ -69,7 +91,11 @@ export function AddMarkerView() {
       </YStack>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-        <Button {...linkProps} icon={<TamaIcon iconName="PlusCircle" />}></Button>
+        <Button
+          {...linkProps}
+          icon={<TamaIcon iconName="PlusCircle" />}
+          onPress={handleChange}
+        ></Button>
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
         <Button icon={<TamaIcon iconName="Trash" />} onPress={() => router.back()}></Button>
       </XStack>

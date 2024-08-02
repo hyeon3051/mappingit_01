@@ -11,12 +11,13 @@ import {
   useEvent,
 } from '@my/ui'
 import { Scale } from '@tamagui/lucide-icons'
+import { selectedIcon } from 'packages/app/types/type'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useEffect, useRef, useState } from 'react'
-import { useLink, useRouter } from 'solito/navigation'
+import { useLink, useRouter, useParams, useUpdateSearchParams } from 'solito/navigation'
 
 export function SelectMarkerView() {
-  const [markerIcon, setMarkerIcon] = useState({
+  const [markerIcon, setMarkerIcon] = useState<selectedIcon>({
     icon: '',
     color: '$white0',
   })
@@ -24,11 +25,10 @@ export function SelectMarkerView() {
   const router = useRouter()
 
   const linkProps = useLink({
-    href: `/marker/addMarker`,
+    href: `/marker/addMarker/${markerIcon.color}/${markerIcon.icon}`,
   })
-  useEffect(() => {
-    console.log(markerIcon)
-  }, [markerIcon])
+
+  useEffect(() => {}, [markerIcon])
 
   return (
     <YStack f={1} ai="center" gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
@@ -58,7 +58,7 @@ export function SelectMarkerView() {
             'Pin',
             'TreePine',
             'ShoppingBag',
-          ].map((iconName, index) => (
+          ].map((iconName: string, index) => (
             <Button
               key={index}
               size="$7"
