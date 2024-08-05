@@ -4,7 +4,7 @@ import { Pos } from '../types/type'
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
 )
-const MapBoxComponent = ({ location }: { location: Pos }) => {
+const MapBoxComponent = ({ location, children }: { location: Pos; children: React.ReactNode }) => {
   const camera = useRef<Camera>(null) // Corrected here
   useEffect(() => {
     if (location && camera.current) {
@@ -18,6 +18,7 @@ const MapBoxComponent = ({ location }: { location: Pos }) => {
       <MapboxGL.MapView style={{ flex: 1, zIndex: 1 }}>
         <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
         <MapboxGL.Camera ref={camera} zoomLevel={11} />
+        {children}
       </MapboxGL.MapView>
     </>
   )

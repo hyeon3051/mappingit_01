@@ -20,8 +20,10 @@ import {
 } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
+import MapboxGL, { Camera } from '@rnmapbox/maps'
+import TamaIcon from 'packages/app/ui/Icon'
 
 export function MarkerView() {
   const router = useRouter()
@@ -43,7 +45,11 @@ export function MarkerView() {
 
   return (
     <>
-      <MapBoxComponent location={[[127.9321, 36.9735], 'hello']} />
+      <MapBoxComponent location={[[127.9321, 36.9735], 'hello']}>
+        <MapboxGL.PointAnnotation coordinate={[127.9321, 36.9735]} id="pt-ann">
+          <TamaIcon iconName="Piano" />
+        </MapboxGL.PointAnnotation>
+      </MapBoxComponent>
       <YStack
         f={1}
         ai="center"

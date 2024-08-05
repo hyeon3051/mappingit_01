@@ -17,24 +17,31 @@ import {
   H5,
   TextAreaFrame,
   Image,
+  useToastController,
 } from '@my/ui'
 import { Scale } from '@tamagui/lucide-icons'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useLink, useParams, useRouter, useSearchParams } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-import { selectedIcon } from 'packages/app/types/type'
+import { selectedIcon, Marker } from 'packages/app/types/type'
 
 export function AddMarkerView() {
-  const userInfo = useContext(fileState)
+  const toast = useToastController()
+  const fileInfo = useContext(fileState)
+  const dispatch = useContext(fileDispatch)
   const params = useParams<selectedIcon>()
 
-  const [markerInfo, setMarkerInfo] = useState({
-    name: '',
+  const [markerInfo, setMarkerInfo] = useState<Marker>({
+    id: (fileInfo?.markers.length || 0) + 1,
+    title: '',
     description: '',
+    markerColor: '',
+    markerIcon: '',
+    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1]?.[0],
   })
 
-  const { name, description } = markerInfo
+  const { title, description } = markerInfo
 
   const router = useRouter()
 
@@ -45,7 +52,7 @@ export function AddMarkerView() {
   const onNameChange = (text) => {
     setMarkerInfo((prev) => ({
       ...prev,
-      name: text,
+      title: text,
     }))
   }
   const onDescriptionChange = (text) => {
@@ -56,11 +63,19 @@ export function AddMarkerView() {
   }
 
   const handleChange = () => {
-    console.log(markerInfo)
+    dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
+    toast.show('Sheet closed!', {
+      message: 'Just showing how toast works...',
+    })
+    router.replace('/marker/marker')
   }
   useEffect(() => {
-    console.log(userInfo?.currentRoute)
-    console.log(params)
+    setMarkerInfo((prev) => ({
+      ...prev,
+      markerIcon: params.icon,
+      markerColor: params.color,
+    }))
+    console.log(fileInfo)
   }, [])
 
   return (
@@ -73,17 +88,17 @@ export function AddMarkerView() {
           backgroundColor={params.color}
         />
         <YStack>
-          <H3>{name || 'example'}</H3>
+          <H3>{title || 'example'}</H3>
           <H6>Lorem ipsum</H6>
         </YStack>
       </XStack>
       <YStack gap="$4" p="$2" w="80%" m={20}>
         <H5>name</H5>
-        <Input onChangeText={onNameChange} value={name} />
+        <Input onChangeText={onNameChange} value={title} />
       </YStack>
       <YStack gap="$4" p="$2" w="80%" ml={20}>
         <H5>description</H5>
-        <TextArea onChange={onDescriptionChange} value={description} />
+        <TextArea onChangeText={onDescriptionChange} value={description} />
       </YStack>
       <YStack gap="$4" p="$2" w="80%" ml={20}>
         <H5>Picture</H5>
@@ -91,11 +106,7 @@ export function AddMarkerView() {
       </YStack>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-        <Button
-          {...linkProps}
-          icon={<TamaIcon iconName="PlusCircle" />}
-          onPress={handleChange}
-        ></Button>
+        <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
         <Button icon={<TamaIcon iconName="Trash" />} onPress={() => router.back()}></Button>
       </XStack>

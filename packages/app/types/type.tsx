@@ -20,6 +20,7 @@ export type Marker = {
   title: string
   description: string
   markerIcon: string
+  markerColor: string
 }
 
 export interface LocateFile {
