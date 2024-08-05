@@ -54,7 +54,7 @@
       [
         "react-native-background-geolocation",
         {
-          "license": "b06de98fffb48d47eb18f9db23bc1df895a6bd9738c0eb1d3a1304e24e9008b5"
+          "license": ""
         }
       ],
       [
@@ -69,7 +69,7 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox",
-          "accessToken": "sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA"
+          "accessToken": ""
         }
       ]
     ],
