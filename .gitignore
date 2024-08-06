@@ -46,3 +46,5 @@ thumbs.db
 
 # turbo build log
 **/.turbo/*
+apps/expo/android/app/src/main/AndroidManifest.xml
+apps/expo/app.json
