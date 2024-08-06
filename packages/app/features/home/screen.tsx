@@ -14,12 +14,14 @@ import {
 } from '@my/ui'
 import { ChevronDown, ChevronUp, X } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'app/provider/MapBox'
+import MapboxGL, { Camera } from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { Pos } from 'app/types/type'
-import { useState, useReducer } from 'react'
+import { useState, useReducer, use, useContext } from 'react'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/navigation'
-import fileReducer from 'packages/app/contexts/mapData/fileReducer'
+import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import TamaIcon from 'packages/app/ui/Icon'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
@@ -31,10 +33,16 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   })
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
-
+  const markers = useContext(fileState)?.markers
   return (
     <>
-      <MapBoxComponent location={location} />
+      <MapBoxComponent location={location}>
+        {markers?.map(({ pos, markerIcon, markerColor, id }) => (
+          <MapboxGL.PointAnnotation key={id} coordinate={[pos[1], pos[0]]} id="pt-ann">
+            <TamaIcon iconName={markerIcon} color={markerColor} />
+          </MapboxGL.PointAnnotation>
+        ))}
+      </MapBoxComponent>
       <Button {...markerLinkProps}>marker</Button>
       <Button {...routeLinkProps}>route</Button>
     </>

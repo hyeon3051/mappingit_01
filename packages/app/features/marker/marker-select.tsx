@@ -64,8 +64,13 @@ export function SelectMarkerView() {
               size="$7"
               animation="medium"
               circular
-              backgroundColor={iconName === markerIcon.icon ? markerIcon.color : '$white0'}
-              icon={<TamaIcon iconName={iconName} size="$6" />}
+              icon={
+                <TamaIcon
+                  iconName={iconName}
+                  size="$6"
+                  color={iconName === markerIcon.icon ? markerIcon.color : ''}
+                />
+              }
               onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
             />
           ))}

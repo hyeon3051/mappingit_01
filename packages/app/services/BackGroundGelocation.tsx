@@ -25,9 +25,7 @@ const useBackgroundGeolocation = () => {
       }
     })
 
-    const onMotionChange: Subscription = BackgroundGeolocation.onMotionChange((event) => {
-      console.log(event)
-    })
+    const onMotionChange: Subscription = BackgroundGeolocation.onMotionChange((event) => {})
 
     const onActivityChange: Subscription = BackgroundGeolocation.onActivityChange((event) => {})
 
