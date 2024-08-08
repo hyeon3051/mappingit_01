@@ -30,16 +30,37 @@ export function AddMarkerView() {
   const toast = useToastController()
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
-  const params = useParams<selectedIcon>()
+  const params = useParams<{ icon: string; color: string; marker: number }>()
+
+  console.log(params)
+  const marker = parseInt(`${params.marker}` || '-1')
 
   const [markerInfo, setMarkerInfo] = useState<Marker>({
-    id: (fileInfo?.markers.length || 0) + 1,
+    id: fileInfo?.markers.length,
     title: '',
     description: '',
     markerColor: '',
     markerIcon: '',
     pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1]?.[0],
   })
+
+  useEffect(() => {
+    setMarkerInfo((prev) => ({
+      ...prev,
+      markerIcon: params.icon,
+      markerColor: params.color,
+    }))
+    if (!isNaN(params.marker)) {
+      const selectedMarker = fileInfo?.markers[marker]
+      console.log(selectedMarker)
+      setMarkerInfo((prev) => ({
+        ...prev,
+        id: selectedMarker.id,
+        title: selectedMarker.title,
+        description: selectedMarker.description,
+      }))
+    }
+  }, [params])
 
   const { title, description } = markerInfo
 
@@ -60,23 +81,33 @@ export function AddMarkerView() {
       ...prev,
       description: text,
     }))
+    console.log(markerInfo)
+  }
+
+  const handleRemove = () => {
+    if (isNaN(params.marker) || params.marker === '-1') return
+    dispatch({
+      type: 'REMOVE_MARKER',
+      payload: { markerId: marker },
+    })
+    router.replace('/marker/marker')
   }
 
   const handleChange = () => {
-    dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
+    console.log(params.marker)
+    if (isNaN(params.marker) && params.marker !== '-1') {
+      dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
+    } else {
+      dispatch({
+        type: 'EDIT_MARKER',
+        payload: { marker: markerInfo, markerId: parseInt(params.marker) },
+      })
+    }
     toast.show('Sheet closed!', {
       message: 'Just showing how toast works...',
     })
     router.replace('/marker/marker')
   }
-  useEffect(() => {
-    setMarkerInfo((prev) => ({
-      ...prev,
-      markerIcon: params.icon,
-      markerColor: params.color,
-    }))
-    console.log(fileInfo)
-  }, [])
 
   return (
     <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
@@ -108,7 +139,7 @@ export function AddMarkerView() {
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
         <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-        <Button icon={<TamaIcon iconName="Trash" />} onPress={() => router.back()}></Button>
+        <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
       </XStack>
     </YStack>
   )

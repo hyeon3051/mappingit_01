@@ -17,23 +17,33 @@ import {
   ChevronLeft,
   PlusCircle,
   Trash,
+  FileEdit,
   Piano,
   ChevronDown,
   ChevronUp,
 } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { Dimensions } from 'react-native'
+import { Marker } from 'packages/app/types/type'
 
 export function MarkerView() {
   const router = useRouter()
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
+  const [marker, setMarker] = useState<Marker>({
+    id: -1,
+    title: '',
+    description: '',
+    markerColor: '',
+    markerIcon: '',
+    pos: [127.9321, 36.9735],
+  })
 
   const fileInfo = useContext(fileState)
 
@@ -41,7 +51,12 @@ export function MarkerView() {
     href: `/marker/selectMarker`,
   })
 
-  function CardDemo() {
+  const editLinkProps = useLink({
+    href: `/marker/selectMarker/?marker=${marker.id}`,
+  })
+  useEffect(() => {}, [])
+
+  function CardDemo({ title, description }) {
     return (
       <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
         <Card.Header padded>
@@ -58,11 +73,8 @@ export function MarkerView() {
           <XStack gap="$3" ai="flex-start" jc="center" px="$4">
             <TamaIcon iconName="Piano" size="$3" />
             <YStack alignContent="center" w="80%">
-              <SizableText size="$8">Hello</SizableText>
-              <Paragraph size="$1">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet enim quia debitis
-                fuga sequi minima quod officia expedita nostrum qui eligendi
-              </Paragraph>
+              <SizableText size="$8">{title}</SizableText>
+              <Paragraph size="$1">{description}</Paragraph>
             </YStack>
           </XStack>
         </Stack>
@@ -77,9 +89,9 @@ export function MarkerView() {
 
   return (
     <>
-      <MapBoxComponent location={[[127.9321, 36.9735], 'hello']}>
-        <MapboxGL.PointAnnotation coordinate={[127.9321, 36.9735]} id="pt-ann">
-          <TamaIcon iconName="Piano" />
+      <MapBoxComponent location={[marker.pos || [127.9321, 36.9735], '']}>
+        <MapboxGL.PointAnnotation coordinate={marker.pos} key={marker.id} id="pt-ann">
+          <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} />
         </MapboxGL.PointAnnotation>
       </MapBoxComponent>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
@@ -107,15 +119,20 @@ export function MarkerView() {
       </Stack>
       <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
         <Carousel
-          loop
+          loop={false}
           width={224}
           height={300}
           vertical={true}
-          autoPlay={true}
-          data={[...new Array(6).keys()]}
-          scrollAnimationDuration={2000}
-          onSnapToItem={(index) => console.log('current index:', index)}
-          renderItem={CardDemo}
+          data={fileInfo?.markers}
+          scrollAnimationDuration={100}
+          onSnapToItem={(index) => {
+            console.log('current index:', index)
+            setMarker(fileInfo?.markers[index])
+          }}
+          renderItem={(data) => {
+            console.log('data', data)
+            return <CardDemo title={data.item.title} description={data.item.description} />
+          }}
         />
       </Stack>
       <XStack
@@ -132,7 +149,7 @@ export function MarkerView() {
       >
         <Button {...linkProps} icon={PlusCircle}></Button>
         <SheetDemo />
-        <Button icon={Trash} onPress={() => router.back()}></Button>
+        <Button {...editLinkProps} icon={FileEdit}></Button>
       </XStack>
     </>
   )
