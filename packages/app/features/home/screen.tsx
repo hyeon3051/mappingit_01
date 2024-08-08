@@ -38,7 +38,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
     <>
       <MapBoxComponent location={location}>
         {markers?.map(({ pos, markerIcon, markerColor, id }) => (
-          <MapboxGL.PointAnnotation key={id} coordinate={[pos[1], pos[0]]} id="pt-ann">
+          <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
         ))}

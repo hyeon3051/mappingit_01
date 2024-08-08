@@ -10,18 +10,18 @@ const MIN_DISTANCE = 0.0001
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
-  const [location, setLocation] = useState<Pos>([[36.97344, 127.93205], ''])
-  const locateLngLat = useRef<[number, number]>([36.97344, 127.93205])
+  const [location, setLocation] = useState<Pos>([[127.93205, 36.97344], ''])
+  const locateLngLat = useRef<[number, number]>([127.93205, 36.97344])
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
       let coords = loc.coords
       if (
-        Math.abs(locateLngLat.current[0] - coords.latitude) > MIN_DISTANCE ||
-        Math.abs(locateLngLat.current[1] - coords.longitude) > MIN_DISTANCE
+        Math.abs(locateLngLat.current[0] - coords.longitude) > MIN_DISTANCE ||
+        Math.abs(locateLngLat.current[1] - coords.latitude) > MIN_DISTANCE
       ) {
-        setLocation([[coords.latitude, coords.longitude], loc.timestamp])
-        locateLngLat.current = [coords.latitude, coords.longitude]
+        setLocation([[coords.longitude, coords.latitude], loc.timestamp])
+        locateLngLat.current = [coords.longitude, coords.latitude]
       }
     })
 
