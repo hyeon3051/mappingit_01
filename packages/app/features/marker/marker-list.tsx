@@ -12,6 +12,8 @@ import {
   Card,
   Image,
   H2,
+  ScrollView,
+  H1,
 } from '@my/ui'
 import {
   ChevronLeft,
@@ -24,7 +26,7 @@ import {
 } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { useContext, useEffect, useState } from 'react'
+import { Fragment, useContext, useEffect, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -37,13 +39,14 @@ export function MarkerView() {
   const router = useRouter()
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const [marker, setMarker] = useState<Marker>({
-    id: -1,
+    id: '',
     title: '',
     description: '',
     markerColor: '',
     markerIcon: '',
     pos: [127.9321, 36.9735],
   })
+  const [idx, setIdx] = useState(-1)
 
   const fileInfo = useContext(fileState)
 
@@ -52,18 +55,18 @@ export function MarkerView() {
   })
 
   const editLinkProps = useLink({
-    href: `/marker/selectMarker/?marker=${marker.id}`,
+    href: `/marker/selectMarker/?marker=${idx}`,
   })
-  useEffect(() => {}, [])
 
-  function CardDemo({ title, description }) {
+  function CardDemo({ title, description, markerIcon, markerColor }) {
     return (
       <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
         <Card.Header padded>
-          <Paragraph theme="alt2"></Paragraph>
+          <Paragraph></Paragraph>
         </Card.Header>
         <Stack
-          borderColor="$black075"
+          borderColor="$white075"
+          backgroundColor="$white075"
           borderWidth="$1"
           alignSelf="flex-start"
           py="$4"
@@ -71,7 +74,7 @@ export function MarkerView() {
           height="$20"
         >
           <XStack gap="$3" ai="flex-start" jc="center" px="$4">
-            <TamaIcon iconName="Piano" size="$3" />
+            <TamaIcon iconName={markerIcon} color={markerColor} size="$3" />
             <YStack alignContent="center" w="80%">
               <SizableText size="$8">{title}</SizableText>
               <Paragraph size="$1">{description}</Paragraph>
@@ -89,7 +92,7 @@ export function MarkerView() {
 
   return (
     <>
-      <MapBoxComponent location={[marker.pos || [127.9321, 36.9735], '']}>
+      <MapBoxComponent location={[marker.pos, '']}>
         <MapboxGL.PointAnnotation coordinate={marker.pos} key={marker.id} id="pt-ann">
           <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} />
         </MapboxGL.PointAnnotation>
@@ -127,11 +130,20 @@ export function MarkerView() {
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
             console.log('current index:', index)
-            setMarker(fileInfo?.markers[index])
+            setIdx(index)
+            if (fileInfo?.markers && fileInfo.markers[index]) {
+              setMarker(fileInfo.markers[index])
+            }
           }}
           renderItem={(data) => {
-            console.log('data', data)
-            return <CardDemo title={data.item.title} description={data.item.description} />
+            return (
+              <CardDemo
+                title={data.item.title}
+                description={data.item.description}
+                markerIcon={data.item.markerIcon}
+                markerColor={data.item.markerColor}
+              />
+            )
           }}
         />
       </Stack>
@@ -161,6 +173,8 @@ function SheetDemo() {
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
 
+  const fileInfo = useContext(fileState)
+
   return (
     <>
       <Button
@@ -181,22 +195,27 @@ function SheetDemo() {
       >
         <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
         <Sheet.Handle bg="$gray8" />
-        <Sheet.Frame ai="center" jc="center" gap="$10" bg="$color2">
-          <XStack gap="$2">
-            <Paragraph ta="center">Made by</Paragraph>
-            <Anchor col="$blue10" href="https://twitter.com/natebirdman" target="_blank">
-              @natebirdman,
-            </Anchor>
-            <Anchor
-              color="$purple10"
-              href="https://github.com/tamagui/tamagui"
-              target="_blank"
-              rel="noreferrer"
-            >
-              give it a ⭐️
-            </Anchor>
+        <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
+          <XStack gap="$4">
+            <Paragraph ta="center">
+              <H2>MarkerList</H2>
+            </Paragraph>
           </XStack>
-
+          {fileInfo?.markers.map((marker) => (
+            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <Button
+                size="$5"
+                circular
+                iconAfter={
+                  <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} size="$6" />
+                }
+              />
+              <YStack gap="$2" ml={20}>
+                <H2>{marker.title || 'example'}</H2>
+                <Paragraph>{marker.description}</Paragraph>
+              </YStack>
+            </XStack>
+          ))}
           <Button
             size="$6"
             circular

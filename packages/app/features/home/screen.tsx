@@ -17,7 +17,7 @@ import MapBoxComponent from 'app/provider/MapBox'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { Pos } from 'app/types/type'
-import { useState, useReducer, use, useContext } from 'react'
+import { useState, useReducer, use, useContext, useEffect } from 'react'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/navigation'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
@@ -33,11 +33,11 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   })
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
-  const markers = useContext(fileState)?.markers
+  const fileInfo = useContext(fileState)
   return (
     <>
       <MapBoxComponent location={location}>
-        {markers?.map(({ pos, markerIcon, markerColor, id }) => (
+        {fileInfo.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>

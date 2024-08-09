@@ -20,7 +20,7 @@ import { useLink, useRouter, useParams, useUpdateSearchParams } from 'solito/nav
 export function SelectMarkerView() {
   const [markerIcon, setMarkerIcon] = useState<selectedIcon>({
     icon: '',
-    color: '$white0',
+    color: '$black10',
   })
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
