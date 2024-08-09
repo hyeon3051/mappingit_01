@@ -15,7 +15,7 @@ export type Route = {
 // 위치 추적시 이름을 지정하고 움직임
 
 export type Marker = {
-  id: number
+  id: string
   pos: Position
   title: string
   description: string

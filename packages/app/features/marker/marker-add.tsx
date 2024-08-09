@@ -25,7 +25,8 @@ import { useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useLink, useParams, useRouter, useSearchParams } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { selectedIcon, Marker } from 'packages/app/types/type'
-
+import 'react-native-get-random-values'
+import { v4 as uuidv4 } from 'uuid'
 export function AddMarkerView() {
   const toast = useToastController()
   const fileInfo = useContext(fileState)
@@ -36,7 +37,7 @@ export function AddMarkerView() {
   const marker = parseInt(`${params.marker}` || '-1')
 
   const [markerInfo, setMarkerInfo] = useState<Marker>({
-    id: fileInfo?.markers.length,
+    id: uuidv4(),
     title: '',
     description: '',
     markerColor: '',
@@ -100,7 +101,7 @@ export function AddMarkerView() {
     } else {
       dispatch({
         type: 'EDIT_MARKER',
-        payload: { marker: markerInfo, markerId: parseInt(params.marker) },
+        payload: { marker: markerInfo, markerId: markerInfo.id },
       })
     }
     toast.show('Sheet closed!', {
