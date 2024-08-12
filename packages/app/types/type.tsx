@@ -7,7 +7,7 @@ export type selectedIcon = {
   icon: string
 }
 export type Route = {
-  id: number
+  id: string
   path: Pos[]
   title: string
 }
