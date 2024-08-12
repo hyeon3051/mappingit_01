@@ -134,7 +134,6 @@ export function AddMarkerView() {
       </YStack>
       <YStack gap="$4" p="$2" w="80%" ml={20}>
         <H5>Picture</H5>
-        <Image />
       </YStack>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>

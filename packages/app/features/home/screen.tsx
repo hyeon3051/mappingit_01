@@ -1,24 +1,10 @@
-import {
-  Anchor,
-  Button,
-  H1,
-  Paragraph,
-  Separator,
-  Sheet,
-  useToastController,
-  SwitchThemeButton,
-  SwitchRouterButton,
-  XStack,
-  YStack,
-  Switch,
-} from '@my/ui'
+import { Anchor, Button } from '@my/ui'
 import { ChevronDown, ChevronUp, X } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'app/provider/MapBox'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { Pos } from 'app/types/type'
 import { useState, useReducer, use, useContext, useEffect } from 'react'
-import { Platform } from 'react-native'
 import { useLink } from 'solito/navigation'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import TamaIcon from 'packages/app/ui/Icon'
