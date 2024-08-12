@@ -17,6 +17,7 @@ import {
 } from '@my/ui'
 import {
   ChevronLeft,
+  ChevronRight,
   PlusCircle,
   Trash,
   FileEdit,
@@ -26,7 +27,7 @@ import {
 } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { Fragment, useContext, useEffect, useState } from 'react'
+import { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -35,19 +36,41 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Dimensions } from 'react-native'
 import { Marker } from 'packages/app/types/type'
 
+function CardDemo({ title, description, markerIcon, markerColor }) {
+  return (
+    <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
+      <Card.Header padded>
+        <Paragraph></Paragraph>
+      </Card.Header>
+      <Stack
+        borderColor="$white075"
+        backgroundColor="$white075"
+        borderWidth="$1"
+        alignSelf="flex-start"
+        py="$4"
+        width="$15"
+        height="$20"
+      >
+        <XStack gap="$3" ai="flex-start" jc="center" px="$4">
+          <TamaIcon iconName={markerIcon} color={markerColor} size="$3" />
+          <YStack alignContent="center" w="80%">
+            <SizableText size="$8">{title}</SizableText>
+            <Paragraph size="$1">{description}</Paragraph>
+          </YStack>
+        </XStack>
+      </Stack>
+      <Card.Footer padded>
+        <XStack flex={1} />
+      </Card.Footer>
+    </Card>
+  )
+}
+
 export function MarkerView() {
   const router = useRouter()
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
-  const [marker, setMarker] = useState<Marker>({
-    id: '',
-    title: '',
-    description: '',
-    markerColor: '',
-    markerIcon: '',
-    pos: [127.9321, 36.9735],
-  })
+  const carouselRef = useRef(null)
   const [idx, setIdx] = useState(-1)
-
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -58,43 +81,25 @@ export function MarkerView() {
     href: `/marker/selectMarker/?marker=${idx}`,
   })
 
-  function CardDemo({ title, description, markerIcon, markerColor }) {
-    return (
-      <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
-        <Card.Header padded>
-          <Paragraph></Paragraph>
-        </Card.Header>
-        <Stack
-          borderColor="$white075"
-          backgroundColor="$white075"
-          borderWidth="$1"
-          alignSelf="flex-start"
-          py="$4"
-          width="$15"
-          height="$20"
-        >
-          <XStack gap="$3" ai="flex-start" jc="center" px="$4">
-            <TamaIcon iconName={markerIcon} color={markerColor} size="$3" />
-            <YStack alignContent="center" w="80%">
-              <SizableText size="$8">{title}</SizableText>
-              <Paragraph size="$1">{description}</Paragraph>
-            </YStack>
-          </XStack>
-        </Stack>
-        <Card.Footer padded>
-          <XStack flex={1} />
-        </Card.Footer>
-      </Card>
-    )
+  const onChageIdx = (index) => {
+    setIdx(index)
+    if (carouselRef.current) {
+      carouselRef.current.scrollTo({ index })
+    }
   }
-  const width = Dimensions.get('window').width
-  const height = Dimensions.get('window').height
 
   return (
     <>
-      <MapBoxComponent location={[marker.pos, '']}>
-        <MapboxGL.PointAnnotation coordinate={marker.pos} key={marker.id} id="pt-ann">
-          <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} />
+      <MapBoxComponent location={[fileInfo?.markers[idx]?.pos || [127.9321, 36.9735], '']}>
+        <MapboxGL.PointAnnotation
+          coordinate={fileInfo?.markers[idx]?.pos || [127.9321, 36.9735]}
+          key={fileInfo?.markers[idx]?.id || '1'}
+          id="pt-ann"
+        >
+          <TamaIcon
+            iconName={fileInfo?.markers[idx]?.markerIcon || 'PinOff'}
+            color={fileInfo?.markers[idx]?.markerColor || '$black10'}
+          />
         </MapboxGL.PointAnnotation>
       </MapBoxComponent>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
@@ -124,6 +129,7 @@ export function MarkerView() {
         <Carousel
           loop={false}
           width={224}
+          ref={carouselRef}
           height={300}
           vertical={true}
           data={fileInfo?.markers}
@@ -131,9 +137,6 @@ export function MarkerView() {
           onSnapToItem={(index) => {
             console.log('current index:', index)
             setIdx(index)
-            if (fileInfo?.markers && fileInfo.markers[index]) {
-              setMarker(fileInfo.markers[index])
-            }
           }}
           renderItem={(data) => {
             return (
@@ -160,14 +163,14 @@ export function MarkerView() {
         right={0}
       >
         <Button {...linkProps} icon={PlusCircle}></Button>
-        <SheetDemo />
+        <SheetDemo onChangeIdx={onChageIdx} />
         <Button {...editLinkProps} icon={FileEdit}></Button>
       </XStack>
     </>
   )
 }
 
-function SheetDemo() {
+function SheetDemo({ onChangeIdx }) {
   const toast = useToastController()
 
   const [open, setOpen] = useState(false)
@@ -201,21 +204,27 @@ function SheetDemo() {
               <H2>MarkerList</H2>
             </Paragraph>
           </XStack>
-          {fileInfo?.markers.map((marker) => (
-            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
-              <Button
-                size="$5"
-                circular
-                iconAfter={
-                  <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} size="$6" />
-                }
-              />
-              <YStack gap="$2" ml={20}>
-                <H2>{marker.title || 'example'}</H2>
-                <Paragraph>{marker.description}</Paragraph>
-              </YStack>
-            </XStack>
-          ))}
+          <ScrollView w="100%">
+            {fileInfo?.markers.map((marker, idx) => (
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+                <Button
+                  size="$5"
+                  circular
+                  onPress={() => {
+                    onChangeIdx(idx)
+                    setOpen(false)
+                  }}
+                  iconAfter={
+                    <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} size="$6" />
+                  }
+                />
+                <YStack gap="$2" ml={20}>
+                  <H2>{marker.title || 'example'}</H2>
+                  <Paragraph>{marker.description}</Paragraph>
+                </YStack>
+              </XStack>
+            ))}
+          </ScrollView>
           <Button
             size="$6"
             circular
