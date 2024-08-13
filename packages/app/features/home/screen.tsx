@@ -12,7 +12,7 @@ import TamaIcon from 'packages/app/ui/Icon'
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
   const markerLinkProps = useLink({
-    href: `/marker/marker`,
+    href: "/marker/marker"
   })
   const routeLinkProps = useLink({
     href: `/route/route`,
@@ -23,7 +23,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
 
   return (
     <>
-      <MapBoxComponent location={location} zoomLevel={15}>
+      <MapBoxComponent location={location}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
