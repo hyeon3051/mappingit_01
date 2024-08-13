@@ -74,7 +74,7 @@ export function RouteView() {
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
-    href: `/marker/selectMarker`,
+    href: `/route/addRoute`,
   })
 
   const editLinkProps = useLink({
