@@ -1,30 +1,9 @@
-import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
-  SizableText,
-  Separator,
-  Stack,
-  Square,
-  ButtonIcon,
-  useEvent,
-  Input,
-  TextArea,
-  H1,
-  H3,
-  H6,
-  H5,
-  TextAreaFrame,
-  Image,
-  useToastController,
-} from '@my/ui'
-import { Scale } from '@tamagui/lucide-icons'
+import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useContext, useEffect, useReducer, useRef, useState } from 'react'
-import { useLink, useParams, useRouter, useSearchParams } from 'solito/navigation'
+import { useContext, useEffect, useState } from 'react'
+import { useLink, useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-import { selectedIcon, Marker } from 'packages/app/types/type'
+import { Marker } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 export function AddMarkerView() {
@@ -33,7 +12,6 @@ export function AddMarkerView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
 
-  console.log(params)
   const marker = parseInt(`${params.marker}` || '-1')
 
   const [markerInfo, setMarkerInfo] = useState<Marker>({
@@ -46,19 +24,20 @@ export function AddMarkerView() {
   })
 
   useEffect(() => {
+    const { icon, color, marker } = params
     setMarkerInfo((prev) => ({
       ...prev,
-      markerIcon: params.icon,
-      markerColor: params.color,
+      markerIcon: icon,
+      markerColor: color,
     }))
-    if (!isNaN(params.marker)) {
+    if (marker !== -1 && fileInfo?.markers[marker]) {
       const selectedMarker = fileInfo?.markers[marker]
-      console.log(selectedMarker)
+      const { id, title, description } = selectedMarker
       setMarkerInfo((prev) => ({
         ...prev,
-        id: selectedMarker.id,
-        title: selectedMarker.title,
-        description: selectedMarker.description,
+        id: id,
+        title: title,
+        description: description,
       }))
     }
   }, [params])
@@ -66,10 +45,6 @@ export function AddMarkerView() {
   const { title, description } = markerInfo
 
   const router = useRouter()
-
-  const linkProps = useLink({
-    href: `/marker`,
-  })
 
   const onNameChange = (text) => {
     setMarkerInfo((prev) => ({
@@ -82,11 +57,10 @@ export function AddMarkerView() {
       ...prev,
       description: text,
     }))
-    console.log(markerInfo)
   }
 
   const handleRemove = () => {
-    if (isNaN(params.marker) || params.marker === '-1') return
+    if (marker === -1) return
     dispatch({
       type: 'REMOVE_MARKER',
       payload: { markerId: marker },
@@ -95,8 +69,7 @@ export function AddMarkerView() {
   }
 
   const handleChange = () => {
-    console.log(params.marker)
-    if (isNaN(params.marker) && params.marker !== '-1') {
+    if (marker !== -1) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
     } else {
       dispatch({

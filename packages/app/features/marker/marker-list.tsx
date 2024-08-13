@@ -8,33 +8,18 @@ import {
   Stack,
   useToastController,
   Sheet,
-  Anchor,
   Card,
-  Image,
   H2,
   ScrollView,
-  H1,
 } from '@my/ui'
-import {
-  ChevronLeft,
-  ChevronRight,
-  PlusCircle,
-  Trash,
-  FileEdit,
-  Piano,
-  ChevronDown,
-  ChevronUp,
-} from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { Fragment, useContext, useEffect, useRef, useState } from 'react'
-import { useLink, useRouter } from 'solito/navigation'
-import MapboxGL, { Camera } from '@rnmapbox/maps'
+import { useContext, useRef, useState } from 'react'
+import { useLink } from 'solito/navigation'
+import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
-import { Dimensions } from 'react-native'
-import { Marker } from 'packages/app/types/type'
 
 function CardDemo({ title, description, markerIcon, markerColor }) {
   return (
@@ -67,8 +52,6 @@ function CardDemo({ title, description, markerIcon, markerColor }) {
 }
 
 export function MarkerView() {
-  const router = useRouter()
-  const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(-1)
   const fileInfo = useContext(fileState)
@@ -87,18 +70,19 @@ export function MarkerView() {
       carouselRef.current.scrollTo({ index })
     }
   }
-
+  const markers = fileInfo?.markers || []
+  const selectedMarker = markers[idx] || { pos: [127.9321, 36.9735] }
   return (
     <>
-      <MapBoxComponent location={[fileInfo?.markers[idx]?.pos || [127.9321, 36.9735], '']}>
+      <MapBoxComponent location={[selectedMarker.pos, '']}>
         <MapboxGL.PointAnnotation
-          coordinate={fileInfo?.markers[idx]?.pos || [127.9321, 36.9735]}
-          key={fileInfo?.markers[idx]?.id || '1'}
+          coordinate={selectedMarker.pos}
+          key={selectedMarker.id || '1'}
           id="pt-ann"
         >
           <TamaIcon
-            iconName={fileInfo?.markers[idx]?.markerIcon || 'PinOff'}
-            color={fileInfo?.markers[idx]?.markerColor || '$black10'}
+            iconName={selectedMarker.markerIcon || 'PinOff'}
+            color={selectedMarker.markerColor || '$black10'}
           />
         </MapboxGL.PointAnnotation>
       </MapBoxComponent>
@@ -135,16 +119,16 @@ export function MarkerView() {
           data={fileInfo?.markers}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            console.log('current index:', index)
             setIdx(index)
           }}
           renderItem={(data) => {
+            const { title, description, markerIcon, markerColor } = data.item
             return (
               <CardDemo
-                title={data.item.title}
-                description={data.item.description}
-                markerIcon={data.item.markerIcon}
-                markerColor={data.item.markerColor}
+                title={title}
+                description={description}
+                markerIcon={markerIcon}
+                markerColor={markerColor}
               />
             )
           }}

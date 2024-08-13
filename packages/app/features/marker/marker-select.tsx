@@ -26,16 +26,15 @@ export function SelectMarkerView() {
   const dispatch = useContext(fileDispatch)
 
   const params = useParams()
-  console.log(params)
   const marker = parseInt(`${params.marker}` || '-1')
 
   useEffect(() => {
-    console.log(fileInfo)
-    console.log(fileInfo?.markers[marker])
-    if (params.marker !== '-1' && !isNaN(params.marker)) {
+    console.log(params)
+    if (marker !== -1 && fileInfo?.markers[marker]) {
+      const { markerIcon, markerColor } = fileInfo?.markers[marker]
       setMarkerIcon({
-        icon: fileInfo?.markers[marker].markerIcon,
-        color: fileInfo?.markers[marker].markerColor,
+        icon: markerIcon,
+        color: markerColor,
       })
     }
   }, [params])
@@ -47,7 +46,7 @@ export function SelectMarkerView() {
   })
 
   const handleRemove = () => {
-    if (isNaN(params.marker) || params.marker === '-1') return
+    if (marker !== -1) return
     dispatch({
       type: 'REMOVE_MARKER',
       payload: { markerId: marker },
@@ -75,7 +74,7 @@ export function SelectMarkerView() {
       </Stack>
       <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
         <Paragraph>마커</Paragraph>
-        <XStack gap="$2" jc="space-around" flexWrap="wrap">
+        <XStack gap="$4" jc="space-around" flexWrap="wrap">
           {[
             'PinOff',
             'Eraser',
