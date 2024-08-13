@@ -6,10 +6,13 @@ export type selectedIcon = {
   color: string
   icon: string
 }
-export type Route = {
+export type Route  = {
   id: string
   path: Pos[]
   title: string
+  description: string
+  lineWidth?: number
+  lineColor?: string
 }
 // TODO endTrackingDate는 isRecord가 false일때 채워짐 true 일때는 startDate
 // 위치 추적시 이름을 지정하고 움직임
