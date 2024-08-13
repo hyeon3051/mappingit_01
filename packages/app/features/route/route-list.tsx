@@ -99,23 +99,42 @@ export function RouteView() {
     return 10
   }
 
-  const startLocation = fileInfo?.routes[idx]?.path[0] || [[127.9321, 36.9735], '']
-  const endLocation = fileInfo?.routes[idx]?.path[fileInfo.routes[idx].path.length - 1] || [
-    [127.9321, 36.9735],
-    '',
-  ]
+  const startLocation = fileInfo?.routes[idx]?.path[0] || fileInfo?.currentRoute?.[0][0]
+  const endLocation =
+    fileInfo?.routes[idx]?.path[fileInfo.routes[idx].path.length - 1][0] ||
+    fileInfo?.currentRoute?.[fileInfo.currentRoute.length - 1][0]
   const zoomLevel = calculateZoomLevel(startLocation, endLocation)
   const routeId = fileInfo?.routes[idx]?.id || '1'
+  const routes = fileInfo?.routes || []
+
+  const lineString = {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates: fileInfo?.currentRoute?.map((pos) => pos[0]),
+    },
+  }
 
   return (
     <>
       <MapBoxComponent location={startLocation} zoomLevel={zoomLevel}>
-        <MapboxGL.PointAnnotation coordinate={startLocation[0]} key="start" id="pt-ann">
-          <TamaIcon iconName="mapPin" color="$black10" />
+        <MapboxGL.PointAnnotation coordinate={startLocation} key="start" id="pt-ann">
+          <TamaIcon iconName="MapPin" color="$black10" size="$2" z />
         </MapboxGL.PointAnnotation>
-        <MapboxGL.PointAnnotation coordinate={endLocation[0]} key="end" id="pt-ann">
-          <TamaIcon iconName="mapPinOff" color="$black10" />
+        <MapboxGL.PointAnnotation coordinate={endLocation} key="end" id="pt-ann">
+          <TamaIcon iconName="Pin" color="$black10" size="$2" />
         </MapboxGL.PointAnnotation>
+        <MapboxGL.ShapeSource id="line-source" shape={lineString}>
+          <MapboxGL.LineLayer
+            id="line"
+            sourceID="line"
+            style={{
+              lineColor: '#bfbfbf',
+              lineWidth: 3,
+            }}
+          />
+        </MapboxGL.ShapeSource>
       </MapBoxComponent>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
         <XStack
@@ -147,10 +166,22 @@ export function RouteView() {
           ref={carouselRef}
           height={300}
           vertical={true}
-          data={fileInfo?.markers}
+          data={[
+            {
+              title: 'title',
+              description: 'description',
+              markerIcon: 'MapPin',
+              markerColor: '$black10',
+            },
+            ...(routes.map((route) => ({
+              title: route.title,
+              description: '',
+              markerIcon: 'MapPin',
+              markerColor: '$black10',
+            })) || []),
+          ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            console.log('current index:', index)
             setIdx(index)
           }}
           renderItem={(data) => {
@@ -220,6 +251,17 @@ function SheetDemo({ onChangeIdx }) {
             </Paragraph>
           </XStack>
           <ScrollView w="100%">
+            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <Button
+                size="$5"
+                circular
+                iconAfter={<TamaIcon iconName="MapPin" color="$black10" size="$2" />}
+              />
+              <YStack gap="$2" ml={20}>
+                <H2>{'현재경로'}</H2>
+                <Paragraph>{'description'}</Paragraph>
+              </YStack>
+            </XStack>
             {fileInfo?.markers.map((marker, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                 <Button

@@ -20,14 +20,38 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const fileInfo = useContext(fileState)
+
   return (
     <>
-      <MapBoxComponent location={location}>
-        {fileInfo.markers?.map(({ pos, markerIcon, markerColor, id }) => (
+      <MapBoxComponent location={location} zoomLevel={15}>
+        {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
         ))}
+        {(fileInfo?.currentRoute.length || 0) > 1 && (
+          <MapboxGL.ShapeSource
+            id="line-source"
+            lineMetrics={true}
+            shape={{
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: fileInfo?.currentRoute.map((pos) => pos[0]),
+              },
+            }}
+          >
+            <MapboxGL.LineLayer
+              id="line"
+              sourceID="line"
+              style={{
+                lineColor: '#bfbfbf',
+                lineWidth: 3,
+              }}
+            />
+          </MapboxGL.ShapeSource>
+        )}
       </MapBoxComponent>
       <Button {...markerLinkProps}>marker</Button>
       <Button {...routeLinkProps}>route</Button>
