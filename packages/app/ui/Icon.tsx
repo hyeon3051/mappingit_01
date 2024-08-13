@@ -3,9 +3,9 @@ import * as Icons from '@tamagui/lucide-icons'
 
 const TamaIcon = ({
   iconName,
-  color = 'black',
+  color = '$black10',
   size = '$5',
-  backgroundColor = '',
+  backgroundColor = '$white0',
   borderRadius = '$0',
 }) => {
   const IconComponent = Icons[iconName]
