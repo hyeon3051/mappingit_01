@@ -8,33 +8,19 @@ import {
   Stack,
   useToastController,
   Sheet,
-  Anchor,
   Card,
-  Image,
   H2,
   ScrollView,
-  H1,
 } from '@my/ui'
-import {
-  ChevronLeft,
-  ChevronRight,
-  PlusCircle,
-  Trash,
-  FileEdit,
-  Piano,
-  ChevronDown,
-  ChevronUp,
-} from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
-import MapboxGL, { Camera } from '@rnmapbox/maps'
+import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
-import { Dimensions } from 'react-native'
-import { Route } from 'packages/app/types/type'
 
 function CardDemo({ title, description, markerIcon, markerColor }) {
   return (
@@ -99,33 +85,35 @@ export function RouteView() {
     return 10
   }
 
-  const startLocation = fileInfo?.routes[idx]?.path[0] || fileInfo?.currentRoute?.[0][0]
-  const endLocation =
-    fileInfo?.routes[idx]?.path[fileInfo.routes[idx].path.length - 1][0] ||
-    fileInfo?.currentRoute?.[fileInfo.currentRoute.length - 1][0]
-  const zoomLevel = calculateZoomLevel(startLocation, endLocation)
   const routeId = fileInfo?.routes[idx]?.id || '1'
   const routes = fileInfo?.routes || []
-
-  const lineString = {
-    type: 'Feature',
-    properties: {},
-    geometry: {
-      type: 'LineString',
-      coordinates: fileInfo?.currentRoute?.map((pos) => pos[0]),
-    },
-  }
+  const route = fileInfo?.currentRoute?.map((pos) => pos[0]) || []
 
   return (
     <>
-      <MapBoxComponent location={startLocation} zoomLevel={zoomLevel}>
-        <MapboxGL.PointAnnotation coordinate={startLocation} key="start" id="pt-ann">
-          <TamaIcon iconName="MapPin" color="$black10" size="$2" z />
-        </MapboxGL.PointAnnotation>
-        <MapboxGL.PointAnnotation coordinate={endLocation} key="end" id="pt-ann">
-          <TamaIcon iconName="Pin" color="$black10" size="$2" />
-        </MapboxGL.PointAnnotation>
-        <MapboxGL.ShapeSource id="line-source" shape={lineString}>
+      <MapBoxComponent location={[route[0], '']}>
+        {route && (
+          <>
+            <MapboxGL.PointAnnotation coordinate={route[0]} key="start" id="pt-ann">
+              <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+            </MapboxGL.PointAnnotation>
+            <MapboxGL.PointAnnotation coordinate={route[route.length - 1]} key="end" id="pt-ann">
+              <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+            </MapboxGL.PointAnnotation>
+          </>
+        )}
+
+        <MapboxGL.ShapeSource
+          id="line-source"
+          shape={{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: route,
+            },
+          }}
+        >
           <MapboxGL.LineLayer
             id="line"
             sourceID="line"
