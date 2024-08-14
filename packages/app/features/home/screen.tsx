@@ -1,10 +1,8 @@
-import { Anchor, Button } from '@my/ui'
-import { ChevronDown, ChevronUp, X } from '@tamagui/lucide-icons'
+import { Button } from '@my/ui'
 import MapBoxComponent from 'app/provider/MapBox'
-import MapboxGL, { Camera } from '@rnmapbox/maps'
+import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
-import { Pos } from 'app/types/type'
-import { useState, useReducer, use, useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { useLink } from 'solito/navigation'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -12,7 +10,7 @@ import TamaIcon from 'packages/app/ui/Icon'
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
   const markerLinkProps = useLink({
-    href: "/marker/marker"
+    href: '/marker/marker',
   })
   const routeLinkProps = useLink({
     href: `/route/route`,
@@ -20,6 +18,8 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const fileInfo = useContext(fileState)
+
+  console.log(fileInfo?.currentRoute.map((data) => data[0]))
 
   return (
     <>

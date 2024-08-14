@@ -1,7 +1,7 @@
 import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
-import { useLink, useParams, useRouter } from 'solito/navigation'
+import { useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { Marker } from 'packages/app/types/type'
 import 'react-native-get-random-values'

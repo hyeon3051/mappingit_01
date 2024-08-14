@@ -1,4 +1,3 @@
-import React from 'react'
 import * as Icons from '@tamagui/lucide-icons'
 
 const TamaIcon = ({

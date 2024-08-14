@@ -1,21 +1,9 @@
-import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
-  SizableText,
-  Separator,
-  Stack,
-  Square,
-  ButtonIcon,
-  useEvent,
-} from '@my/ui'
-import { Scale } from '@tamagui/lucide-icons'
+import { Button, Paragraph, XStack, YStack, Stack, Square } from '@my/ui'
 import { fileDispatch, fileState } from 'packages/app/contexts/mapData/fileReducer'
 import { selectedIcon } from 'packages/app/types/type'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useContext, useEffect, useRef, useState } from 'react'
-import { useLink, useRouter, useParams, useUpdateSearchParams } from 'solito/navigation'
+import { useContext, useEffect, useState } from 'react'
+import { useLink, useRouter, useParams } from 'solito/navigation'
 
 export function SelectMarkerView() {
   const [markerIcon, setMarkerIcon] = useState<selectedIcon>({
@@ -72,9 +60,9 @@ export function SelectMarkerView() {
           ))}
         </XStack>
       </Stack>
-      <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
+      <Stack p="$2" gap="$2" jc="flex-start" mt="$2" w="100%">
         <Paragraph>마커</Paragraph>
-        <XStack gap="$4" jc="space-around" flexWrap="wrap">
+        <XStack gap="$2" jc="space-around" flexWrap="wrap">
           {[
             'PinOff',
             'Eraser',

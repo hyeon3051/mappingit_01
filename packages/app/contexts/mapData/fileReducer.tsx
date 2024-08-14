@@ -1,4 +1,3 @@
-import { Position } from '@rnmapbox/maps/lib/typescript/src/types/Position'
 import { produce } from 'immer'
 import { Pos, Route, Marker, LocateFile } from 'packages/app/types/type'
 import React from 'react'
