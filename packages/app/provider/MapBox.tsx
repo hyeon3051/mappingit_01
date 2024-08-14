@@ -4,6 +4,7 @@ import { Pos } from '../types/type'
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
 )
+
 const MapBoxComponent = ({
   location,
   children,
@@ -25,8 +26,15 @@ const MapBoxComponent = ({
     <>
       <MapboxGL.MapView style={{ flex: 1, zIndex: 1 }}>
         <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
-        <MapboxGL.Camera ref={camera} zoomLevel={zoomLevel} />
-        {children}
+        <MapboxGL.Camera
+          ref={camera}
+          defaultSettings={{
+            centerCoordinate: location[0],
+            zoomLevel: zoomLevel,
+          }}
+          zoomLevel={zoomLevel}
+          centerCoordinate={location[0]}
+        />
       </MapboxGL.MapView>
     </>
   )
