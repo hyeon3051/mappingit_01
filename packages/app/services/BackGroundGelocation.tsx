@@ -4,21 +4,31 @@ import BackgroundGeolocation, {
   State,
   Subscription,
 } from 'react-native-background-geolocation'
-import { LocateFile, Pos } from '../types/type'
+import { Pos } from '../types/type'
 import { fileDispatch } from '../contexts/mapData/fileReducer'
-const MIN_DISTANCE = 0.0001
+const MIN_DISTANCE = 1e-14
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
-  const [location, setLocation] = useState<Pos>([[127.93205, 36.97344], ''])
-  const locateLngLat = useRef<[number, number]>([127.93205, 36.97344])
+  const [location, setLocation] = useState<Pos>([[0, 0], ''])
+  const locateLngLat = useRef<[number, number]>([0, 0])
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
       let coords = loc.coords
+      console.log('onLocation', coords)
+      console.log('onLocation', locateLngLat.current)
+      console.log(
+        Math.sqrt(
+          Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
+            Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
+        )
+      )
       if (
-        Math.abs(locateLngLat.current[0] - coords.longitude) > MIN_DISTANCE ||
-        Math.abs(locateLngLat.current[1] - coords.latitude) > MIN_DISTANCE
+        Math.sqrt(
+          Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
+            Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
+        ) > MIN_DISTANCE
       ) {
         setLocation([[coords.longitude, coords.latitude], loc.timestamp])
         locateLngLat.current = [coords.longitude, coords.latitude]
@@ -36,7 +46,7 @@ const useBackgroundGeolocation = () => {
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
         stopTimeout: 1,
         logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
-        distanceFilter: 10,
+        distanceFilter: 4,
         stopOnTerminate: true,
       },
       (state: State) => {
@@ -66,6 +76,7 @@ const useBackgroundGeolocation = () => {
   }, [enabled])
 
   useEffect(() => {
+    if (locateLngLat.current[0] === 0 && locateLngLat.current[1] === 0) return
     dispatch({ type: 'APPEND_POS', payload: { pos: location } })
   }, [location])
 
