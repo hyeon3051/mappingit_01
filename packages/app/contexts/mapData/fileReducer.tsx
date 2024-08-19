@@ -30,7 +30,7 @@ interface EditMarkerAction {
 
 interface AddRouteAction {
   type: typeof ADD_ROUTE
-  payload: { routeId: string }
+  payload: { route: Route }
 }
 
 interface RemoveRouteAction {
@@ -72,7 +72,7 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         )
         break
       case 'ADD_ROUTE':
-        draft.routes.push({ id: action.payload.routeId, path: draft.currentRoute, title: '' })
+        draft.routes.push(action.payload.route)
         draft.currentRoute = []
 
         break

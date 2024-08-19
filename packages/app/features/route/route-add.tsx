@@ -26,7 +26,7 @@ export function AddRouteView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ routeId: number }>()
 
-  const routeIdx = parseInt(`${params.routeId}` || '-1')
+  const routeIdx = params.routeId || -1
 
   const [routeInfo, setRouteInfo] = useState<Route>({
     id: uuidv4(),
@@ -72,7 +72,7 @@ export function AddRouteView() {
   }
 
   const onWidthChange = (value) => {
-    console.log()
+    console.log(routeInfo)
     setRouteInfo((prev) => ({
       ...prev,
       lineWidth: value[0],
@@ -89,18 +89,19 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
+    console.log(routeInfo, routeIdx, 'routeInfo, routeIdx')
     if (routeIdx !== -1 && routeId) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
       dispatch({
         type: 'ADD_ROUTE',
-        payload: { routeId: routeId },
+        payload: { route: routeInfo },
       })
     }
     toast.show('Sheet closed!', {
       message: 'Just showing how toast works...',
     })
-    router.replace('/marker/marker')
+    router.replace('/route/route')
   }
 
   return (
@@ -126,7 +127,7 @@ export function AddRouteView() {
         <YStack gap="$4" p="$2" w="80%" ml={20}>
           <H5>color</H5>
           <XStack gap="$2" jc="space-between">
-            {['$red10', '$blue10', '$purple10', '$green10'].map((color, index) => (
+            {['#FF0000', '#00FF00', '#0000FF', '#FF00FF'].map((color, index) => (
               <Square
                 key={index}
                 size="$6"
