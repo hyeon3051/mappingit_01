@@ -6,7 +6,7 @@ import BackgroundGeolocation, {
 } from 'react-native-background-geolocation'
 import { Pos } from '../types/type'
 import { fileDispatch } from '../contexts/mapData/fileReducer'
-const MIN_DISTANCE = 1e-14
+const MIN_DISTANCE = 1e-3
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)

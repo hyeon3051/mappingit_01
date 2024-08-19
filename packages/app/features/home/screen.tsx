@@ -20,7 +20,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const fileInfo = useContext(fileState)
 
   console.log(fileInfo?.currentRoute.map((data) => data[0]))
-
+  console.log((fileInfo?.currentRoute.length || 0) > 1)
   return (
     <>
       <MapBoxComponent location={location}>
@@ -46,8 +46,8 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
               id="line"
               sourceID="line"
               style={{
-                lineColor: '#bfbfbf',
-                lineWidth: 3,
+                lineColor: '#FF0000',
+                lineWidth: 10,
               }}
             />
           </MapboxGL.ShapeSource>
