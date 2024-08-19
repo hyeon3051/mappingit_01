@@ -22,7 +22,7 @@ import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 
-function CardDemo({ title, description, markerIcon, markerColor }) {
+function CardDemo({ title, description, routeIcon, routeColor }) {
   return (
     <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
       <Card.Header padded>
@@ -38,7 +38,7 @@ function CardDemo({ title, description, markerIcon, markerColor }) {
         height="$20"
       >
         <XStack gap="$3" ai="flex-start" jc="center" px="$4">
-          <TamaIcon iconName={markerIcon} color={markerColor} size="$3" />
+          <TamaIcon iconName={routeIcon} color={routeColor} size="$3" />
           <YStack alignContent="center" w="80%">
             <SizableText size="$8">{title}</SizableText>
             <Paragraph size="$1">{description}</Paragraph>
@@ -64,11 +64,11 @@ export function RouteView() {
   })
 
   const editLinkProps = useLink({
-    href: `/marker/selectMarker/?marker=${idx}`,
+    href: `/route/addRoute/?marker=${idx}`,
   })
 
   const onChageIdx = (index) => {
-    setIdx(index)
+    setIdx(index + 1) // 0 is current route
     if (carouselRef.current) {
       carouselRef.current.scrollTo({ index })
     }
@@ -88,6 +88,8 @@ export function RouteView() {
   const routeId = fileInfo?.routes[idx]?.id || '1'
   const routes = fileInfo?.routes || []
   const route = fileInfo?.currentRoute?.map((pos) => pos[0]) || []
+
+  console.log(routes, 'routes')
 
   return (
     <>
@@ -161,12 +163,12 @@ export function RouteView() {
               markerIcon: 'MapPin',
               markerColor: '$black10',
             },
-            ...(routes.map((route) => ({
+            ...routes.map((route) => ({
               title: route.title,
-              description: '',
+              description: route.title,
               markerIcon: 'MapPin',
               markerColor: '$black10',
-            })) || []),
+            })),
           ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
@@ -177,8 +179,8 @@ export function RouteView() {
               <CardDemo
                 title={data.item.title}
                 description={data.item.description}
-                markerIcon={data.item.markerIcon}
-                markerColor={data.item.markerColor}
+                markerIcon="MapPin"
+                markerColor="#black10"
               />
             )
           }}
@@ -244,28 +246,30 @@ function SheetDemo({ onChangeIdx }) {
                 size="$5"
                 circular
                 iconAfter={<TamaIcon iconName="MapPin" color="$black10" size="$2" />}
+                onPress={() => {
+                  onChangeIdx(0)
+                  setOpen(false)
+                }}
               />
               <YStack gap="$2" ml={20}>
                 <H2>{'현재경로'}</H2>
                 <Paragraph>{'description'}</Paragraph>
               </YStack>
             </XStack>
-            {fileInfo?.markers.map((marker, idx) => (
+            {fileInfo?.routes.map((route, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                 <Button
                   size="$5"
                   circular
                   onPress={() => {
-                    onChangeIdx(idx)
+                    onChangeIdx(idx + 1)
                     setOpen(false)
                   }}
-                  iconAfter={
-                    <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} size="$6" />
-                  }
+                  iconAfter={<TamaIcon iconName="mapPin" color="$black10" size="$6" />}
                 />
                 <YStack gap="$2" ml={20}>
-                  <H2>{marker.title || 'example'}</H2>
-                  <Paragraph>{marker.description}</Paragraph>
+                  <H2>{route.title || 'example'}</H2>
+                  <Paragraph>{route.description}</Paragraph>
                 </YStack>
               </XStack>
             ))}
