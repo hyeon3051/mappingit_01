@@ -6,7 +6,7 @@ import BackgroundGeolocation, {
 } from 'react-native-background-geolocation'
 import { Pos } from '../types/type'
 import { fileDispatch } from '../contexts/mapData/fileReducer'
-const MIN_DISTANCE = 1e-3
+const MIN_DISTANCE = 1e-9
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
@@ -16,22 +16,13 @@ const useBackgroundGeolocation = () => {
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
       let coords = loc.coords
-      console.log('onLocation', coords)
-      console.log('onLocation', locateLngLat.current)
-      console.log(
-        Math.sqrt(
-          Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
-            Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
-        )
-      )
-      if (
-        Math.sqrt(
-          Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
-            Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
-        ) > MIN_DISTANCE
-      ) {
+      try {
+        console.log('onLocation', coords)
+        console.log('onLocation', locateLngLat.current)
         setLocation([[coords.longitude, coords.latitude], loc.timestamp])
         locateLngLat.current = [coords.longitude, coords.latitude]
+      } catch (e) {
+        console.log('error', e)
       }
     })
 
@@ -44,9 +35,9 @@ const useBackgroundGeolocation = () => {
     BackgroundGeolocation.ready(
       {
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-        stopTimeout: 1,
+        stopTimeout: 5,
         logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
-        distanceFilter: 4,
+        distanceFilter: 2,
         stopOnTerminate: true,
       },
       (state: State) => {
