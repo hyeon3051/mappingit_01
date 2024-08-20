@@ -8,7 +8,7 @@ MapboxGL.setAccessToken(
 const MapBoxComponent = ({
   location,
   children,
-  zoomLevel = 10,
+  zoomLevel = 16,
 }: {
   location: Pos
   children: React.ReactNode
@@ -19,6 +19,8 @@ const MapBoxComponent = ({
     if (location && camera.current) {
       camera.current.setCamera({
         centerCoordinate: location[0],
+        zoomLevel: zoomLevel,
+        animationDuration: 500,
       })
     }
   }, [location])
@@ -28,12 +30,10 @@ const MapBoxComponent = ({
         <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
         <MapboxGL.Camera
           ref={camera}
-          defaultSettings={{
-            centerCoordinate: location[0],
-            zoomLevel: zoomLevel,
-          }}
           zoomLevel={zoomLevel}
           centerCoordinate={location[0]}
+          animationMode="easeTo"
+          animationDuration={1000}
         />
         {children}
       </MapboxGL.MapView>
