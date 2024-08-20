@@ -15,7 +15,7 @@ import {
 import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
-import { useContext, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -54,9 +54,9 @@ function CardDemo({ title, description, routeIcon, routeColor }) {
 
 export function RouteView() {
   const router = useRouter()
-  const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const carouselRef = useRef(null)
-  const [idx, setIdx] = useState(-1)
+  const [idx, setIdx] = useState(0)
+  const [route, setRoute] = useState([])
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -85,15 +85,23 @@ export function RouteView() {
     return 10
   }
 
-  const routeId = fileInfo?.routes[idx]?.id || '1'
   const routes = fileInfo?.routes || []
-  const route = fileInfo?.currentRoute?.map((pos) => pos[0]) || []
+  useEffect(() => {
+    let route =
+      idx !== 0
+        ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])
+        : fileInfo?.currentRoute?.map((pos) => pos[0])
+    setRoute(route)
+  }, [idx])
 
-  console.log(routes, 'routes')
+  console.log(route, 'routes')
 
   return (
     <>
-      <MapBoxComponent location={[route[0], '']}>
+      <MapBoxComponent
+        location={[route[0] ?? 0, '']}
+        zoomLevel={calculateZoomLevel(route[0], route[route.length - 1])}
+      >
         {route && (
           <>
             <MapboxGL.PointAnnotation coordinate={route[0]} key="start" id="pt-ann">
