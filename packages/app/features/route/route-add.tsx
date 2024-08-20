@@ -95,7 +95,7 @@ export function AddRouteView() {
     } else {
       dispatch({
         type: 'ADD_ROUTE',
-        payload: { route: routeInfo },
+        payload: { route: { ...routeInfo, path: fileInfo?.currentRoute } },
       })
     }
     toast.show('Sheet closed!', {
