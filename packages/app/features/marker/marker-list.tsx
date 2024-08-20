@@ -14,12 +14,13 @@ import {
 } from '@my/ui'
 import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
+import { Marker } from 'packages/app/types/type'
 
 function CardDemo({ title, description, markerIcon, markerColor }) {
   return (
@@ -54,6 +55,14 @@ function CardDemo({ title, description, markerIcon, markerColor }) {
 export function MarkerView() {
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(-1)
+  const [selectedMarker, setSelectedMarker] = useState<Marker>({
+    id: '',
+    title: '',
+    description: '',
+    pos: [127.9321, 36.9735],
+    markerIcon: 'PinOff',
+    markerColor: '$black10',
+  })
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -70,11 +79,14 @@ export function MarkerView() {
       carouselRef.current.scrollTo({ index })
     }
   }
-  const markers = fileInfo?.markers || []
-  const selectedMarker = markers[idx] || { pos: [127.9321, 36.9735] }
+  useEffect(() => {
+    const markers = fileInfo?.markers || []
+    const tempSelectedMarker = markers[idx] || { pos: [127.9321, 36.9735] }
+    setSelectedMarker(tempSelectedMarker)
+  }, [idx])
   return (
     <>
-      <MapBoxComponent location={[selectedMarker.pos, '']}>
+      <MapBoxComponent location={[selectedMarker.pos, '']} zoomLevel={20}>
         <MapboxGL.PointAnnotation
           coordinate={selectedMarker.pos}
           key={selectedMarker.id || '1'}
