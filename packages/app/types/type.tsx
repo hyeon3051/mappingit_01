@@ -28,12 +28,23 @@ export type Marker = {
 
 export interface LocateFile {
   title: string
+  description: string
   routes: Route[]
   markers: Marker[]
   isRecord: boolean
   currentRoute: Pos[]
 }
 
-export interface FileList {
-  curentFile: LocateFile
+export interface File {
+  id: string
+  title: string
+  description: string
+}
+
+export interface FileState {
+  id: string
+  title: string
+  description: string
+  routes: Route[]
+  markers: Marker[]
 }

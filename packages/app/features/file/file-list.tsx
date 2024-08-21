@@ -20,7 +20,7 @@ import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
-import { Marker } from 'packages/app/types/type'
+import { LocateFile, Marker, File, FileState } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 
 export function Header() {
@@ -76,7 +76,10 @@ function CardDemo({ title, description, markerIcon, markerColor }) {
 
 export function FileView() {
   const carouselRef = useRef(null)
+  const db = useSQLiteContext()
   const [idx, setIdx] = useState(-1)
+  const [fileList, setFileList] = useState<File[]>()
+  const [fileInfo, setFileInfo] = useState<FileState>()
   const [selectedMarker, setSelectedMarker] = useState<Marker>({
     id: '',
     title: '',
@@ -85,7 +88,7 @@ export function FileView() {
     markerIcon: 'PinOff',
     markerColor: '$black10',
   })
-  const fileInfo = useContext(fileState)
+  const currentFileInfo = useContext(fileState)
 
   const linkProps = useLink({
     href: `/marker/selectMarker`,
@@ -101,25 +104,72 @@ export function FileView() {
       carouselRef.current.scrollTo({ index })
     }
   }
+
   useEffect(() => {
-    const markers = fileInfo?.markers || []
-    const tempSelectedMarker = markers[idx] || { pos: [127.9321, 36.9735] }
-    setSelectedMarker(tempSelectedMarker)
+    async function setup() {
+      const result = await db.getFirstAsync<{ 'Files()': File[] }>('SELECT * from file')
+      if (result) {
+        setFileList(result['Files()'])
+      }
+    }
+    setup()
+    if (currentFileInfo) {
+      const { title, description, routes, markers } = currentFileInfo
+      const fileInfo = {
+        id: '1',
+        title: title,
+        description: description,
+        routes: routes,
+        markers: markers,
+      }
+      setFileInfo(fileInfo)
+    }
+  }, [])
+
+  useEffect(() => {
+    async function setupData() {
+      const result = await db.getFirstAsync<{ 'Files()': FileState }>(
+        'SELECT * from where id = ? inner join markers on parent.id = ? inner join routes on parent.id = ?',
+        [idx, idx, idx]
+      )
+      if (result) {
+        setFileInfo(result['Files()'])
+      }
+    }
+    setupData()
   }, [idx])
   return (
     <>
-      <Header />
       <MapBoxComponent location={[selectedMarker.pos, '']} zoomLevel={20}>
-        <MapboxGL.PointAnnotation
-          coordinate={selectedMarker.pos}
-          key={selectedMarker.id || '1'}
-          id="pt-ann"
-        >
-          <TamaIcon
-            iconName={selectedMarker.markerIcon || 'PinOff'}
-            color={selectedMarker.markerColor || '$black10'}
-          />
-        </MapboxGL.PointAnnotation>
+        {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
+          <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
+            <TamaIcon iconName={markerIcon} color={markerColor} />
+          </MapboxGL.PointAnnotation>
+        ))}
+        {fileInfo?.routes?.map(({ path, lineColor, lineWidth }, idx) => (
+          <MapboxGL.ShapeSource
+            key={String(idx)}
+            id={'line' + String(idx)}
+            lineMetrics={true}
+            shape={{
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: path.map((pos) => pos[0]),
+              },
+            }}
+          >
+            <MapboxGL.LineLayer
+              id={'line' + idx}
+              sourceID={'line' + idx}
+              style={{
+                lineColor: lineColor || '#FFFFFF',
+                lineWidth: lineWidth || 3,
+              }}
+            />
+          </MapboxGL.ShapeSource>
+        ))}
       </MapBoxComponent>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
         <XStack
@@ -151,7 +201,20 @@ export function FileView() {
           ref={carouselRef}
           height={300}
           vertical={true}
-          data={fileInfo?.markers}
+          data={[
+            {
+              title: 'title',
+              description: 'description',
+              markerIcon: 'MapPin',
+              markerColor: '$black10',
+            },
+            ...(fileList?.map(({ title, description }) => ({
+              title,
+              description,
+              markerIcon: 'MapPin',
+              markerColor: '$black10',
+            })) || []),
+          ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
             setIdx(index)
@@ -189,13 +252,11 @@ export function FileView() {
   )
 }
 
-function SheetDemo({ onChangeIdx }) {
+function SheetDemo({ onChangeIdx, fileList }) {
   const toast = useToastController()
 
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
-
-  const fileInfo = useContext(fileState)
 
   return (
     <>
@@ -224,13 +285,13 @@ function SheetDemo({ onChangeIdx }) {
             </Paragraph>
           </XStack>
           <ScrollView w="100%">
-            {fileInfo?.markers.map((marker, idx) => (
+            {fileList.map((marker, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                 <Button
                   size="$5"
                   circular
                   onPress={() => {
-                    onChangeIdx(idx)
+                    onChangeIdx(idx + 1)
                     setOpen(false)
                   }}
                   iconAfter={
