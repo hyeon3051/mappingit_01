@@ -15,12 +15,16 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const routeLinkProps = useLink({
     href: `/route/route`,
   })
+  const fileLinkProps = useLink({
+    href: '/file/file',
+  })
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const fileInfo = useContext(fileState)
 
   console.log(fileInfo?.currentRoute.map((data) => data[0]))
   console.log((fileInfo?.currentRoute.length || 0) > 1)
+  console.log(fileInfo?.routes.length)
   return (
     <>
       <MapBoxComponent location={location}>
@@ -52,9 +56,34 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
             />
           </MapboxGL.ShapeSource>
         )}
+        {fileInfo?.routes?.map(({ path, id, lineColor, lineWidth }, idx) => (
+          <MapboxGL.ShapeSource
+            key={idx}
+            id={'line' + idx}
+            lineMetrics={true}
+            shape={{
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: path.map((pos) => pos[0]),
+              },
+            }}
+          >
+            <MapboxGL.LineLayer
+              id={'line' + idx}
+              sourceID={'line' + idx}
+              style={{
+                lineColor: lineColor || '#FFFFFF',
+                lineWidth: lineWidth || 3,
+              }}
+            />
+          </MapboxGL.ShapeSource>
+        ))}
       </MapBoxComponent>
       <Button {...markerLinkProps}>marker</Button>
       <Button {...routeLinkProps}>route</Button>
+      <Button {...fileLinkProps}>file</Button>
     </>
   )
 }
