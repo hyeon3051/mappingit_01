@@ -14,7 +14,6 @@ import {
 } from '@my/ui'
 import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
@@ -64,11 +63,11 @@ export function RouteView() {
   })
 
   const editLinkProps = useLink({
-    href: `/route/addRoute/?marker=${idx}`,
+    href: `/route/addRoute/?routeId=${idx}`,
   })
 
   const onChageIdx = (index) => {
-    setIdx(index + 1) // 0 is current route
+    setIdx(index) // 0 is current route
     if (carouselRef.current) {
       carouselRef.current.scrollTo({ index })
     }
@@ -92,6 +91,7 @@ export function RouteView() {
         ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])
         : fileInfo?.currentRoute?.map((pos) => pos[0])
     setRoute(route)
+    console.log(idx)
   }, [idx])
 
   console.log(route, 'routes')
@@ -128,8 +128,8 @@ export function RouteView() {
             id="line"
             sourceID="line"
             style={{
-              lineColor: '#bfbfbf',
-              lineWidth: 3,
+              lineColor: fileInfo?.routes[idx - 1]?.lineColor || '#000',
+              lineWidth: fileInfo?.routes[idx - 1]?.lineWidth || 3,
             }}
           />
         </MapboxGL.ShapeSource>

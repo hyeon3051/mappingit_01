@@ -41,15 +41,18 @@ export function AddRouteView() {
     setRouteInfo((prev) => ({
       ...prev,
     }))
-    if (routeIdx !== -1 && fileInfo?.routes[routeIdx]) {
-      const selectedRoute = fileInfo?.routes[routeIdx]
-      const { id, title, description, path } = selectedRoute
+    if (routeIdx !== -1 && fileInfo?.routes[routeIdx - 1]) {
+      const selectedRoute = fileInfo?.routes[routeIdx - 1]
+      console.log(selectedRoute, 'selectedRoute')
+      const { id, title, description, lineColor, lineWidth, path } = selectedRoute
       setRouteInfo((prev) => ({
         ...prev,
         id: id,
         title: title,
         description: description,
         path: path,
+        lineColor: lineColor,
+        lineWidth: lineWidth,
       }))
     }
   }, [params])
@@ -85,7 +88,7 @@ export function AddRouteView() {
       type: 'REMOVE_ROUTE',
       payload: { routeId: routeId },
     })
-    router.replace('/marker/marker')
+    router.replace('/route/route')
   }
 
   const handleChange = () => {
