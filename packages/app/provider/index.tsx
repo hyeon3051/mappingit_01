@@ -4,6 +4,7 @@ import { ToastViewport } from './ToastViewport'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import fileReducer from 'packages/app/contexts/mapData/fileReducer'
 import { useReducer } from 'react'
+import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite'
 
 const initalData = {
   title: '',
@@ -33,9 +34,14 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
           ]
         }
       >
-        <fileState.Provider value={state}>
-          <fileDispatch.Provider value={dispatch}>{children}</fileDispatch.Provider>
-        </fileState.Provider>
+        <SQLiteProvider
+          databaseName="mappingit.db"
+          assetSource={{ assetId: require('../mappingit.db') }}
+        >
+          <fileState.Provider value={state}>
+            <fileDispatch.Provider value={dispatch}>{children}</fileDispatch.Provider>
+          </fileState.Provider>
+        </SQLiteProvider>
         <CustomToast />
         <ToastViewport />
       </ToastProvider>

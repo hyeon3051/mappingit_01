@@ -6,7 +6,7 @@ export type selectedIcon = {
   color: string
   icon: string
 }
-export type Route  = {
+export type Route = {
   id: string
   path: Pos[]
   title: string
@@ -32,4 +32,8 @@ export interface LocateFile {
   markers: Marker[]
   isRecord: boolean
   currentRoute: Pos[]
+}
+
+export interface FileList {
+  curentFile: LocateFile
 }
