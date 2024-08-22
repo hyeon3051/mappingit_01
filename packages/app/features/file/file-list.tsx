@@ -77,17 +77,9 @@ function CardDemo({ title, description, markerIcon, markerColor }) {
 export function FileView() {
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
-  const [idx, setIdx] = useState(-1)
+  const [idx, setIdx] = useState(0)
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState>()
-  const [selectedMarker, setSelectedMarker] = useState<Marker>({
-    id: '',
-    title: '',
-    description: '',
-    pos: [127.9321, 36.9735],
-    markerIcon: 'PinOff',
-    markerColor: '$black10',
-  })
   const currentFileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -107,9 +99,10 @@ export function FileView() {
 
   useEffect(() => {
     async function setup() {
-      const result = await db.getFirstAsync<{ 'Files()': File[] }>('SELECT * from file')
+      const result = await db.getAllAsync('SELECT * from file')
+      console.log(result)
       if (result) {
-        setFileList(result['Files()'])
+        setFileList(result)
       }
     }
     setup()
@@ -128,19 +121,37 @@ export function FileView() {
 
   useEffect(() => {
     async function setupData() {
-      const result = await db.getFirstAsync<{ 'Files()': FileState }>(
-        'SELECT * from where id = ? inner join markers on parent.id = ? inner join routes on parent.id = ?',
-        [idx, idx, idx]
-      )
+      let { id, title, description } = fileList[idx - 1]
+      const result = await db.getFirstAsync('SELECT * from file where id = ?', [id])
+      const markers = await db.getAllAsync('SELECT * from marker where parent = ?', [id])
+      const routes = await db.getAllAsync('SELECT * from route where parent = ?', [id])
+      console.log(result, markers, routes)
       if (result) {
-        setFileInfo(result['Files()'])
+        setFileInfo({
+          id: id,
+          title: title,
+          description: description,
+          markers: markers.map((marker) => ({
+            ...marker,
+            pos: JSON.parse(marker.pos),
+          })),
+          routes: routes.map((route) => ({
+            ...route,
+            path: JSON.parse(route.path),
+          })),
+        })
       }
     }
-    setupData()
+    console.log(idx, fileList)
+    if (idx !== 0) {
+      setupData()
+    } else {
+      setFileInfo(currentFileInfo)
+    }
   }, [idx])
   return (
     <>
-      <MapBoxComponent location={[selectedMarker.pos, '']} zoomLevel={20}>
+      <MapBoxComponent location={[[0, 0], '']} zoomLevel={2}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
@@ -208,9 +219,9 @@ export function FileView() {
               markerIcon: 'MapPin',
               markerColor: '$black10',
             },
-            ...(fileList?.map(({ title, description }) => ({
-              title,
-              description,
+            ...(fileList?.map((file) => ({
+              title: file['title'],
+              description: file['description'],
               markerIcon: 'MapPin',
               markerColor: '$black10',
             })) || []),
@@ -245,7 +256,7 @@ export function FileView() {
         right={0}
       >
         <Button {...linkProps} icon={PlusCircle}></Button>
-        <SheetDemo onChangeIdx={onChageIdx} />
+        <SheetDemo onChangeIdx={onChageIdx} fileList={fileList} />
         <Button {...editLinkProps} icon={FileEdit}></Button>
       </XStack>
     </>
@@ -285,7 +296,22 @@ function SheetDemo({ onChangeIdx, fileList }) {
             </Paragraph>
           </XStack>
           <ScrollView w="100%">
-            {fileList.map((marker, idx) => (
+            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <Button
+                size="$5"
+                circular
+                iconAfter={<TamaIcon iconName="MapPin" color="$black10" size="$2" />}
+                onPress={() => {
+                  onChangeIdx(0)
+                  setOpen(false)
+                }}
+              />
+              <YStack gap="$2" ml={20}>
+                <H2>{'현재경로'}</H2>
+                <Paragraph>{'description'}</Paragraph>
+              </YStack>
+            </XStack>
+            {fileList?.map((file, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                 <Button
                   size="$5"
@@ -294,13 +320,11 @@ function SheetDemo({ onChangeIdx, fileList }) {
                     onChangeIdx(idx + 1)
                     setOpen(false)
                   }}
-                  iconAfter={
-                    <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} size="$6" />
-                  }
+                  iconAfter={<TamaIcon iconName="AArrowUp" color="$black10" size="$6" />}
                 />
                 <YStack gap="$2" ml={20}>
-                  <H2>{marker.title || 'example'}</H2>
-                  <Paragraph>{marker.description}</Paragraph>
+                  <H2>{file['title'] || 'example'}</H2>
+                  <Paragraph>{file['description']}</Paragraph>
                 </YStack>
               </XStack>
             ))}
