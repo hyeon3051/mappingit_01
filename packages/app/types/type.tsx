@@ -13,6 +13,7 @@ export type Route = {
   description: string
   lineWidth?: number
   lineColor?: string
+  parent?: number
 }
 // TODO endTrackingDate는 isRecord가 false일때 채워짐 true 일때는 startDate
 // 위치 추적시 이름을 지정하고 움직임
@@ -24,6 +25,7 @@ export type Marker = {
   description: string
   markerIcon: string
   markerColor: string
+  parent?: number
 }
 
 export interface LocateFile {
@@ -36,9 +38,10 @@ export interface LocateFile {
 }
 
 export interface File {
-  id: string
+  id: number
   title: string
   description: string
+  isSelected?: boolean
 }
 
 export interface FileState {

@@ -20,7 +20,7 @@ import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
-import { LocateFile, Marker, File, FileState } from 'packages/app/types/type'
+import { LocateFile, Marker, File, FileState, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 
 export function Header() {
@@ -122,8 +122,8 @@ export function FileView() {
     async function setupData() {
       let { id, title, description } = fileList[idx - 1]
       const result = await db.getFirstAsync('SELECT * from file where id = ?', [id])
-      const markers = await db.getAllAsync('SELECT * from marker where parent = ?', [id])
-      const routes = await db.getAllAsync('SELECT * from route where parent = ?', [id])
+      const markers: Marker[] = await db.getAllAsync('SELECT * from marker where parent = ?', [id])
+      const routes: Route[] = await db.getAllAsync('SELECT * from route where parent = ?', [id])
       if (result) {
         setFileInfo({
           id: id,
