@@ -91,10 +91,7 @@ export function RouteView() {
         ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])
         : fileInfo?.currentRoute?.map((pos) => pos[0])
     setRoute(route)
-    console.log(idx)
   }, [idx])
-
-  console.log(route, 'routes')
 
   return (
     <>

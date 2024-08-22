@@ -100,7 +100,6 @@ export function FileView() {
   useEffect(() => {
     async function setup() {
       const result = await db.getAllAsync('SELECT * from file')
-      console.log(result)
       if (result) {
         setFileList(result)
       }
@@ -125,7 +124,6 @@ export function FileView() {
       const result = await db.getFirstAsync('SELECT * from file where id = ?', [id])
       const markers = await db.getAllAsync('SELECT * from marker where parent = ?', [id])
       const routes = await db.getAllAsync('SELECT * from route where parent = ?', [id])
-      console.log(result, markers, routes)
       if (result) {
         setFileInfo({
           id: id,
@@ -142,7 +140,6 @@ export function FileView() {
         })
       }
     }
-    console.log(idx, fileList)
     if (idx !== 0) {
       setupData()
     } else {

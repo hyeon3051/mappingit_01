@@ -1,4 +1,4 @@
-import { Button } from '@my/ui'
+import { Button, XStack } from '@my/ui'
 import MapBoxComponent from 'app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
@@ -21,10 +21,6 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
 
   const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const fileInfo = useContext(fileState)
-
-  console.log(fileInfo?.currentRoute.map((data) => data[0]))
-  console.log((fileInfo?.currentRoute.length || 0) > 1)
-  console.log(fileInfo?.routes.length)
   return (
     <>
       <MapBoxComponent location={location}>
@@ -81,9 +77,20 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
           </MapboxGL.ShapeSource>
         ))}
       </MapBoxComponent>
-      <Button {...markerLinkProps}>marker</Button>
-      <Button {...routeLinkProps}>route</Button>
-      <Button {...fileLinkProps}>file</Button>
+      <XStack jc="space-around" ai="center">
+        <Button {...markerLinkProps} icon={<TamaIcon iconName="MapPin" color="black" />}>
+          마커
+        </Button>
+        <Button {...routeLinkProps} icon={<TamaIcon iconName="Route" color="black" />}>
+          루트
+        </Button>
+        <Button {...fileLinkProps} icon={<TamaIcon iconName="File" color="black" />}>
+          파일
+        </Button>
+        <Button {...fileLinkProps} icon={<TamaIcon iconName="Cog" color="black" />}>
+          설정
+        </Button>
+      </XStack>
     </>
   )
 }

@@ -17,7 +17,6 @@ export function SelectMarkerView() {
   const marker = parseInt(`${params.marker}` || '-1')
 
   useEffect(() => {
-    console.log(params)
     if (marker !== -1 && fileInfo?.markers[marker]) {
       const { markerIcon, markerColor } = fileInfo?.markers[marker]
       setMarkerIcon({

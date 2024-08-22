@@ -43,7 +43,6 @@ export function AddRouteView() {
     }))
     if (routeIdx !== -1 && fileInfo?.routes[routeIdx - 1]) {
       const selectedRoute = fileInfo?.routes[routeIdx - 1]
-      console.log(selectedRoute, 'selectedRoute')
       const { id, title, description, lineColor, lineWidth, path } = selectedRoute
       setRouteInfo((prev) => ({
         ...prev,
@@ -75,7 +74,6 @@ export function AddRouteView() {
   }
 
   const onWidthChange = (value) => {
-    console.log(routeInfo)
     setRouteInfo((prev) => ({
       ...prev,
       lineWidth: value[0],
@@ -92,7 +90,6 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
-    console.log(routeInfo, routeIdx, 'routeInfo, routeIdx')
     if (routeIdx !== -1 && routeId) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
