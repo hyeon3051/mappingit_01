@@ -28,7 +28,9 @@ export function Header() {
   const [version, setVersion] = useState('')
   useEffect(() => {
     async function setup() {
-      const result = await db.getFirstAsync<{ 'sqlite_version()': string }>('  sqlite_version()')
+      const result = await db.getFirstAsync<{ 'sqlite_version()': string }>(
+        'SELECT sqlite_version()'
+      )
       if (result) {
         setVersion(result['sqlite_version()'])
       }
@@ -42,39 +44,7 @@ export function Header() {
   )
 }
 
-function CardDemo({ title, description, markerIcon, markerColor }) {
-  return (
-    <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
-      <Card.Header padded>
-        <Paragraph></Paragraph>
-      </Card.Header>
-      <Stack
-        borderColor="$white075"
-        backgroundColor="$white075"
-        borderWidth="$1"
-        alignSelf="flex-start"
-        py="$4"
-        width="$15"
-        height="$20"
-      >
-        <XStack gap="$3" ai="flex-start" jc="center" px="$4">
-          <TamaIcon iconName={markerIcon} color={markerColor} size="$3" />
-          <YStack alignContent="center" w="80%">
-            <SizableText size="$8">{title}</SizableText>
-            <Paragraph size="$1">{description}</Paragraph>
-          </YStack>
-        </XStack>
-      </Stack>
-      <Card.Footer>
-        <XStack flex={1} m="$2" jc="flex-end">
-          <Button size="$3" icon={<TamaIcon iconName="Check" size="$2" />} px="$4" />
-        </XStack>
-      </Card.Footer>
-    </Card>
-  )
-}
-
-export function FileView() {
+export function SelectFileView() {
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
@@ -179,67 +149,6 @@ export function FileView() {
           </MapboxGL.ShapeSource>
         ))}
       </MapBoxComponent>
-      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
-        <XStack
-          backgroundColor="$blue10"
-          f={2}
-          w="80%"
-          jc="space-around"
-          p="$2"
-          m="$2"
-          borderRadius="$10"
-        >
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            정보
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            마커
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            사진
-          </SizableText>
-        </XStack>
-      </Stack>
-      <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
-        <Carousel
-          loop={false}
-          width={224}
-          ref={carouselRef}
-          height={300}
-          vertical={true}
-          data={[
-            {
-              title: 'title',
-              description: 'description',
-              markerIcon: 'MapPin',
-              markerColor: '$black10',
-            },
-            ...(fileList?.map((file) => ({
-              title: file['title'],
-              description: file['description'],
-              markerIcon: 'MapPin',
-              markerColor: '$black10',
-            })) || []),
-          ]}
-          scrollAnimationDuration={100}
-          onSnapToItem={(index) => {
-            setIdx(index)
-          }}
-          renderItem={(data) => {
-            const { title, description, markerIcon, markerColor } = data.item
-            return (
-              <CardDemo
-                title={title}
-                description={description}
-                markerIcon={markerIcon}
-                markerColor={markerColor}
-              />
-            )
-          }}
-        />
-      </Stack>
       <XStack
         f={2}
         jc="space-between"
@@ -279,7 +188,7 @@ function SheetDemo({ onChangeIdx, fileList }) {
         animation="medium"
         open={open}
         onOpenChange={setOpen}
-        snapPoints={[80]}
+        snapPoints={[60]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
@@ -290,7 +199,7 @@ function SheetDemo({ onChangeIdx, fileList }) {
               <H2>MarkerList</H2>
             </Paragraph>
           </XStack>
-          <ScrollView w="100%">
+          <ScrollView w="100%" h="90%">
             <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
               <Button
                 size="$5"
@@ -325,7 +234,7 @@ function SheetDemo({ onChangeIdx, fileList }) {
             ))}
           </ScrollView>
           <Button
-            size="$6"
+            size="$3"
             circular
             icon={ChevronDown}
             onPress={() => {

@@ -1,4 +1,4 @@
-import { FileView } from 'app/features/file/file-list'
+import { SelectFileView } from 'app/features/file/file-select'
 import { Stack } from 'expo-router'
 import { useTheme } from '@my/ui'
 
@@ -16,7 +16,7 @@ export default function Screen() {
           gestureDirection: 'horizontal',
         }}
       />
-      <FileView />
+      <SelectFileView />
     </>
   )
 }
