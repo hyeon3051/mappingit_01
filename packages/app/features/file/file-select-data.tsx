@@ -23,7 +23,7 @@ import {
   ChevronRight,
 } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { use, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -31,35 +31,12 @@ import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import { File, FileState, Marker, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 
-export function Header() {
-  const db = useSQLiteContext()
-  const [version, setVersion] = useState('')
-  useEffect(() => {
-    async function setup() {
-      const result = await db.getFirstAsync<{ 'sqlite_version()': string }>(
-        'SELECT sqlite_version()'
-      )
-      if (result) {
-        setVersion(result['sqlite_version()'])
-      }
-    }
-    setup()
-  }, [])
-  return (
-    <XStack gap="$4" p="$4">
-      <H2>SQLite Version: {version}</H2>
-    </XStack>
-  )
-}
-
-export function SelectFileView() {
-  const carouselRef = useRef(null)
+export function SelectDataView() {
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState | undefined>()
   const currentFileInfo = useContext(fileState)
-  const [prevSelected, setPrevSelected] = useState<boolean[]>([])
 
   const linkProps = useLink({
     href: `/file/addFile`,
@@ -71,59 +48,38 @@ export function SelectFileView() {
 
   const router = useRouter()
 
+  const params = useParams<{ ids: string }>()
+
+  console.log(params, 'params')
+
   useEffect(() => {
-    async function setup() {
-      let result: File[] | undefined = await db.getAllAsync('SELECT * from file')
-      if (result) {
-        result = result.map((file) => ({
-          ...file,
-          isSelected: false,
-        }))
-        setFileList(result)
-      }
-      setPrevSelected(Array(result?.length).fill(false))
-    }
-    setup()
+    let ids = params.ids.split(',').map((id) => parseInt(id))
     if (currentFileInfo) {
       const { title, description, routes, markers } = currentFileInfo
       const fileInfo = {
         id: '1',
         title: title,
         description: description,
-        routes: routes,
-        markers: markers,
+        routes: routes.map((route) => ({
+          ...route,
+          isSelected: true,
+        })),
+        markers: markers.map((marker) => ({
+          ...marker,
+          isSelected: true,
+        })),
       }
       setFileInfo(fileInfo)
     }
-  }, [])
-
-  useEffect(() => {
-    async function setupData() {
-      // 만약 prevSelected의 array 중 변경 사항이 있을 경우에만 실행
-      // 오직 하나의 인덱스에 대해서만 실행
-      if (fileList === undefined) return
-      let idx: number = prevSelected.findIndex((check, i) => check !== fileList[i].isSelected)
-      let fileId: number = fileList[idx].id
-      let check: boolean = fileList[idx].isSelected
-      console.log(check)
-      if (check) {
-        setFileInfo((prev) => {
-          if (!prev) return prev
-          return {
-            ...prev,
-            markers: prev.markers.filter((marker) => marker.parent !== parseInt(fileId)),
-            routes: prev.routes.filter((route) => route.parent !== parseInt(fileId)),
-          }
-        })
-      } else {
-        const result = await db.getFirstAsync('SELECT * from file where id = ?', [fileId])
-        const markers: Marker[] = await db.getAllAsync('SELECT * from marker where parent = ?', [
-          fileId,
-        ])
-        const routes: Route[] = await db.getAllAsync('SELECT * from route where parent = ?', [
-          fileId,
-        ])
-        if (result) {
+    async function setup() {
+      await Promise.all(
+        ids.map(async (fileId) => {
+          const markers: Marker[] = await db.getAllAsync('SELECT * from marker where parent = ?', [
+            fileId,
+          ])
+          const routes: Route[] = await db.getAllAsync('SELECT * from route where parent = ?', [
+            fileId,
+          ])
           setFileInfo((prev) => {
             if (!prev) return prev
             return {
@@ -133,6 +89,7 @@ export function SelectFileView() {
                 ...markers.map((marker) => ({
                   ...marker,
                   pos: JSON.parse(marker.pos),
+                  isSelected: true,
                 })),
               ],
               routes: [
@@ -140,31 +97,54 @@ export function SelectFileView() {
                 ...routes.map((route) => ({
                   ...route,
                   path: JSON.parse(route.path),
+                  isSelected: true,
                 })),
               ],
             }
           })
-        }
-      }
-      console.log(fileInfo)
-      setFileList((prev) =>
-        prev.map((file, i) => (i === idx ? { ...file, isSelected: !file.isSelected } : file))
+        })
       )
     }
-    setupData()
-  }, [prevSelected])
+    setup()
+  }, [])
 
-  const onChangeSelected = (index: number) => {
-    setPrevSelected(prevSelected.map((check, i) => (i === index ? !check : check)))
-  }
+  const onChangeMarkerSelected = useCallback((idx: number, value: boolean) => {
+    setFileInfo((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        markers: prev.markers.map((marker, index) =>
+          index === idx ? { ...marker, isSelected: value } : marker
+        ),
+      }
+    })
+    console.log(fileInfo?.markers[idx])
+  }, [])
+
+  const onChangeRoueSelected = useCallback((idx: number, value: boolean) => {
+    setFileInfo((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        routes: prev.routes.map((route, index) =>
+          index === idx ? { ...route, isSelected: value } : route
+        ),
+      }
+    })
+    console.log(fileInfo?.routes[idx])
+  }, [])
+
   return (
     <>
       <MapBoxComponent location={[[127.32, 37.44], '']} zoomLevel={3}>
-        {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
-          <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
-            <TamaIcon iconName={markerIcon} color={markerColor} />
-          </MapboxGL.PointAnnotation>
-        ))}
+        {fileInfo?.markers?.map(
+          ({ pos, markerIcon, markerColor, id, isSelected }) =>
+            isSelected && (
+              <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
+                <TamaIcon iconName={markerIcon} color={markerColor} />
+              </MapboxGL.PointAnnotation>
+            )
+        )}
         {fileInfo?.routes?.map(({ path, lineColor, lineWidth }, idx) => (
           <MapboxGL.ShapeSource
             key={String(idx)}
@@ -203,19 +183,24 @@ export function SelectFileView() {
         right={0}
       >
         <Button onPress={() => router.back()} icon={ChevronLeft}></Button>
-        <SheetDemo fileList={fileList} onChangeSelected={onChangeSelected} />
+        <SheetDemo
+          routes={fileInfo?.routes}
+          markers={fileInfo?.markers}
+          onChangeMarkerSelected={onChangeMarkerSelected}
+          onChangeRoueSelected={onChangeRoueSelected}
+        />
         <Button {...editLinkProps} icon={ChevronRight}></Button>
       </XStack>
     </>
   )
 }
 
-function SheetDemo({ fileList, onChangeSelected }) {
+function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelected }) {
   const toast = useToastController()
 
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
-
+  console.log(markers, 'markers')
   return (
     <>
       <Button
@@ -234,6 +219,7 @@ function SheetDemo({ fileList, onChangeSelected }) {
         onPositionChange={setPosition}
         dismissOnSnapToBottom
       >
+        <Sheet.Handle width="100%" h="10px" bg="$gray10" />
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
             <Paragraph ta="center">
@@ -241,35 +227,42 @@ function SheetDemo({ fileList, onChangeSelected }) {
             </Paragraph>
           </XStack>
           <ScrollView w="100%" h="90%">
-            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
-              <Button
-                size="$5"
-                circular
-                iconAfter={<TamaIcon iconName="MapPin" color="$black10" size="$2" />}
-                onPress={() => {
-                  setOpen(false)
-                }}
-              />
-              <YStack gap="$2" ml={20}>
-                <H2>{'현재경로'}</H2>
-                <Paragraph>{'description'}</Paragraph>
-              </YStack>
-            </XStack>
-            {fileList?.map((file, idx) => (
+            {markers?.map((marker, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                 <XStack gap="$2">
                   <Checkbox
-                    value={file['isSelected']}
+                    checked={marker.isSelected}
+                    value={marker.isSelected}
                     onCheckedChange={(value) => {
-                      onChangeSelected(idx)
+                      onChangeMarkerSelected(idx, value)
                     }}
                   />
                 </XStack>
-                <TamaIcon iconName="AArrowUp" color="$black10" size="$6" />
-
+                <TamaIcon
+                  iconName={marker.markerIcon}
+                  color={marker.isSelected ? marker.markerColor : '$gray10'}
+                  size="$6"
+                />
                 <YStack gap="$2" ml={20}>
-                  <H2>{file['title'] || 'example'}</H2>
-                  <Paragraph>{file['description']}</Paragraph>
+                  <H2>{marker.title}</H2>
+                  <Paragraph>{marker.description}</Paragraph>
+                </YStack>
+              </XStack>
+            ))}
+            {routes?.map((route, idx) => (
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+                <XStack gap="$2">
+                  <Checkbox
+                    checked={route.isSelected}
+                    value={route.isSelected}
+                    onCheckedChange={(value) => {
+                      onChangeRoueSelected(idx, value)
+                    }}
+                  />
+                </XStack>
+                <YStack gap="$2" ml={20}>
+                  <H2>{route.title}</H2>
+                  <Paragraph>{route.description}</Paragraph>
                 </YStack>
               </XStack>
             ))}

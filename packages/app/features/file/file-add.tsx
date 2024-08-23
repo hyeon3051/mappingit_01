@@ -18,8 +18,6 @@ import { useContext, useEffect, useState } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { FileState } from 'packages/app/types/type'
-import 'react-native-get-random-values'
-import { v4 as uuidv4 } from 'uuid'
 export function AddFileView() {
   const toast = useToastController()
   const fileInfo = useContext(fileState)

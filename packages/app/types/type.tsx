@@ -26,6 +26,7 @@ export type Marker = {
   markerIcon: string
   markerColor: string
   parent?: number
+  isSelected?: boolean
 }
 
 export interface LocateFile {
