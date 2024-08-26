@@ -22,25 +22,11 @@ import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { LocateFile, Marker, File, FileState, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
-
-export function Header() {
-  const db = useSQLiteContext()
-  const [version, setVersion] = useState('')
-  useEffect(() => {
-    async function setup() {
-      const result = await db.getFirstAsync<{ 'sqlite_version()': string }>('  sqlite_version()')
-      if (result) {
-        setVersion(result['sqlite_version()'])
-      }
-    }
-    setup()
-  }, [])
-  return (
-    <XStack gap="$4" p="$4">
-      <H2>SQLite Version: {version}</H2>
-    </XStack>
-  )
-}
+import {
+  getFileDataById,
+  getMarkerById,
+  getRouteById,
+} from 'packages/app/contexts/fileData/fileReducer'
 
 function CardDemo({ title, description, markerIcon, markerColor }) {
   return (
@@ -121,10 +107,12 @@ export function FileView() {
   useEffect(() => {
     async function setupData() {
       let { id, title, description } = fileList[idx - 1]
-      const result = await db.getFirstAsync('SELECT * from file where id = ?', [id])
-      const markers: Marker[] = await db.getAllAsync('SELECT * from marker where parent = ?', [id])
-      const routes: Route[] = await db.getAllAsync('SELECT * from route where parent = ?', [id])
-      if (result) {
+      const result = await getFileDataById(id, db)
+      console.log(result)
+      const markers: Marker[] = await getMarkerById(result.id, db)
+      const routes: Route[] = await getRouteById(result.id, db)
+      console.log(result, markers, routes)
+      if (result.id) {
         setFileInfo({
           id: id,
           title: title,
@@ -140,11 +128,13 @@ export function FileView() {
         })
       }
     }
+    console.log(idx)
     if (idx !== 0) {
       setupData()
     } else {
       setFileInfo(currentFileInfo)
     }
+    console.log(fileInfo)
   }, [idx])
   return (
     <>

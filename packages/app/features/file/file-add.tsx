@@ -1,33 +1,30 @@
-import {
-  Button,
-  XStack,
-  YStack,
-  Input,
-  TextArea,
-  H3,
-  H6,
-  H5,
-  useToastController,
-  Square,
-  Slider,
-  SliderProps,
-  Separator,
-} from '@my/ui'
+import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { FileState } from 'packages/app/types/type'
+import {
+  addFile,
+  addMarker,
+  addRoute,
+  getFileDataById,
+  getMarkerById,
+  getRouteById,
+  updateFile,
+} from 'packages/app/contexts/fileData/fileReducer'
+import { useSQLiteContext } from 'expo-sqlite'
 export function AddFileView() {
   const toast = useToastController()
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ fileId: number }>()
+  const db = useSQLiteContext()
 
   const fileId = params.fileId || -1
 
   const [currentFileInfo, setCurrentFileInfo] = useState<FileState>({
-    id: '',
+    id: -1,
     title: '',
     description: '',
     routes: [],
@@ -38,26 +35,47 @@ export function AddFileView() {
     href: `/file/selectFile`,
   })
 
+  const fileDataSelectProps = useLink({
+    href: `/file/selectData/?fileId=${fileId}`,
+  })
+
   useEffect(() => {
-    setCurrentFileInfo((prev) => ({
-      ...prev,
-    }))
-    if (fileId !== -1) {
-      const { id, title, description, routes, markers } = currentFileInfo
+    async function setup() {
       setCurrentFileInfo((prev) => ({
         ...prev,
-        id: id,
-        title: title,
-        description: description,
-        routes: routes,
-        markers: markers,
       }))
+      console.log(fileId)
+      if (fileId !== -1) {
+        const file = await getFileDataById(fileId, db)
+        const routes = await getRouteById(fileId, db)
+        const markers = await getMarkerById(fileId, db)
+        const { id, title, description } = file
+        setCurrentFileInfo((prev) => ({
+          ...prev,
+          id: id,
+          title: title,
+          description: description,
+          routes: routes,
+          markers: markers,
+        }))
+      }
     }
+    setup()
   }, [params])
 
   const { title, description, routes, markers } = currentFileInfo
 
   const router = useRouter()
+
+  const onFileChange = () => {
+    if (fileId !== -1 && fileId) {
+      router.replace(`/file/selectData/?fileId=${fileId}`)
+    } else {
+      router.replace(`/file/selectFile`)
+    }
+    const { title, description } = currentFileInfo
+    dispatch({ type: 'SET_TITLE', payload: { title, description } })
+  }
 
   const onNameChange = (text) => {
     setCurrentFileInfo((prev) => ({
@@ -81,24 +99,25 @@ export function AddFileView() {
     router.replace('/file/file')
   }
 
-  const handleChange = () => {
+  const handleChange = async () => {
     if (fileId !== -1 && fileId) {
-      /*
-      sqlite3 => update file set title = title, description = description where id = fileId
-      for (let i = 0; i < routes.length; i++) {
-        if (prevRoutes[i].delete_flag !== currRoutes[i].delete_flag) {
-         sqlite3 => update route set delete_flag = 1 where id = routes[i].id
-        }
-      }
-      for (let i = 0; i < markers.length; i++) {
-        if (prevMarkers[i].delete_flag !== currMarkers[i].delete_flag) {
-         sqlite3 => update marker set delete_flag = 1 where id = markers[i].id
-        }
-      }
-      }
-      */
+      updateFile({ title, description }, fileId, db)
     } else {
-      /*
+      const file = await addFile({ title, description }, db)
+      const fileId = file.lastInsertRowId
+      console.log(fileId)
+      for (let route of fileInfo.routes) {
+        const routeId = await addRoute({ ...route, parent: fileId }, db)
+        console.log(routeId, 'routeId')
+      }
+      console.log(markers)
+      for await (let marker of fileInfo.markers) {
+        const markerId = await addMarker({ ...marker, parent: fileId }, db)
+        console.log(markerId, 'markerId')
+      }
+      dispatch({ type: 'INIT' })
+    }
+    /*
       sqlite3 => insert into file (id, title, description) values (fileId, title, description)
       batch = []
       sqltie3 => insert into route (id, title, description, lineColor, lineWidth) values (routeId, title, description, lineColor, lineWidth)
@@ -107,7 +126,6 @@ export function AddFileView() {
       batch.push(markerId)
       batch.excute()
       */
-    }
     toast.show('Sheet closed!', {
       message: 'Just showing how toast works...',
     })
@@ -134,7 +152,11 @@ export function AddFileView() {
         <YStack gap="$4" p="$2" w="80%" ml={20}>
           <H5>파일 결합</H5>
           <XStack gap="$2" jc="space-between">
-            <Button icon={<TamaIcon iconName="File" />} {...fileSelectProps}>
+            <Button
+              icon={<TamaIcon iconName="File" />}
+              onPress={onFileChange}
+              {...(fileId !== -1 && fileId ? fileDataSelectProps : fileSelectProps)}
+            >
               파일 선택
             </Button>
           </XStack>
@@ -148,17 +170,5 @@ export function AddFileView() {
         </XStack>
       </YStack>
     </>
-  )
-}
-
-function SimpleSlider({ children, ...props }: SliderProps) {
-  return (
-    <Slider defaultValue={[2]} max={15} step={1} {...props}>
-      <Slider.Track>
-        <Slider.TrackActive />
-      </Slider.Track>
-      <Slider.Thumb size="$2" index={0} circular />
-      {children}
-    </Slider>
   )
 }
