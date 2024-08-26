@@ -14,6 +14,8 @@ export type Route = {
   lineWidth?: number
   lineColor?: string
   parent?: number
+  delete_flag?: boolean
+  isSelected?: boolean
 }
 // TODO endTrackingDate는 isRecord가 false일때 채워짐 true 일때는 startDate
 // 위치 추적시 이름을 지정하고 움직임
@@ -27,6 +29,7 @@ export type Marker = {
   markerColor: string
   parent?: number
   isSelected?: boolean
+  delete_flag?: boolean
 }
 
 export interface LocateFile {
@@ -46,7 +49,7 @@ export interface File {
 }
 
 export interface FileState {
-  id: string
+  id: number
   title: string
   description: string
   routes: Route[]
