@@ -141,6 +141,3 @@ export function SelectMarkerView() {
     </YStack>
   )
 }
-function dispatch(arg0: { type: string; payload: { markerId: number } }) {
-  throw new Error('Function not implemented.')
-}

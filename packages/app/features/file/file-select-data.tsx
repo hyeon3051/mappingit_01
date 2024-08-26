@@ -148,10 +148,12 @@ export function SelectDataView() {
     const fileId = file.lastInsertRowId
     console.log(fileId)
     for (let route of fileInfo.routes) {
+      if (!route.isSelected) continue
       const routeId = await addRoute({ ...route, parent: fileId }, db)
       console.log(routeId, 'routeId')
     }
     for await (let marker of fileInfo.markers) {
+      if (!marker.isSelected) continue
       const markerId = await addMarker({ ...marker, parent: fileId }, db)
       console.log(markerId, 'markerId')
     }
