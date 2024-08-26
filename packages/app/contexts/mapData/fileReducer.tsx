@@ -13,6 +13,11 @@ const APPEND_POS = 'APPEND_POS'
 export const fileDispatch = React.createContext<React.Dispatch<LocateFileActions>>(() => null)
 export const fileState = React.createContext<LocateFile | null>(null)
 
+interface SetTitleAction {
+  type: 'SET_TITLE'
+  payload: { title: string; description: string }
+}
+
 interface AddMarkerAction {
   type: typeof ADD_MARKER
   payload: { marker: Marker }
@@ -49,6 +54,8 @@ interface appendPos {
 }
 
 export type LocateFileActions =
+  | SetTitleAction
+  | { type: 'INIT' }
   | AddMarkerAction
   | RemoveMarkerAction
   | EditMarkerAction
@@ -60,6 +67,16 @@ export type LocateFileActions =
 const fileReducer = (state: LocateFile, action: LocateFileActions) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case 'SET_TITLE':
+        draft.title = action.payload.title
+        draft.description = action.payload.description
+        break
+      case 'INIT':
+        draft.title = ''
+        draft.description = ''
+        draft.markers = []
+        draft.routes = []
+        break
       case 'ADD_MARKER':
         draft.markers.push(action.payload.marker)
         break
