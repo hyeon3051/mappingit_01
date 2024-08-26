@@ -73,7 +73,7 @@ export function FileView() {
   })
 
   const editLinkProps = useLink({
-    href: `/file/addFile/?fileId=${idx}`,
+    href: `/file/addFile/?fileId=${fileInfo?.id}`,
   })
 
   const onChageIdx = (index) => {
