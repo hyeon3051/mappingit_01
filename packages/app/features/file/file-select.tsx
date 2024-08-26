@@ -30,6 +30,11 @@ import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import { File, FileState, Marker, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
+import {
+  getFileDataById,
+  getMarkerById,
+  getRouteById,
+} from 'packages/app/contexts/fileData/fileReducer'
 
 export function Header() {
   const db = useSQLiteContext()
@@ -74,7 +79,8 @@ export function SelectFileView() {
   useEffect(() => {
     async function setup() {
       let result: File[] | undefined = await db.getAllAsync('SELECT * from file')
-      if (result) {
+      console.log(result, 'result')
+      if (result.length > 0) {
         result = result.map((file) => ({
           ...file,
           isSelected: false,
@@ -82,6 +88,7 @@ export function SelectFileView() {
         setFileList(result)
       }
       setPrevSelected(Array(result?.length).fill(false))
+      console.log(prevSelected)
     }
     setup()
     if (currentFileInfo) {
@@ -99,6 +106,7 @@ export function SelectFileView() {
 
   useEffect(() => {
     async function setupData() {
+      console.log(prevSelected, 'fileList')
       // 만약 prevSelected의 array 중 변경 사항이 있을 경우에만 실행
       // 오직 하나의 인덱스에 대해서만 실행
       if (fileList === undefined) return
@@ -111,19 +119,17 @@ export function SelectFileView() {
           if (!prev) return prev
           return {
             ...prev,
-            markers: prev.markers.filter((marker) => marker.parent !== parseInt(fileId)),
-            routes: prev.routes.filter((route) => route.parent !== parseInt(fileId)),
+            markers: prev.markers.filter((marker) => marker.parent !== fileId),
+            routes: prev.routes.filter((route) => route.parent !== fileId),
           }
         })
       } else {
-        const result = await db.getFirstAsync('SELECT * from file where id = ?', [fileId])
-        const markers: Marker[] = await db.getAllAsync('SELECT * from marker where parent = ?', [
-          fileId,
-        ])
-        const routes: Route[] = await db.getAllAsync('SELECT * from route where parent = ?', [
-          fileId,
-        ])
-        if (result) {
+        const result = await getFileDataById(fileId, db)
+        console.log(result, 'result')
+        const markers: Marker[] = await getMarkerById(fileId, db)
+        const routes: Route[] = await getRouteById(fileId, db)
+        console.log(result, markers, routes, 'resultMR')
+        if (result.id) {
           setFileInfo((prev) => {
             if (!prev) return prev
             return {
@@ -213,7 +219,7 @@ export function SelectFileView() {
 function SheetDemo({ fileList, onChangeSelected }) {
   const toast = useToastController()
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [position, setPosition] = useState(0)
 
   return (
