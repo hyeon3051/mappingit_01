@@ -15,6 +15,7 @@ const useBackgroundGeolocation = () => {
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
+      console.log('loc', loc)
       let coords = loc.coords
       try {
         console.log('onLocation', coords)
@@ -35,10 +36,11 @@ const useBackgroundGeolocation = () => {
     BackgroundGeolocation.ready(
       {
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-        stopTimeout: 5,
-        logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
+        stopTimeout: 2,
         distanceFilter: 2,
         stopOnTerminate: true,
+        startOnBoot: true,
+        stationaryRadius: 5,
       },
       (state: State) => {
         BackgroundGeolocation.start()
