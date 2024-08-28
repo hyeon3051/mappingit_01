@@ -63,12 +63,12 @@ export function RouteView() {
         ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])
         : fileInfo?.currentRoute?.map((pos) => pos[0])
     setRoute(route)
-  }, [idx])
+  }, [idx, fileInfo?.currentRoute])
 
   return (
     <>
       <MapBoxComponent
-        location={[route[0] ?? 0, '']}
+        location={[route[route.length - 1] ?? 0, '']}
         zoomLevel={calculateZoomLevel(route[0], route[route.length - 1])}
       >
         {route && (
@@ -157,7 +157,7 @@ export function RouteView() {
                 title={data.item.title}
                 description={data.item.description}
                 markerIcon="MapPin"
-                markerColor="#black10"
+                markerColor="$black10"
               />
             )
           }}
@@ -175,9 +175,17 @@ export function RouteView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}></Button>
-        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.routes} />
-        <Button {...editLinkProps} icon={FileEdit}></Button>
+        <Button {...linkProps} icon={PlusCircle}>
+          추가
+        </Button>
+        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.routes} type="route" />
+        {idx !== 0 ? (
+          <Button {...editLinkProps} icon={FileEdit}>
+            수정
+          </Button>
+        ) : (
+          <Button>현재 파일</Button>
+        )}
       </XStack>
     </>
   )
