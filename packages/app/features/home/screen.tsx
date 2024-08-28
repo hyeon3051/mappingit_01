@@ -45,9 +45,10 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
             <MapboxGL.LineLayer
               id="line"
               sourceID="line"
+              minZoomLevel={10}
               style={{
-                lineColor: '#FF0000',
-                lineWidth: 10,
+                lineColor: '#000000',
+                lineWidth: 5,
               }}
             />
           </MapboxGL.ShapeSource>
