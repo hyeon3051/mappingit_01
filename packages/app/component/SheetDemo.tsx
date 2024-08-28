@@ -14,22 +14,25 @@ import {
 } from '@my/ui'
 import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useState } from 'react'
-import { TamaIcon } from '@tama/packages/ui'
+import TamaIcon from '../ui/Icon'
 
-export function SheetDemo({ onChangeIdx, data }) {
+export function SheetDemo({ onChangeIdx, data, type }) {
   const toast = useToastController()
 
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
 
+  const title =
+    type === 'marker' ? '마커' : type === 'route' ? '경로' : type === 'file' ? '파일' : '정보'
+
   return (
     <>
       <Button
         size="$6"
-        icon={open ? ChevronDown : ChevronUp}
         circular
         onPress={() => setOpen((x) => !x)}
-      />
+        icon={<TamaIcon iconName={open ? 'ChevronDown' : 'ChevronUp'} color="$black10" size="$4" />}
+      ></Button>
       <Sheet
         modal
         animation="medium"
@@ -43,7 +46,7 @@ export function SheetDemo({ onChangeIdx, data }) {
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
             <Paragraph ta="center">
-              <H2>MarkerList</H2>
+              <H2>{title} 리스트</H2>
             </Paragraph>
           </XStack>
           <ScrollView w="100%">
@@ -58,7 +61,7 @@ export function SheetDemo({ onChangeIdx, data }) {
                 }}
               />
               <YStack gap="$2" ml={20}>
-                <H2>{'현재경로'}</H2>
+                <H2>{'현재 ' + title}</H2>
                 <Paragraph>{'description'}</Paragraph>
               </YStack>
             </XStack>

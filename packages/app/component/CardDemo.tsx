@@ -12,7 +12,7 @@ import {
   H2,
   ScrollView,
 } from '@my/ui'
-import { TamaIcon } from '@tama/packages/ui'
+import TamaIcon from '../ui/Icon'
 
 export function CardDemo({ title, description, markerIcon, markerColor }) {
   return (
