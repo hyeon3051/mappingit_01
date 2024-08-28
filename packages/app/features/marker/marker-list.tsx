@@ -10,12 +10,10 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
-import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 
 export function MarkerView() {
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(-1)
-  const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const [selectedMarker, setSelectedMarker] = useState<Marker>({
     id: '',
     title: '',
@@ -43,9 +41,9 @@ export function MarkerView() {
   useEffect(() => {
     setSelectedMarker((prev) => ({
       ...prev,
-      pos: location[0],
+      pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1]?.[0],
     }))
-  }, [location])
+  }, [fileInfo])
   useEffect(() => {
     const markers = fileInfo?.markers || []
     const tempSelectedMarker = markers[idx] || { pos: location[0] }

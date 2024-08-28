@@ -26,7 +26,6 @@ import {
   getMarkerById,
   getRouteById,
 } from 'packages/app/contexts/fileData/fileReducer'
-import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 
 export function SelectDataView() {
   const db = useSQLiteContext()
@@ -36,8 +35,6 @@ export function SelectDataView() {
   const currentFileInfo = useContext(fileState)
 
   const dispatch = useContext(fileDispatch)
-
-  const { enabled, location, setEnabled } = useBackgroundGeolocation()
 
   const linkProps = useLink({
     href: `/file/addFile`,
@@ -178,7 +175,7 @@ export function SelectDataView() {
 
   return (
     <>
-      <MapBoxComponent location={location} zoomLevel={3}>
+      <MapBoxComponent location={[[0, 0], '']} zoomLevel={3}>
         {fileInfo?.markers?.map(
           ({ pos, markerIcon, markerColor, id, isSelected }) =>
             isSelected && (
