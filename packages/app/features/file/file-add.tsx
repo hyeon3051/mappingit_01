@@ -12,6 +12,7 @@ import {
   getMarkerById,
   getRouteById,
   updateFile,
+  deleteFile,
 } from 'packages/app/contexts/fileData/fileReducer'
 import { useSQLiteContext } from 'expo-sqlite'
 export function AddFileView() {
@@ -68,13 +69,15 @@ export function AddFileView() {
   const router = useRouter()
 
   const onFileChange = () => {
+    const { title, description } = currentFileInfo
+    console.log(title, description)
+    dispatch({ type: 'SET_TITLE', payload: { title, description } })
+    console.log(fileInfo, 'fileInfo')
     if (fileId !== -1 && fileId) {
       router.replace(`/file/selectData/?fileId=${fileId}`)
     } else {
       router.replace(`/file/selectFile`)
     }
-    const { title, description } = currentFileInfo
-    dispatch({ type: 'SET_TITLE', payload: { title, description } })
   }
 
   const onNameChange = (text) => {
@@ -90,12 +93,9 @@ export function AddFileView() {
     }))
   }
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (fileId === -1 && fileId) return
-    /*
-    sqlite3 => delete from file where id = fileId
-    fileId: integer
-    */
+    await deleteFile(fileId, db)
     router.replace('/file/file')
   }
 
@@ -152,11 +152,7 @@ export function AddFileView() {
         <YStack gap="$4" p="$2" w="80%" ml={20}>
           <H5>파일 결합</H5>
           <XStack gap="$2" jc="space-between">
-            <Button
-              icon={<TamaIcon iconName="File" />}
-              onPress={onFileChange}
-              {...(fileId !== -1 && fileId ? fileDataSelectProps : fileSelectProps)}
-            >
+            <Button icon={<TamaIcon iconName="File" />} onPress={onFileChange}>
               파일 선택
             </Button>
           </XStack>
@@ -164,9 +160,15 @@ export function AddFileView() {
         <YStack gap="$4" p="$2" w="80%" ml={20}></YStack>
 
         <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-          <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
-          <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+          <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}>
+            추가
+          </Button>
+          <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
+            뒤로가기
+          </Button>
+          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
+            삭제
+          </Button>
         </XStack>
       </YStack>
     </>

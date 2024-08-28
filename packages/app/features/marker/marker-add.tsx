@@ -71,6 +71,7 @@ export function AddMarkerView() {
   const handleChange = () => {
     if (marker !== -1) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
+      console.log('add marker')
     } else {
       dispatch({
         type: 'EDIT_MARKER',
@@ -82,6 +83,7 @@ export function AddMarkerView() {
     })
     router.replace('/marker/marker')
   }
+  console.log(marker)
 
   return (
     <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
@@ -110,9 +112,19 @@ export function AddMarkerView() {
       </YStack>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-        <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
-        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-        <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+        <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}>
+          추가
+        </Button>
+        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
+          뒤로가기
+        </Button>
+        {marker !== -1 ? (
+          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
+            삭제
+          </Button>
+        ) : (
+          <Button>현재 위치</Button>
+        )}
       </XStack>
     </YStack>
   )

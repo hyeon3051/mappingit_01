@@ -23,15 +23,17 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
+import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 
 export function MarkerView() {
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(-1)
+  const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const [selectedMarker, setSelectedMarker] = useState<Marker>({
     id: '',
     title: '',
     description: '',
-    pos: [127.9321, 36.9735],
+    pos: location[0],
     markerIcon: 'PinOff',
     markerColor: '$black10',
   })
@@ -52,8 +54,14 @@ export function MarkerView() {
     }
   }
   useEffect(() => {
+    setSelectedMarker((prev) => ({
+      ...prev,
+      pos: location[0],
+    }))
+  }, [location])
+  useEffect(() => {
     const markers = fileInfo?.markers || []
-    const tempSelectedMarker = markers[idx] || { pos: [127.9321, 36.9735] }
+    const tempSelectedMarker = markers[idx] || { pos: location[0] }
     setSelectedMarker(tempSelectedMarker)
   }, [idx])
   return (
@@ -130,9 +138,17 @@ export function MarkerView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}></Button>
-        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.markers} />
-        <Button {...editLinkProps} icon={FileEdit}></Button>
+        <Button {...linkProps} icon={PlusCircle}>
+          추가
+        </Button>
+        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.markers} type="marker" />
+        {idx !== -1 ? (
+          <Button {...editLinkProps} icon={FileEdit}>
+            수정
+          </Button>
+        ) : (
+          <Button>현재 마커</Button>
+        )}
       </XStack>
     </>
   )

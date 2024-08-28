@@ -11,8 +11,9 @@ import {
   Card,
   H2,
   ScrollView,
+  ButtonIcon,
 } from '@my/ui'
-import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, ChevronDown, ChevronUp, Plus } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
@@ -212,9 +213,17 @@ export function FileView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}></Button>
-        <SheetDemo onChangeIdx={onChageIdx} data={fileList} />
-        <Button {...editLinkProps} icon={FileEdit}></Button>
+        <Button {...linkProps} icon={PlusCircle}>
+          추가
+        </Button>
+        <SheetDemo onChangeIdx={onChageIdx} data={fileList} type="file" />
+        {idx !== 0 ? (
+          <Button {...editLinkProps} icon={FileEdit}>
+            수정
+          </Button>
+        ) : (
+          <Button>현재 파일</Button>
+        )}
       </XStack>
     </>
   )

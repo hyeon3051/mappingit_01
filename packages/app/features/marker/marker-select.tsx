@@ -130,13 +130,21 @@ export function SelectMarkerView() {
           ))}
         </XStack>
       </Stack>
-      <XStack f={2} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
+      <XStack f={2} jc="space-around" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
         <Button
           {...(marker !== -1 ? { ...linkProps } : {})}
           icon={<TamaIcon iconName="PlusCircle" />}
-        ></Button>
-        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-        <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+        >
+          정보 입력
+        </Button>
+        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
+          돌아가기
+        </Button>
+        {marker !== -1 && (
+          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
+            삭제
+          </Button>
+        )}
       </XStack>
     </YStack>
   )
