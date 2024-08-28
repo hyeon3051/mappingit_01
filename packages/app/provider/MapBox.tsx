@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react'
+import React, { use, useEffect, useRef } from 'react'
 import MapboxGL, { Camera } from '@rnmapbox/maps'
 import { Pos } from '../types/type'
+import { useColorScheme } from 'react-native'
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
 )
@@ -15,6 +16,8 @@ const MapBoxComponent = ({
   zoomLevel: number
 }) => {
   const camera = useRef<Camera>(null) // Corrected here
+  const colorScheme = useColorScheme()
+  const styleURL = colorScheme === 'dark' ? MapboxGL.StyleURL.Dark : MapboxGL.StyleURL
   useEffect(() => {
     if (location && camera.current) {
       camera.current.setCamera({
@@ -23,9 +26,15 @@ const MapBoxComponent = ({
       })
     }
   }, [location])
+
   return (
     <>
-      <MapboxGL.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false}>
+      <MapboxGL.MapView
+        style={{ flex: 1 }}
+        logoEnabled={false}
+        attributionEnabled={false}
+        styleURL={styleURL}
+      >
         <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
         <MapboxGL.Camera
           ref={camera}
