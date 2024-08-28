@@ -1,18 +1,5 @@
-import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
-  SizableText,
-  Separator,
-  Stack,
-  useToastController,
-  Sheet,
-  Card,
-  H2,
-  ScrollView,
-} from '@my/ui'
-import { PlusCircle, FileEdit, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { Button, XStack, SizableText, Separator, Stack } from '@my/ui'
+import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'

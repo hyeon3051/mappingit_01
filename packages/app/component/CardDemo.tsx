@@ -1,17 +1,4 @@
-import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
-  SizableText,
-  Separator,
-  Stack,
-  useToastController,
-  Sheet,
-  Card,
-  H2,
-  ScrollView,
-} from '@my/ui'
+import { Button, Paragraph, XStack, YStack, SizableText, Stack, Card } from '@my/ui'
 import TamaIcon from '../ui/Icon'
 
 export function CardDemo({ title, description, markerIcon, markerColor }) {

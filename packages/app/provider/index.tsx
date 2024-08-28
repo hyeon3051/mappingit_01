@@ -4,7 +4,7 @@ import { ToastViewport } from './ToastViewport'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import fileReducer from 'packages/app/contexts/mapData/fileReducer'
 import { useReducer } from 'react'
-import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite'
+import { SQLiteProvider } from 'expo-sqlite'
 
 const initalData = {
   title: '',

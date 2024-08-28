@@ -3,28 +3,16 @@ import {
   Paragraph,
   XStack,
   YStack,
-  SizableText,
-  Separator,
-  Stack,
   useToastController,
   Sheet,
-  Card,
   H2,
   ScrollView,
   Checkbox,
 } from '@my/ui'
-import {
-  PlusCircle,
-  FileEdit,
-  ChevronDown,
-  ChevronUp,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from '@tamagui/lucide-icons'
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useRef, useState } from 'react'
-import { useLink, useParams, useRouter } from 'solito/navigation'
+import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'

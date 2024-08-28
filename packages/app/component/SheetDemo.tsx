@@ -3,16 +3,12 @@ import {
   Paragraph,
   XStack,
   YStack,
-  SizableText,
-  Separator,
-  Stack,
   useToastController,
   Sheet,
-  Card,
   H2,
   ScrollView,
 } from '@my/ui'
-import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { ChevronDown } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import TamaIcon from '../ui/Icon'
 

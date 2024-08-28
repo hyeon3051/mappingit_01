@@ -1,19 +1,5 @@
-import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
-  SizableText,
-  Separator,
-  Stack,
-  useToastController,
-  Sheet,
-  Card,
-  H2,
-  ScrollView,
-  ButtonIcon,
-} from '@my/ui'
-import { PlusCircle, FileEdit, ChevronDown, ChevronUp, Plus } from '@tamagui/lucide-icons'
+import { Button, XStack, SizableText, Separator, Stack } from '@my/ui'
+import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
@@ -21,7 +7,7 @@ import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
-import { LocateFile, Marker, File, FileState, Route } from 'packages/app/types/type'
+import { Marker, File, FileState, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 import {
   getFileDataById,
