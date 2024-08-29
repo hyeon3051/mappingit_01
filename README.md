@@ -122,7 +122,17 @@ You may potentially want to have the native module transpiled for the next app. 
 #### 마커 추가
 ![image](https://github.com/user-attachments/assets/c0153f85-441f-4d3e-8644-dc3206e09017)
 
+#### 루트 정보
+![image](https://github.com/user-attachments/assets/2c9f0d6d-e638-47c7-bf52-c3141b9beac2)
 
+#### 파일 정보 
+![image](https://github.com/user-attachments/assets/c5fd4533-0190-4ea6-84e7-9a03bc3e7e80)
+
+#### 파일 결합
+![image](https://github.com/user-attachments/assets/80efb183-588a-4b9a-b8d9-b435885dfaad)
+
+#### 파일 정보 결합
+![image](https://github.com/user-attachments/assets/bb70f8f8-2ae7-46d5-9737-0ef54a5b48f8)
 
 
 
