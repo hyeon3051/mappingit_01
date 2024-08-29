@@ -105,3 +105,24 @@ You may potentially want to have the native module transpiled for the next app. 
 
 ### 추가 라이브러리
 - rnMapBoxApi
+- rnBackgroundGeolocation
+
+### 앱 설명
+사용자에 마커 루트 정보를 저장하여 사용자 로컬 내에서 파일로 관리 할 수 있도록 하는 앱 
+
+#### 초기화면
+![image](https://github.com/user-attachments/assets/bf0f663c-334b-4449-89ca-181ff8ec65f4)
+
+#### 마커 정보
+![image](https://github.com/user-attachments/assets/730eb63f-61fe-40ca-8707-fde7465e63af)
+
+#### 마커 아이콘 선택
+![image](https://github.com/user-attachments/assets/e687884d-787f-4785-8b85-3a73e29bb37b)
+
+#### 마커 추가
+![image](https://github.com/user-attachments/assets/c0153f85-441f-4d3e-8644-dc3206e09017)
+
+
+
+
+
