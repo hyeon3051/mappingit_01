@@ -33,14 +33,16 @@ const MapBoxComponent = ({
         style={{ flex: 1 }}
         logoEnabled={false}
         attributionEnabled={false}
-        styleURL={styleURL}
       >
-        <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
+        <MapboxGL.UserLocation
+          androidRenderMode="normal"
+          animated={true}
+        />        
         <MapboxGL.Camera
           ref={camera}
           zoomLevel={zoomLevel}
-          centerCoordinate={location[0]}
           animationMode="easeTo"
+          followUserLocation={true}
           animationDuration={1000}
         />
         {children}
