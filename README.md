@@ -1,3 +1,41 @@
+#  MAPPINGIT
+ 사용자에 마커 루트 정보를 저장하여 사용자 로컬 내에서 파일로 관리 할 수 있도록 하는 앱 
+
+### 사용 라이브러리
+- rnMapBoxApi
+- rnBackgroundGeolocation
+- sqlite
+- reanimatedCarousel
+- fileReducer
+
+#### 초기화면
+![image](https://github.com/user-attachments/assets/bf0f663c-334b-4449-89ca-181ff8ec65f4)
+
+#### 마커 정보
+![image](https://github.com/user-attachments/assets/730eb63f-61fe-40ca-8707-fde7465e63af)
+
+#### 마커 아이콘 선택
+![image](https://github.com/user-attachments/assets/e687884d-787f-4785-8b85-3a73e29bb37b)
+
+#### 마커 추가
+![image](https://github.com/user-attachments/assets/c0153f85-441f-4d3e-8644-dc3206e09017)
+
+#### 루트 정보
+![image](https://github.com/user-attachments/assets/2c9f0d6d-e638-47c7-bf52-c3141b9beac2)
+
+#### 파일 정보 
+![image](https://github.com/user-attachments/assets/c5fd4533-0190-4ea6-84e7-9a03bc3e7e80)
+
+#### 파일 결합
+![image](https://github.com/user-attachments/assets/80efb183-588a-4b9a-b8d9-b435885dfaad)
+
+#### 파일 정보 결합
+![image](https://github.com/user-attachments/assets/bb70f8f8-2ae7-46d5-9737-0ef54a5b48f8)
+
+
+
+
+
 # Tamagui + Solito + Next + Expo Monorepo
 
 ```sh
@@ -30,17 +68,6 @@ The main apps are:
   - `app` you'll be importing most files from `app/`
     - `features` (don't use a `screens` folder. organize by feature.)
     - `provider` (all the providers that wrap the app, and some no-ops for Web.)
-
-You can add other folders inside of `packages/` if you know what you're doing and have a good reason to.
-
-> [!TIP]
-> Switching from `app` to `pages` router:
->
-> - remove `app` folder from `apps/next`
-> - move `index.tsx` from `pages-example` to `pages` folder
-> - rename `pages-example-user` to `user` and be sure to update `linkTarget` in `screen.tsx` to `user` as well
-> - delete `SwitchRouterButton.tsx` component and remove it from `screen.tsx` and `packages/ui/src/index.tsx`
-> - search for `pagesMode` keyword and remove it
 
 ## 🏁 Start the app
 
@@ -102,37 +129,3 @@ You may potentially want to have the native module transpiled for the next app. 
 - Install command to be `yarn set version stable && yarn install`
 - Build command: leave default setting
 - Output dir: leave default setting
-
-### 추가 라이브러리
-- rnMapBoxApi
-- rnBackgroundGeolocation
-
-### 앱 설명
-사용자에 마커 루트 정보를 저장하여 사용자 로컬 내에서 파일로 관리 할 수 있도록 하는 앱 
-
-#### 초기화면
-![image](https://github.com/user-attachments/assets/bf0f663c-334b-4449-89ca-181ff8ec65f4)
-
-#### 마커 정보
-![image](https://github.com/user-attachments/assets/730eb63f-61fe-40ca-8707-fde7465e63af)
-
-#### 마커 아이콘 선택
-![image](https://github.com/user-attachments/assets/e687884d-787f-4785-8b85-3a73e29bb37b)
-
-#### 마커 추가
-![image](https://github.com/user-attachments/assets/c0153f85-441f-4d3e-8644-dc3206e09017)
-
-#### 루트 정보
-![image](https://github.com/user-attachments/assets/2c9f0d6d-e638-47c7-bf52-c3141b9beac2)
-
-#### 파일 정보 
-![image](https://github.com/user-attachments/assets/c5fd4533-0190-4ea6-84e7-9a03bc3e7e80)
-
-#### 파일 결합
-![image](https://github.com/user-attachments/assets/80efb183-588a-4b9a-b8d9-b435885dfaad)
-
-#### 파일 정보 결합
-![image](https://github.com/user-attachments/assets/bb70f8f8-2ae7-46d5-9737-0ef54a5b48f8)
-
-
-
