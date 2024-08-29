@@ -32,9 +32,14 @@
 #### 파일 정보 결합
 ![image](https://github.com/user-attachments/assets/bb70f8f8-2ae7-46d5-9737-0ef54a5b48f8)
 
-
-
-
+#### 추후 개발 사항
+1. 다크 라이트 모드 지원
+2. 루트 위치 수정 기능
+3. 아이콘 커스텀화
+4. 설정 화면에 사용자 커스텀 추가
+5. 유저별 권한 관리를 통한 기능의 permission 제공
+6. 클라우드 위치 기록
+7. Oauth를 활용한 로그인 회원가입 지원
 
 # Tamagui + Solito + Next + Expo Monorepo
 
