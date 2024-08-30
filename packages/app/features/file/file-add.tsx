@@ -72,7 +72,6 @@ export function AddFileView() {
     const { title, description } = currentFileInfo
     console.log(title, description)
     dispatch({ type: 'SET_TITLE', payload: { title, description } })
-    console.log(fileInfo, 'fileInfo')
     if (fileId !== -1 && fileId) {
       router.replace(`/file/selectData/?fileId=${fileId}`)
     } else {

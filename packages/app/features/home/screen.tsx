@@ -19,11 +19,10 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
     href: '/file/file',
   })
 
-  const { enabled, location, setEnabled } = useBackgroundGeolocation()
   const fileInfo = useContext(fileState)
   return (
     <>
-      <MapBoxComponent location={location}>
+      <MapBoxComponent>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />

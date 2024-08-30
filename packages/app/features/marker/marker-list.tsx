@@ -51,7 +51,7 @@ export function MarkerView() {
   }, [idx])
   return (
     <>
-      <MapBoxComponent location={[selectedMarker.pos, '']} zoomLevel={20}>
+      <MapBoxComponent location={[selectedMarker.pos, '']}>
         <MapboxGL.PointAnnotation
           coordinate={selectedMarker.pos}
           key={selectedMarker.id || '1'}

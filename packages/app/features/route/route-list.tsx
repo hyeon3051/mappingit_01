@@ -54,10 +54,7 @@ export function RouteView() {
 
   return (
     <>
-      <MapBoxComponent
-        location={[route[route.length - 1] ?? 0, '']}
-        zoomLevel={calculateZoomLevel(route[0], route[route.length - 1])}
-      >
+      <MapBoxComponent location={[route[route.length - 1] ?? 0, '']}>
         {route && (
           <>
             <MapboxGL.PointAnnotation coordinate={route[0]} key="start" id="pt-ann">

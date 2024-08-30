@@ -97,7 +97,7 @@ export function FileView() {
   }, [idx])
   return (
     <>
-      <MapBoxComponent location={[[127, 38], '']} zoomLevel={2}>
+      <MapBoxComponent>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
