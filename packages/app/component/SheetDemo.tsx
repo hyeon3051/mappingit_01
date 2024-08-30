@@ -62,7 +62,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
               </YStack>
             </XStack>
             {data?.map((file, idx) => (
-              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={idx}>
                 <Button
                   size="$5"
                   circular

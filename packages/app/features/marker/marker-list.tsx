@@ -13,7 +13,7 @@ import { SheetDemo } from 'packages/app/component/SheetDemo'
 
 export function MarkerView() {
   const carouselRef = useRef(null)
-  const [idx, setIdx] = useState(-1)
+  const [idx, setIdx] = useState(0)
   const [selectedMarker, setSelectedMarker] = useState<Marker>({
     id: '',
     title: '',
@@ -35,7 +35,7 @@ export function MarkerView() {
   const onChageIdx = (index) => {
     setIdx(index)
     if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index })
+      carouselRef.current.scrollTo({ index: index -1 })
     }
   }
   useEffect(() => {
@@ -46,7 +46,7 @@ export function MarkerView() {
   }, [fileInfo])
   useEffect(() => {
     const markers = fileInfo?.markers || []
-    const tempSelectedMarker = markers[idx] || { pos: [127, 38] }
+    const tempSelectedMarker =  idx !== 0 ? markers[idx -1] : { pos: [127, 38] }
     setSelectedMarker(tempSelectedMarker)
   }, [idx])
   return (
@@ -54,7 +54,7 @@ export function MarkerView() {
       <MapBoxComponent location={[selectedMarker.pos, '']} zoomLevel={20}>
         <MapboxGL.PointAnnotation
           coordinate={selectedMarker.pos}
-          key={selectedMarker.id || '1'}
+          key={-1}
           id="pt-ann"
         >
           <TamaIcon
@@ -96,7 +96,7 @@ export function MarkerView() {
           data={fileInfo?.markers}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            setIdx(index)
+            setIdx(index + 1)
           }}
           renderItem={(data) => {
             const { title, description, markerIcon, markerColor } = data.item
@@ -106,6 +106,7 @@ export function MarkerView() {
                 description={description}
                 markerIcon={markerIcon}
                 markerColor={markerColor}
+                key={data.index}
               />
             )
           }}
@@ -127,7 +128,7 @@ export function MarkerView() {
           추가
         </Button>
         <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.markers} type="marker" />
-        {idx !== -1 ? (
+        {idx !== 0 ? (
           <Button {...editLinkProps} icon={FileEdit}>
             수정
           </Button>

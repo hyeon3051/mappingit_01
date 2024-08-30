@@ -17,7 +17,6 @@ const useBackgroundGeolocation = () => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
       let coords = loc.coords
 
-      console.log('onLocation', coords)
       try {
         if (
           Math.sqrt(
