@@ -175,7 +175,7 @@ export function SelectDataView() {
 
   return (
     <>
-      <MapBoxComponent location={[[0, 0], '']} zoomLevel={3}>
+      <MapBoxComponent location={[[127, 38], '']} zoomLevel={3}>
         {fileInfo?.markers?.map(
           ({ pos, markerIcon, markerColor, id, isSelected }) =>
             isSelected && (

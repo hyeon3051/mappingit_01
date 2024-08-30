@@ -10,8 +10,8 @@ const MIN_DISTANCE = 1e-6
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
-  const [location, setLocation] = useState<Pos>([[0, 0], ''])
-  const locateLngLat = useRef<[number, number]>([0, 0])
+  const [location, setLocation] = useState<Pos>([[127, 38], ''])
+  const locateLngLat = useRef<[number, number]>([127, 38])
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
@@ -19,12 +19,14 @@ const useBackgroundGeolocation = () => {
 
       console.log('onLocation', coords)
       try {
-        if(Math.sqrt(
-          Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
-            Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
-        ) > MIN_DISTANCE){
-        setLocation([[coords.longitude, coords.latitude], loc.timestamp])
-        locateLngLat.current = [coords.longitude, coords.latitude]
+        if (
+          Math.sqrt(
+            Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
+              Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
+          ) > MIN_DISTANCE
+        ) {
+          setLocation([[coords.longitude, coords.latitude], loc.timestamp])
+          locateLngLat.current = [coords.longitude, coords.latitude]
         }
       } catch (e) {
         console.log('error', e)

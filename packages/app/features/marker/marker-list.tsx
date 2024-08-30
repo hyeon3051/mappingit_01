@@ -18,7 +18,7 @@ export function MarkerView() {
     id: '',
     title: '',
     description: '',
-    pos: location[0],
+    pos: [127, 38],
     markerIcon: 'PinOff',
     markerColor: '$black10',
   })
@@ -46,7 +46,7 @@ export function MarkerView() {
   }, [fileInfo])
   useEffect(() => {
     const markers = fileInfo?.markers || []
-    const tempSelectedMarker = markers[idx] || { pos: location[0] }
+    const tempSelectedMarker = markers[idx] || { pos: [127, 38] }
     setSelectedMarker(tempSelectedMarker)
   }, [idx])
   return (

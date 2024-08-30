@@ -65,7 +65,9 @@ export function FileView() {
     async function setupData() {
       let { id, title, description } = fileList[idx - 1]
       const result = await getFileDataById(id, db)
-      console.log(result)
+      if (!result) {
+        return
+      }
       const markers: Marker[] = await getMarkerById(result.id, db)
       const routes: Route[] = await getRouteById(result.id, db)
       console.log(result, markers, routes)
@@ -95,7 +97,7 @@ export function FileView() {
   }, [idx])
   return (
     <>
-      <MapBoxComponent location={[[0, 0], '']} zoomLevel={2}>
+      <MapBoxComponent location={[[127, 38], '']} zoomLevel={2}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
