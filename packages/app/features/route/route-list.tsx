@@ -9,13 +9,15 @@ import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
+import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 
 export function RouteView() {
   const router = useRouter()
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(0)
-  const [route, setRoute] = useState([])
+  const [route, setRoute] = useState<number[]>([127, 38])
   const fileInfo = useContext(fileState)
+  const { location } = useBackgroundGeolocation()
 
   const linkProps = useLink({
     href: `/route/addRoute`,
@@ -45,47 +47,51 @@ export function RouteView() {
 
   const routes = fileInfo?.routes || []
   useEffect(() => {
+    console.log('idx', idx)
     let route =
       idx !== 0
         ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])
         : fileInfo?.currentRoute?.map((pos) => pos[0])
     setRoute(route)
-  }, [idx, fileInfo?.currentRoute])
+  }, [idx])
 
   return (
     <>
       <MapBoxComponent location={[route[route.length - 1] ?? 0, '']}>
         {route && (
           <>
-            <MapboxGL.PointAnnotation coordinate={route[0]} key="start" id="pt-ann">
+            <MapboxGL.PointAnnotation coordinate={route[0] ?? location[0]} key="start" id="pt-ann">
               <TamaIcon iconName="MapPin" color="$black10" size="$2" />
             </MapboxGL.PointAnnotation>
-            <MapboxGL.PointAnnotation coordinate={route[route.length - 1]} key="end" id="pt-ann">
+            <MapboxGL.PointAnnotation
+              coordinate={route.length ? route[route.length - 1] : location[0]}
+              key="end"
+              id="pt-ann"
+            >
               <TamaIcon iconName="MapPin" color="$black10" size="$2" />
             </MapboxGL.PointAnnotation>
+            <MapboxGL.ShapeSource
+              id="line-source"
+              shape={{
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: route,
+                },
+              }}
+            >
+              <MapboxGL.LineLayer
+                id="line"
+                sourceID="line"
+                style={{
+                  lineColor: idx !== 0 ? fileInfo?.routes[idx - 1]?.lineColor : '#000',
+                  lineWidth: idx !== 0 ? fileInfo?.routes[idx - 1]?.lineWidth : 3,
+                }}
+              />
+            </MapboxGL.ShapeSource>
           </>
         )}
-
-        <MapboxGL.ShapeSource
-          id="line-source"
-          shape={{
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: route,
-            },
-          }}
-        >
-          <MapboxGL.LineLayer
-            id="line"
-            sourceID="line"
-            style={{
-              lineColor: fileInfo?.routes[idx - 1]?.lineColor || '#000',
-              lineWidth: fileInfo?.routes[idx - 1]?.lineWidth || 3,
-            }}
-          />
-        </MapboxGL.ShapeSource>
       </MapBoxComponent>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
         <XStack
@@ -142,6 +148,7 @@ export function RouteView() {
                 description={data.item.description}
                 markerIcon="MapPin"
                 markerColor="$black10"
+                key={data.index}
               />
             )
           }}

@@ -32,17 +32,14 @@ export function AddRouteView() {
     id: uuidv4(),
     title: '',
     description: '',
-    path: [],
+    path: fileInfo?.currentRoute || [],
     lineWidth: 3,
     lineColor: '#fbfbfb',
   })
 
   useEffect(() => {
-    setRouteInfo((prev) => ({
-      ...prev,
-    }))
-    if (routeIdx !== -1 && fileInfo?.routes[routeIdx - 1]) {
-      const selectedRoute = fileInfo?.routes[routeIdx - 1]
+    if (routeIdx !== -1 && fileInfo?.routes[routeIdx]) {
+      const selectedRoute = fileInfo?.routes[routeIdx]
       const { id, title, description, lineColor, lineWidth, path } = selectedRoute
       setRouteInfo((prev) => ({
         ...prev,
@@ -90,12 +87,13 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
+    console.log(routeInfo)
     if (routeIdx !== -1 && routeId) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
       dispatch({
         type: 'ADD_ROUTE',
-        payload: { route: { ...routeInfo, path: fileInfo?.currentRoute } },
+        payload: { route: routeInfo },
       })
     }
     toast.show('Sheet closed!', {
