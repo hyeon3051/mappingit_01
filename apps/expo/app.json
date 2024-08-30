@@ -15,13 +15,19 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "infoPlist": {
         "NSLocationAlwaysAndWhenInUseUsageDescription": "[CHANGEME] This app requires location always, even when the app is in the background",
         "NSLocationWhenInUseUsageDescription": "[CHANGEME] This app requires location while in use",
         "NSMotionUsageDescription": "[CHANGEME] This app uses motion-detection to determine the motion-activity of the device (walking, vehicle, bicycle, etc)",
-        "UIBackgroundModes": ["location", "fetch", "processing"],
+        "UIBackgroundModes": [
+          "location",
+          "fetch",
+          "processing"
+        ],
         "BGTaskSchedulerPermittedIdentifiers": [
           "com.transistorsoft.fetch",
           "com.transistorsoft.customtask"
@@ -54,7 +60,7 @@
       [
         "react-native-background-geolocation",
         {
-          "license": ""
+          "license": "b06de98fffb48d47eb18f9db23bc1df895a6bd9738c0eb1d3a1304e24e9008b5"
         }
       ],
       [
@@ -69,12 +75,20 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox",
-          "accessToken": ""
+          "accessToken": "sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c8c7105f-eb06-46cf-8636-bb08d28a2c54"
+      }
     }
   }
 }
