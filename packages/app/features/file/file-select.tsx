@@ -274,9 +274,6 @@ function SheetDemo({ fileList, onChangeSelected }) {
             icon={ChevronDown}
             onPress={() => {
               setOpen(false)
-              toast.show('Sheet closed!', {
-                message: 'Just showing how toast works...',
-              })
             }}
           />
         </Sheet.Frame>

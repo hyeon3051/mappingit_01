@@ -25,7 +25,7 @@ interface AddMarkerAction {
 
 interface RemoveMarkerAction {
   type: typeof REMOVE_MARKER
-  payload: { markerId: number }
+  payload: { markerId: string }
 }
 
 interface EditMarkerAction {

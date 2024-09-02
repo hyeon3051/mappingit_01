@@ -78,9 +78,6 @@ export function AddMarkerView() {
         payload: { marker: markerInfo, markerId: markerInfo.id },
       })
     }
-    toast.show('Sheet closed!', {
-      message: 'Just showing how toast works...',
-    })
     router.replace('/marker/marker')
   }
   console.log(marker)

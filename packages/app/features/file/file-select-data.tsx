@@ -30,6 +30,7 @@ import {
 export function SelectDataView() {
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
+  const toast = useToastController()
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState | undefined>()
   const currentFileInfo = useContext(fileState)
@@ -128,12 +129,15 @@ export function SelectDataView() {
   }, [])
 
   const onEnroll = async () => {
+    toast.show('등록중', {
+      message: '파일을 등록중입니다.',
+    })
     if (!fileInfo) return
     const { title, description } = fileInfo
     const file = await addFile({ title, description }, db)
     const fileId = file.lastInsertRowId
     console.log(fileId)
-    for (let route of fileInfo.routes) {
+    for await (let route of fileInfo.routes) {
       if (!route.isSelected) continue
       const routeId = await addRoute({ ...route, parent: fileId }, db)
       console.log(routeId, 'routeId')
@@ -143,6 +147,11 @@ export function SelectDataView() {
       const markerId = await addMarker({ ...marker, parent: fileId }, db)
       console.log(markerId, 'markerId')
     }
+    toast.hide()
+    toast.show('등록완료', {
+      message: '파일 등록이 완료되었습니다.',
+    })
+
     dispatch({ type: 'INIT' })
     router.replace('/file/file')
   }
@@ -315,9 +324,6 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
             icon={ChevronDown}
             onPress={() => {
               setOpen(false)
-              toast.show('Sheet closed!', {
-                message: 'Just showing how toast works...',
-              })
             }}
           />
         </Sheet.Frame>

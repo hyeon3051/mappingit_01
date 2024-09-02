@@ -100,13 +100,15 @@ export function AddFileView() {
 
   const handleChange = async () => {
     if (fileId !== -1 && fileId) {
-      updateFile({ title, description }, fileId, db)
+      await updateFile({ title, description }, fileId, db)
+      toast.hide()
+      toast.show('파일 수정이 완료되었습니다.')
     } else {
       const file = await addFile({ title, description }, db)
       const fileId = file.lastInsertRowId
       console.log(fileId)
-      for (let route of fileInfo.routes) {
-        const routeId = await addRoute({ ...route, parent: fileId }, db)
+      for await (let route of fileInfo.routes) {
+        const routeId = addRoute({ ...route, parent: fileId }, db)
         console.log(routeId, 'routeId')
       }
       console.log(markers)
@@ -114,6 +116,8 @@ export function AddFileView() {
         const markerId = await addMarker({ ...marker, parent: fileId }, db)
         console.log(markerId, 'markerId')
       }
+      toast.hide()
+      toast.show('파일 추가가 완료되었습니다.')
       dispatch({ type: 'INIT' })
     }
     /*
@@ -125,9 +129,6 @@ export function AddFileView() {
       batch.push(markerId)
       batch.excute()
       */
-    toast.show('Sheet closed!', {
-      message: 'Just showing how toast works...',
-    })
     router.replace('/file/file')
   }
 

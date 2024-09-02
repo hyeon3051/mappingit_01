@@ -10,15 +10,17 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
+import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 
 export function MarkerView() {
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(0)
+  let { location: currLocation } = useBackgroundGeolocation()
   const [selectedMarker, setSelectedMarker] = useState<Marker>({
     id: '',
     title: '',
     description: '',
-    pos: [127, 38],
+    pos: [0, 0],
     markerIcon: 'PinOff',
     markerColor: '$black10',
   })
@@ -35,7 +37,7 @@ export function MarkerView() {
   const onChageIdx = (index) => {
     setIdx(index)
     if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index: index -1 })
+      carouselRef.current.scrollTo({ index: index - 1 })
     }
   }
   useEffect(() => {
@@ -46,17 +48,16 @@ export function MarkerView() {
   }, [fileInfo])
   useEffect(() => {
     const markers = fileInfo?.markers || []
-    const tempSelectedMarker =  idx !== 0 ? markers[idx -1] : { pos: [127, 38] }
-    setSelectedMarker(tempSelectedMarker)
+    const tempSelectedMarker = idx !== 0 ? markers[idx - 1] : { pos: currLocation[0] }
+    setSelectedMarker((prev) => ({
+      ...prev,
+      ...tempSelectedMarker,
+    }))
   }, [idx])
   return (
     <>
-      <MapBoxComponent location={[selectedMarker.pos, '']}>
-        <MapboxGL.PointAnnotation
-          coordinate={selectedMarker.pos}
-          key={-1}
-          id="pt-ann"
-        >
+      <MapBoxComponent location={[selectedMarker.pos, ''] || currLocation}>
+        <MapboxGL.PointAnnotation coordinate={selectedMarker.pos} key={-1} id="pt-ann">
           <TamaIcon
             iconName={selectedMarker.markerIcon || 'PinOff'}
             color={selectedMarker.markerColor || '$black10'}

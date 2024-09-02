@@ -96,9 +96,6 @@ export function AddRouteView() {
         payload: { route: routeInfo },
       })
     }
-    toast.show('Sheet closed!', {
-      message: 'Just showing how toast works...',
-    })
     router.replace('/route/route')
   }
 

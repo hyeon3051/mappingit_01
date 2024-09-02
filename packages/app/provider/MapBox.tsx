@@ -43,6 +43,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
           followUserLocation={true}
           animationDuration={1000}
           followZoomLevel={15}
+          followPitch={0}
         />
         {children}
       </MapboxGL.MapView>

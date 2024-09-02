@@ -21,6 +21,7 @@ export function FileView() {
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
+  const [check, setCheck] = useState(false)
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState>()
   const currentFileInfo = useContext(fileState)
@@ -68,23 +69,25 @@ export function FileView() {
       if (!result) {
         return
       }
-      const markers: Marker[] = await getMarkerById(result.id, db)
-      const routes: Route[] = await getRouteById(result.id, db)
-      console.log(result, markers, routes)
-      if (result.id) {
-        setFileInfo({
-          id: id,
-          title: title,
-          description: description,
-          markers: markers.map((marker) => ({
-            ...marker,
-            pos: JSON.parse(marker.pos),
-          })),
-          routes: routes.map((route) => ({
-            ...route,
-            path: JSON.parse(route.path),
-          })),
-        })
+      if (check) {
+        const markers: Marker[] = await getMarkerById(result.id, db)
+        const routes: Route[] = await getRouteById(result.id, db)
+        console.log(result, markers, routes)
+        if (result.id) {
+          setFileInfo({
+            id: id,
+            title: title,
+            description: description,
+            markers: markers.map((marker) => ({
+              ...marker,
+              pos: JSON.parse(marker.pos),
+            })),
+            routes: routes.map((route) => ({
+              ...route,
+              path: JSON.parse(route.path),
+            })),
+          })
+        }
       }
     }
     console.log(idx)
@@ -94,6 +97,14 @@ export function FileView() {
       setFileInfo(currentFileInfo)
     }
     console.log(fileInfo)
+  }, [idx, check])
+
+  const onSelect = () => {
+    setCheck(!check)
+  }
+
+  useEffect(() => {
+    setCheck(false)
   }, [idx])
   return (
     <>
@@ -184,6 +195,8 @@ export function FileView() {
                 description={description}
                 markerIcon={markerIcon}
                 markerColor={markerColor}
+                key={data.index}
+                onSelect={() => onSelect(data.index)}
               />
             )
           }}

@@ -10,8 +10,8 @@ const MIN_DISTANCE = 1e-6
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const [enabled, setEnabled] = useState<boolean>(false)
-  const [location, setLocation] = useState<Pos>([[127, 38], ''])
-  const locateLngLat = useRef<[number, number]>([127, 38])
+  const [location, setLocation] = useState<Pos>([[0, 0], ''])
+  const locateLngLat = useRef<[number, number]>([0, 0])
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {

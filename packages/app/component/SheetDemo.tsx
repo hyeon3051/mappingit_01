@@ -85,9 +85,6 @@ export function SheetDemo({ onChangeIdx, data, type }) {
             icon={ChevronDown}
             onPress={() => {
               setOpen(false)
-              toast.show('Sheet closed!', {
-                message: 'Just showing how toast works...',
-              })
             }}
           />
         </Sheet.Frame>
