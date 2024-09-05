@@ -1,6 +1,7 @@
 import React, { use, useEffect, useRef } from 'react'
-import MapboxGL, { Camera } from '@rnmapbox/maps'
+import MapboxGL, { Camera, SymbolLayer } from '@rnmapbox/maps'
 import { Pos } from '../types/type'
+import { Image } from '@my/ui'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
@@ -10,6 +11,9 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   let { location: currLocation } = useBackgroundGeolocation()
   const camera = useRef<Camera>(null) // Corrected here
   const mapRef = useRef<MapboxGL.MapView>(null)
+
+  const img_url =
+    'https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80'
 
   mapRef.current?.getZoom().then((zoom) => {
     camera.current?.setCamera({
@@ -36,7 +40,16 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         zoomEnabled={true}
         ref={mapRef}
       >
-        <MapboxGL.UserLocation androidRenderMode="normal" animated={true} />
+        <MapboxGL.UserLocation visible={true} animated={true} renderMode="normal">
+          <SymbolLayer
+            id="marker"
+            style={{
+              iconImage: img_url,
+              iconSize: 0.1,
+              iconAllowOverlap: true,
+            }}
+          />
+        </MapboxGL.UserLocation>
         <MapboxGL.Camera
           ref={camera}
           animationMode="easeTo"
