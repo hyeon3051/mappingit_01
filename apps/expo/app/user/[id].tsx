@@ -10,6 +10,7 @@ export default function Screen() {
       <Stack.Screen
         options={{
           title: 'User',
+          headerShown: false,
           presentation: 'modal',
           animation: 'slide_from_right',
           gestureEnabled: true,

@@ -8,17 +8,6 @@ import { fileState } from 'packages/app/contexts/mapData/fileReducer'
 import TamaIcon from 'packages/app/ui/Icon'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
-  const linkTarget = pagesMode ? '/pages-example-user' : '/user'
-  const markerLinkProps = useLink({
-    href: '/marker/marker',
-  })
-  const routeLinkProps = useLink({
-    href: `/route/route`,
-  })
-  const fileLinkProps = useLink({
-    href: '/file/file',
-  })
-
   const fileInfo = useContext(fileState)
   return (
     <>
@@ -77,19 +66,20 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
           </MapboxGL.ShapeSource>
         ))}
       </MapBoxComponent>
-      <XStack jc="space-around" ai="center">
-        <Button {...markerLinkProps} icon={<TamaIcon iconName="MapPin" color="black" />}>
-          마커
-        </Button>
-        <Button {...routeLinkProps} icon={<TamaIcon iconName="Route" color="black" />}>
-          루트
-        </Button>
-        <Button {...fileLinkProps} icon={<TamaIcon iconName="File" color="black" />}>
-          파일
-        </Button>
-        <Button {...fileLinkProps} icon={<TamaIcon iconName="Cog" color="black" />}>
-          설정
-        </Button>
+      <XStack
+        f={2}
+        jc="space-between"
+        gap="$1"
+        w="100%"
+        zIndex={3}
+        pos="absolute"
+        bottom={0}
+        left={0}
+        p="$4"
+        right={0}
+      >
+        <Button icon={<TamaIcon iconName="Home" color="$white1" size="$2" />}></Button>
+        <Button>측정 여부</Button>
       </XStack>
     </>
   )
