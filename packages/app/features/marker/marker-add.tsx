@@ -1,4 +1,15 @@
-import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController } from '@my/ui'
+import {
+  Button,
+  XStack,
+  YStack,
+  Input,
+  TextArea,
+  H3,
+  H6,
+  H5,
+  useToastController,
+  ScrollView,
+} from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
@@ -83,30 +94,34 @@ export function AddMarkerView() {
   console.log(marker)
 
   return (
-    <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
-      <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
-        <Button
-          size="$7"
-          circular
-          iconAfter={<TamaIcon iconName={params.icon} size="$6" />}
-          backgroundColor={params.color}
-        />
-        <YStack>
-          <H3>{title || 'example'}</H3>
-          <H6>Lorem ipsum</H6>
+    <>
+      <ScrollView>
+        <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
+          <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
+            <Button
+              size="$7"
+              circular
+              iconAfter={<TamaIcon iconName={params.icon} size="$6" />}
+              backgroundColor={params.color}
+            />
+            <YStack>
+              <H3>{title || 'example'}</H3>
+              <H6>Lorem ipsum</H6>
+            </YStack>
+          </XStack>
+          <YStack gap="$4" p="$2" w="80%" m={20}>
+            <H5>name</H5>
+            <Input onChangeText={onNameChange} value={title} />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H5>description</H5>
+            <TextArea onChangeText={onDescriptionChange} value={description} />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H5>Picture</H5>
+          </YStack>
         </YStack>
-      </XStack>
-      <YStack gap="$4" p="$2" w="80%" m={20}>
-        <H5>name</H5>
-        <Input onChangeText={onNameChange} value={title} />
-      </YStack>
-      <YStack gap="$4" p="$2" w="80%" ml={20}>
-        <H5>description</H5>
-        <TextArea onChangeText={onDescriptionChange} value={description} />
-      </YStack>
-      <YStack gap="$4" p="$2" w="80%" ml={20}>
-        <H5>Picture</H5>
-      </YStack>
+      </ScrollView>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
         <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}>
@@ -123,6 +138,6 @@ export function AddMarkerView() {
           <Button>현재 위치</Button>
         )}
       </XStack>
-    </YStack>
+    </>
   )
 }

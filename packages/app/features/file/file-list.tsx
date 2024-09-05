@@ -205,7 +205,7 @@ export function FileView() {
       <XStack
         f={2}
         jc="space-between"
-        gap="$4"
+        gap="$1"
         w="100%"
         zIndex={3}
         pos="absolute"
