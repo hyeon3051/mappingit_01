@@ -27,6 +27,7 @@ export type Marker = {
   description: string
   markerIcon: string
   markerColor: string
+  imageUri?: string[]
   parent?: number
   isSelected?: boolean
   delete_flag?: boolean

@@ -47,7 +47,6 @@ export function RouteView() {
 
   const routes = fileInfo?.routes || []
   useEffect(() => {
-    console.log('idx', idx)
     let route =
       idx !== 0
         ? fileInfo?.routes[idx - 1]?.path.map((pos) => pos[0])

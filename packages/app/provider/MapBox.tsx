@@ -40,16 +40,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         zoomEnabled={true}
         ref={mapRef}
       >
-        <MapboxGL.UserLocation visible={true} animated={true} renderMode="normal">
-          <SymbolLayer
-            id="marker"
-            style={{
-              iconImage: img_url,
-              iconSize: 0.1,
-              iconAllowOverlap: true,
-            }}
-          />
-        </MapboxGL.UserLocation>
+        <MapboxGL.UserLocation visible={true} animated={true} renderMode="normal" />
         <MapboxGL.Camera
           ref={camera}
           animationMode="easeTo"
