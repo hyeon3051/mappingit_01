@@ -1,7 +1,7 @@
 import { Button, XStack, SizableText, Separator, Stack } from '@my/ui'
-import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, X } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -11,8 +11,10 @@ import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
+import { TabView, SceneMap } from 'react-native-tab-view'
+import { useWindowDimensions } from 'react-native'
 
-export function MarkerView() {
+const MarkerListView = () => {
   const carouselRef = useRef(null)
   const [idx, setIdx] = useState(0)
   let { location: currLocation } = useBackgroundGeolocation()
@@ -138,5 +140,29 @@ export function MarkerView() {
         )}
       </XStack>
     </>
+  )
+}
+
+const renderScreen = SceneMap({
+  first: MarkerListView,
+})
+export function MarkerView() {
+  const layout = useWindowDimensions()
+  const [tabIdx, setTabIdx] = useState(0)
+  let { location: currLocation } = useBackgroundGeolocation()
+  const fileInfo = useContext(fileState)
+  const [routes] = useState([{ key: 'first', title: 'Marker' }])
+
+  return (
+    <TabView
+      navigationState={{
+        index: tabIdx,
+        routes,
+      }}
+      style={{ width: '100%', top: 0 }}
+      renderScene={renderScreen}
+      onIndexChange={setTabIdx}
+      initialLayout={{ width: layout.width }}
+    />
   )
 }

@@ -2,36 +2,39 @@ import {
   Button,
   XStack,
   YStack,
+  Stack,
   Input,
   TextArea,
   H3,
+  Card,
   H6,
   H5,
   useToastController,
   ScrollView,
+  Image,
 } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
+import Carousel from 'react-native-reanimated-carousel'
 import { useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { Marker } from 'packages/app/types/type'
 import 'react-native-get-random-values'
+import ImagePicker from 'react-native-image-crop-picker'
 import { v4 as uuidv4 } from 'uuid'
 export function AddMarkerView() {
-  const toast = useToastController()
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
-
   const marker = parseInt(`${params.marker}` || '-1')
-
   const [markerInfo, setMarkerInfo] = useState<Marker>({
     id: uuidv4(),
     title: '',
     description: '',
     markerColor: '',
     markerIcon: '',
-    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1]?.[0],
+    imageUri: [],
+    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1][0],
   })
 
   useEffect(() => {
@@ -76,7 +79,6 @@ export function AddMarkerView() {
       type: 'REMOVE_MARKER',
       payload: { markerId: marker },
     })
-    router.replace('/marker/marker')
   }
 
   const handleChange = () => {
@@ -89,7 +91,8 @@ export function AddMarkerView() {
         payload: { marker: markerInfo, markerId: markerInfo.id },
       })
     }
-    router.replace('/marker/marker')
+    router.back()
+    router.back()
   }
   console.log(marker)
 
@@ -119,6 +122,40 @@ export function AddMarkerView() {
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
             <H5>Picture</H5>
+            <Button
+              onPress={() =>
+                ImagePicker.openPicker({
+                  width: 300,
+                  height: 400,
+                  cropping: true,
+                  multiple: true,
+                }).then((image) => {
+                  setMarkerInfo((prev) => ({
+                    ...prev,
+                    imageUri: image.map((img) => img.path),
+                  }))
+                })
+              }
+            >
+              Add Picture
+            </Button>
+            {markerInfo?.imageUri?.length > 0 &&
+              (console.log(markerInfo?.imageUri),
+              (
+                <Carousel
+                  loop={true}
+                  modeConfig={{
+                    mode: 'stack',
+                    stackInterval: 18,
+                  }}
+                  mode="horizontal-stack"
+                  width={300}
+                  height={300}
+                  scrollAnimationDuration={100}
+                  data={markerInfo?.imageUri}
+                  renderItem={({ item }) => <CardDemo uri={item} />}
+                />
+              ))}
           </YStack>
         </YStack>
       </ScrollView>
@@ -139,5 +176,18 @@ export function AddMarkerView() {
         )}
       </XStack>
     </>
+  )
+}
+
+export function CardDemo({ uri }) {
+  return (
+    <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
+      <Image source={{ uri: uri, width: 274, height: 300 }} />
+      <Card.Footer>
+        <XStack flex={1} m="$2" jc="flex-end" px="$4">
+          <Button size="$3" icon={<TamaIcon iconName="Check" size="$2" />} px="$4" />
+        </XStack>
+      </Card.Footer>
+    </Card>
   )
 }
