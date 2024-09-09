@@ -19,17 +19,21 @@ export async function addFile(
   db: ReturnType<typeof useSQLiteContext>
 ) {
   return await db.runAsync(
-    `INSERT INTO file (title, description) VALUES ('${title}', '${description}')`
+    `CREATE TABLE IF NOT EXISTS file (id INTEGER PRIMARY KEY NOT NULL, title TEXT, description TEXT)
+    INSERT INTO file (title, description) VALUES ('${title}', '${description}')
+    `
   )
 }
 
 export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteContext>) {
-  const { pos, title, description, markerIcon, markerColor, parent } = Marker
+  const { pos, title, description, markerIcon, markerColor, imageUri, parent } = Marker
   const stringifyPos = JSON.stringify(pos)
+  const stringifyImgUri = JSON.stringify(imageUri)
   console.log(stringifyPos)
   return await db.runAsync(
-    `INSERT INTO marker (pos, title, description, markerIcon, markerColor, parent) VALUES (
-    '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', ${parent}
+    `CREATE TABLE IF NOT EXISTS marker (id INTEGER PRIMARY KEY NOT NULL, pos TEXT, title TEXT, description TEXT, markerIcon TEXT, markerColor TEXT, pathImg TEXT, parent INTEGER)     
+    INSERT INTO marker (pos, title, description, markerIcon, markerColor, pathImg, parent) VALUES (
+    '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}, ${parent}
     )`
   )
 }
@@ -39,7 +43,8 @@ export async function addRoute(Route: Route, db: ReturnType<typeof useSQLiteCont
   const stringifyPath = JSON.stringify(path)
   console.log(stringifyPath)
   return await db.runAsync(
-    `INSERT INTO route (path, title, description, lineWdith, lineColor, parent) VALUES (
+    `CREATE TABLE IF NOT EXISTS route (id INTEGER PRIMARY KEY NOT NULL, path TEXT, title TEXT, description TEXT, lineWidth TEXT, lineColor TEXT, parent INTEGER)
+    INSERT INTO route (path, title, description, lineWdith, lineColor, parent) VALUES (
     '${stringifyPath}', '${title}', '${description}', '${lineWidth}', '${lineColor}', ${parent}
     )`
   )
