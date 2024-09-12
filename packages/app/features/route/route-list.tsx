@@ -92,29 +92,7 @@ export function RouteView() {
           </>
         )}
       </MapBoxComponent>
-      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
-        <XStack
-          backgroundColor="$blue10"
-          f={2}
-          w="80%"
-          jc="space-around"
-          p="$2"
-          m="$2"
-          borderRadius="$10"
-        >
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            정보
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            마커
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            사진
-          </SizableText>
-        </XStack>
-      </Stack>
+      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center"></Stack>
       <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
         <Carousel
           loop={false}

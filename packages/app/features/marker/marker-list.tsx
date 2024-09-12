@@ -1,5 +1,5 @@
 import { Button, XStack, SizableText, Card, Stack, YStack, Paragraph, Image } from '@my/ui'
-import { PlusCircle, FileEdit, X } from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, X, MonitorSpeaker } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import React, { use, useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
@@ -37,15 +37,18 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = ({ location }) => {
   const { marker } = useMarkerState()
   return (
-    <MapBoxComponent location={[location, '']}>
+    <MapBoxComponent location={[location || [127, 38], '']}>
       <MapboxGL.PointAnnotation
-        coordinate={marker.pos[0]}
+        coordinate={marker?.pos[0] || [127, 38]}
         key={`
-         pt-ann-${marker.id}
+         pt-ann-${marker?.id || 'pt-ann'}
         `}
         id="pt-ann"
       >
-        <TamaIcon iconName={marker.markerIcon} color={marker.markerColor} />
+        <TamaIcon
+          iconName={marker?.markerIcon || 'PinOff'}
+          color={marker?.markerColor || '$black10'}
+        />
       </MapboxGL.PointAnnotation>
     </MapBoxComponent>
   )
@@ -133,7 +136,7 @@ const MarkerListView = () => {
 
 const MarkerInfoView = () => {
   const { marker } = useMarkerState()
-  const markerDate = new Date(marker.pos[1])
+  const markerDate = new Date(marker?.pos[1]) || new Date()
   const markerTimeStr = markerDate.toLocaleTimeString()
   const markerDateStr = markerDate.toLocaleDateString()
   return (
@@ -152,8 +155,8 @@ const MarkerInfoView = () => {
           >
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
-                <SizableText size="$8">{marker['title']}</SizableText>
-                <Paragraph size="$1">{marker['description']}</Paragraph>
+                <SizableText size="$8">{marker?.title}</SizableText>
+                <Paragraph size="$1">{marker?.description}</Paragraph>
                 <Paragraph size="$1">{markerDateStr}</Paragraph>
                 <Paragraph size="$1">{markerTimeStr}</Paragraph>
               </YStack>
@@ -209,13 +212,13 @@ export function MarkerView() {
   const { marker } = useMarkerState()
   const layout = useWindowDimensions()
   const [tabIdx, setTabIdx] = useState(1)
-  const [zIndex, setZIndex] = useState(3)
+  const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
     { key: 'first', title: 'info' },
     { key: 'second', title: 'Marker' },
     { key: 'three', title: 'Image' },
   ])
-
+  useEffect(() => {}, [marker])
   return (
     <>
       <MarkerOnMap location={marker?.pos[0] || [0, 0]} />
@@ -224,13 +227,17 @@ export function MarkerView() {
           index: tabIdx,
           routes,
         }}
-        style={{ width: '100%', height: '100%', zIndex: 3 }}
+        style={{ width: '100%', height: '100%', zIndex: zIndex }}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}
         initialLayout={{ width: layout.width, height: layout.height }}
       />
-      <Button onPress={() => setZIndex(1)} backgroundColor={'$black10'} zIndex={10}>
-        +asdfasdf
+      <Button
+        onPress={() => setZIndex(zIndex === 1 ? 10 : 1)}
+        backgroundColor={'$white10'}
+        zIndex={10}
+      >
+        press the map view
       </Button>
     </>
   )

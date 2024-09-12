@@ -82,7 +82,7 @@ export function AddMarkerView() {
   }
 
   const handleChange = () => {
-    if (marker !== -1) {
+    if (!marker) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
       console.log('add marker')
     } else {

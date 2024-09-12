@@ -155,7 +155,7 @@ export function SelectFileView() {
     <>
       <MapBoxComponent location={[[127.32, 37.44], '']} zoomLevel={3}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
-          <MapboxGL.PointAnnotation key={id} coordinate={pos} id="pt-ann">
+          <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
         ))}
