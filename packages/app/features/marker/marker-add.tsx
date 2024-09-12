@@ -9,7 +9,6 @@ import {
   Card,
   H6,
   H5,
-  useToastController,
   ScrollView,
   Image,
 } from '@my/ui'
@@ -34,7 +33,7 @@ export function AddMarkerView() {
     markerColor: '',
     markerIcon: '',
     imageUri: [],
-    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1][0],
+    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1],
   })
 
   useEffect(() => {
@@ -44,14 +43,15 @@ export function AddMarkerView() {
       markerIcon: icon,
       markerColor: color,
     }))
-    if (marker !== -1 && fileInfo?.markers[marker]) {
-      const selectedMarker = fileInfo?.markers[marker]
-      const { id, title, description } = selectedMarker
+    if (marker !== -1 && fileInfo?.markers[marker - 1]) {
+      const selectedMarker = fileInfo?.markers[marker - 1]
+      const { id, title, description, imageUri } = selectedMarker
       setMarkerInfo((prev) => ({
         ...prev,
         id: id,
         title: title,
         description: description,
+        imageUri: imageUri,
       }))
     }
   }, [params])

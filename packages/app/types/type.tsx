@@ -22,7 +22,7 @@ export type Route = {
 
 export type Marker = {
   id: string
-  pos: Position
+  pos: Pos
   title: string
   description: string
   markerIcon: string

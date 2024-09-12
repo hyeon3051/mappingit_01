@@ -24,7 +24,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
 
   useEffect(() => {
     if (location && camera.current) {
-      camera.current.setCamera({
+      camera.current.moveTo({
         centerCoordinate: location[0] ?? currLocation[0],
         animationDuration: 1000,
       })
@@ -34,7 +34,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   return (
     <>
       <MapboxGL.MapView
-        style={{ flex: 1 }}
+        style={{ flex: 1, zIndex: 3, top: 0, position: 'absolute', width: '100%', height: '100%' }}
         logoEnabled={false}
         attributionEnabled={false}
         zoomEnabled={true}
