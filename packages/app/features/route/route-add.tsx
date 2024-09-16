@@ -96,7 +96,7 @@ export function AddRouteView() {
         payload: { route: routeInfo },
       })
     }
-    router.replace('/route/route')
+    router.back()
   }
 
   return (

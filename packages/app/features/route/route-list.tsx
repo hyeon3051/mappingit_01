@@ -20,7 +20,7 @@ interface RouteState {
 }
 
 const useMarkerState = create<RouteState>((set) => ({
-  idx: -1,
+  idx: 0,
   setIdx(idx) {
     set({ idx })
   },
@@ -31,7 +31,7 @@ const RouteOnMap = ({ location }) => {
   const { idx } = useMarkerState()
   const [route, setRoute] = useState<Route>()
   useEffect(() => {
-    if (idx !== -1) {
+    if (idx !== 0) {
       setRoute(fileInfo?.routes[idx])
     } else {
       setRoute({
@@ -39,18 +39,18 @@ const RouteOnMap = ({ location }) => {
         description: 'current',
         path: fileInfo?.currentRoute,
         lineColor: 'black',
-        lineWidth: 2,
+        lineWidth: 10,
       })
     }
-  }, [idx])
+  }, [idx, fileInfo?.currentRoute])
   return (
     <MapBoxComponent location={location}>
       {route && (
         <>
-          <MapboxGL.PointAnnotation coordinate={[127, 37]} key="start" id="pt-ann">
+          <MapboxGL.PointAnnotation coordinate={[127, 37]} key="start" id="pt-ann-start">
             <TamaIcon iconName="MapPin" color="$black10" size="$2" />
           </MapboxGL.PointAnnotation>
-          <MapboxGL.PointAnnotation coordinate={location} key="end" id="pt-ann">
+          <MapboxGL.PointAnnotation coordinate={location} key="end" id="pt-ann-end">
             <TamaIcon iconName="MapPin" color="$black10" size="$2" />
           </MapboxGL.PointAnnotation>
           <MapboxGL.ShapeSource
@@ -63,6 +63,7 @@ const RouteOnMap = ({ location }) => {
                 coordinates: route?.path?.map((pos) => pos[0]) || [],
               },
             }}
+            key="line-source"
           >
             <MapboxGL.LineLayer
               id="line"
@@ -84,19 +85,20 @@ const RouteInfoView = () => {
   const { idx } = useMarkerState()
   const [route, setRoute] = useState()
   useEffect(() => {
-    if (idx !== -1) {
-      setRoute(fileInfo?.routes[idx])
+    if (idx !== 0 ) {
+      setRoute(fileInfo?.routes[idx - 1 ])
     } else {
       setRoute({
         title: 'current',
         description: 'current',
+        path: fileInfo?.currentRoute,
       })
     }
   }, [idx])
-  const start_at = new Date()
+  const start_at = new Date(fileInfo?.currentRoute?.[0]?.[1] || new Date())
   const startDate = start_at.toLocaleDateString()
   const startTime = start_at.toLocaleTimeString()
-  const end_at = new Date()
+  const end_at = new Date(fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] || new Date())
   const endDate = end_at.toLocaleDateString()
   const endTime = end_at.toLocaleTimeString()
   return (
@@ -228,6 +230,7 @@ const renderScreen = SceneMap({
 export function RouteView() {
   const { idx } = useMarkerState()
   const layout = useWindowDimensions()
+  const fileInfo = useContext(fileState)
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
