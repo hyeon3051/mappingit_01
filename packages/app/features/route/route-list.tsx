@@ -1,6 +1,6 @@
 import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -30,19 +30,23 @@ const RouteOnMap = ({ location }) => {
   const fileInfo = useContext(fileState)
   const { idx } = useMarkerState()
   const [route, setRoute] = useState<Route>()
-  useEffect(() => {
+  const memoizedRoute = useMemo(() => {
     if (idx !== 0) {
-      setRoute(fileInfo?.routes[idx])
+      return fileInfo?.routes[idx]
     } else {
-      setRoute({
+      return {
         title: 'current',
         description: 'current',
         path: fileInfo?.currentRoute,
         lineColor: 'black',
         lineWidth: 10,
-      })
+      }
     }
-  }, [idx, fileInfo?.currentRoute])
+  }, [idx, fileInfo?.routes, fileInfo?.currentRoute])
+
+  useEffect(() => {
+    setRoute(memoizedRoute)
+  }, [memoizedRoute])
   return (
     <MapBoxComponent location={location}>
       {route && (
@@ -81,20 +85,8 @@ const RouteOnMap = ({ location }) => {
 }
 
 const RouteInfoView = () => {
-  const fileInfo = useContext(fileState)
   const { idx } = useMarkerState()
-  const [route, setRoute] = useState()
-  useEffect(() => {
-    if (idx !== 0 ) {
-      setRoute(fileInfo?.routes[idx - 1 ])
-    } else {
-      setRoute({
-        title: 'current',
-        description: 'current',
-        path: fileInfo?.currentRoute,
-      })
-    }
-  }, [idx])
+  const fileInfo = useContext(fileState)
   const start_at = new Date(fileInfo?.currentRoute?.[0]?.[1] || new Date())
   const startDate = start_at.toLocaleDateString()
   const startTime = start_at.toLocaleTimeString()
@@ -117,8 +109,8 @@ const RouteInfoView = () => {
           >
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
-                <SizableText size="$8">{route?.title}</SizableText>
-                <Paragraph size="$1">{route?.description}</Paragraph>
+                <SizableText size="$8">{fileInfo?.routes[idx]?.title}</SizableText>
+                <Paragraph size="$1">{fileInfo?.routes[idx]?.description}</Paragraph>
                 <Paragraph size="$1">{startDate}</Paragraph>
                 <Paragraph size="$1">{startTime}</Paragraph>
                 <Paragraph size="$1">{endDate}</Paragraph>
@@ -230,7 +222,6 @@ const renderScreen = SceneMap({
 export function RouteView() {
   const { idx } = useMarkerState()
   const layout = useWindowDimensions()
-  const fileInfo = useContext(fileState)
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
