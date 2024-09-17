@@ -95,6 +95,7 @@ export function AddRouteView() {
         type: 'ADD_ROUTE',
         payload: { route: routeInfo },
       })
+      dispatch({ type: 'CHANGE_IS_RECORD_FALSE' })
     }
     router.back()
   }

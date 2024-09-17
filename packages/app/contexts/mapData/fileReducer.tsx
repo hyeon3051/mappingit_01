@@ -53,6 +53,14 @@ interface appendPos {
   payload: { pos: Pos }
 }
 
+interface ChangeIsRecordTrueAction {
+  type: 'CHANGE_IS_RECORD_TRUE'
+}
+
+interface ChangeIsRecordFalseAction {
+  type: 'CHANGE_IS_RECORD_FALSE'
+}
+
 export type LocateFileActions =
   | SetTitleAction
   | { type: 'INIT' }
@@ -63,6 +71,8 @@ export type LocateFileActions =
   | RemoveRouteAction
   | EditRouteAction
   | appendPos
+  | ChangeIsRecordTrueAction
+  | ChangeIsRecordFalseAction
 
 const fileReducer = (state: LocateFile, action: LocateFileActions) =>
   produce(state, (draft) => {
@@ -109,6 +119,12 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
       // 위치 추적
       case 'APPEND_POS':
         draft.currentRoute.push(action.payload.pos)
+        break
+      case 'CHANGE_IS_RECORD_TRUE':
+        draft.isRecord = true
+        break
+      case 'CHANGE_IS_RECORD_FALSE':
+        draft.isRecord = false
         break
     }
   })

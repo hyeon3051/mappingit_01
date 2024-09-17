@@ -2,16 +2,32 @@ import { Button, XStack } from '@my/ui'
 import MapBoxComponent from 'app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useLink } from 'solito/navigation'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
+
 import TamaIcon from 'packages/app/ui/Icon'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   const fileInfo = useContext(fileState)
+  const dispatch = useContext(fileDispatch)
+  const changeIsRecordTrue = () => {
+    dispatch({ type: 'CHANGE_IS_RECORD_TRUE' })
+  }
+  const changeIsRecordFalse = () => {
+    dispatch({ type: 'CHANGE_IS_RECORD_FALSE' })
+  }
+  const [isRecord, setIsRecord] = useState(false)
+  useEffect(() => {
+    if (fileInfo?.isRecord) {
+      setIsRecord(true)
+    } else {
+      setIsRecord(false)
+    }
+  }, [fileInfo?.isRecord])
   return (
     <>
-      <MapBoxComponent>
+      <MapBoxComponent location={fileInfo?.currentRoute[fileInfo?.currentRoute.length - 1]}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
@@ -78,7 +94,10 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
         p="$4"
         right={0}
       >
-        <Button icon={<TamaIcon iconName="Home" color="$white1" size="$2" />}></Button>
+        {isRecord ? 
+          <Button onPress={changeIsRecordFalse} icon={<TamaIcon iconName="CameraOff" color="red" />} disabled>경로에서 종료</Button> :
+          <Button onPress={changeIsRecordTrue} icon={<TamaIcon iconName="Camera" color="green" />}>측정 시작</Button>
+        }
         <Button>측정 여부</Button>
       </XStack>
     </>

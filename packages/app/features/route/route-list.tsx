@@ -32,7 +32,7 @@ const RouteOnMap = ({ location }) => {
   const [route, setRoute] = useState<Route>()
   const memoizedRoute = useMemo(() => {
     if (idx !== 0) {
-      return fileInfo?.routes[idx]
+      return fileInfo?.routes[idx -1]
     } else {
       return {
         title: 'current',
@@ -46,6 +46,7 @@ const RouteOnMap = ({ location }) => {
 
   useEffect(() => {
     setRoute(memoizedRoute)
+    console.log('route', route)
   }, [memoizedRoute])
   return (
     <MapBoxComponent location={location}>
