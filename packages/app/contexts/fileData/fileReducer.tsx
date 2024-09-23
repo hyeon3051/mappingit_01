@@ -31,8 +31,8 @@ export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteC
   const stringifyImgUri = JSON.stringify(imageUri)
   console.log(stringifyPos)
   return await db.runAsync(
-    `CREATE TABLE IF NOT EXISTS marker (id INTEGER PRIMARY KEY NOT NULL, pos TEXT, title TEXT, description TEXT, markerIcon TEXT, markerColor TEXT, pathImg TEXT, parent INTEGER)     
-    INSERT INTO marker (pos, title, description, markerIcon, markerColor, pathImg, parent) VALUES (
+    `CREATE TABLE IF NOT EXISTS marker (id INTEGER PRIMARY KEY NOT NULL, pos TEXT, title TEXT, description TEXT, markerIcon TEXT, markerColor TEXT, pathImg TEXT, parent INTEGER, imageUrl TEXT)  
+    INSERT INTO marker (pos, title, description, markerIcon, markerColor, imageUrl, parent) VALUES (
     '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}, ${parent}
     )`
   )
