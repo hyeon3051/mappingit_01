@@ -32,6 +32,15 @@ export function FileView() {
     href: `/file/addFile`,
   })
 
+  useEffect(() => {
+    async function setup() {
+      console.log(await db.getAllAsync('SELECT * from file')  )
+      console.log(await db.getAllAsync('SELECT * from marker')  )
+      console.log(await db.getAllAsync('SELECT * from route')  )
+    }
+    setup()
+  }, [])
+
   const editLinkProps = useLink({
     href: `/file/addFile/?fileId=${fileInfo?.id}`,
   })
@@ -71,9 +80,10 @@ export function FileView() {
       if (!result) {
         return
       }
-      if (check) {
+      if (idx && check) {
         const markers: Marker[] = await getMarkerById(result.id, db)
         const routes: Route[] = await getRouteById(result.id, db)
+        console.log(markers)
         if (result.id) {
           setFileInfo({
             id: id,
@@ -85,6 +95,7 @@ export function FileView() {
             })),
             routes: routes.map((route) => ({
               ...route,
+              lineWidth: parseInt(route.lineWidth),
               path: JSON.parse(route.path),
             })),
           })
@@ -109,6 +120,7 @@ export function FileView() {
 
   useEffect(() => {
     if (save) {
+      console.log(fileInfo)
       dispatch({ type: 'SET_DATA', payload: { data: fileInfo } })
       setSave(false)
     }
@@ -120,9 +132,9 @@ export function FileView() {
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
-        ))}
-        {fileInfo?.routes?.map(({ path, lineColor, lineWidth }, idx) => (
-          <MapboxGL.ShapeSource
+               ))}
+          {fileInfo?.routes?.map((route, idx) => (
+            <MapboxGL.ShapeSource
             key={String(idx)}
             id={'line' + String(idx)}
             lineMetrics={true}
@@ -131,7 +143,7 @@ export function FileView() {
               properties: {},
               geometry: {
                 type: 'LineString',
-                coordinates: path.map((pos) => pos[0]),
+                coordinates: route['path'].map((pos) => pos[0]),
               },
             }}
           >
@@ -139,8 +151,8 @@ export function FileView() {
               id={'line' + idx}
               sourceID={'line' + idx}
               style={{
-                lineColor: lineColor || '#FFFFFF',
-                lineWidth: lineWidth || 3,
+                lineColor: route['lineColor'] || '#FFFFFF',
+                lineWidth: route['lineWidth'] || 3,
               }}
             />
           </MapboxGL.ShapeSource>

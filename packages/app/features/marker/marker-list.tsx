@@ -38,9 +38,8 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = ({ location }) => {
   const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
-  console.log('marker', marker)
   return (
-    <MapBoxComponent location={marker?.id ? marker.pos[0] : fileInfo.pos[0]}>
+    <MapBoxComponent location={marker?.id && marker.pos[0], []}>
       <MapboxGL.PointAnnotation
         coordinate={marker?.id  ? marker.pos[0] : fileInfo.pos[0]}
         key={`
@@ -222,7 +221,6 @@ export function MarkerView() {
     { key: 'second', title: 'Marker' },
     { key: 'three', title: 'Image' },
   ])
-  useEffect(() => {}, [marker])
   return (
     <>
       <MarkerOnMap location={marker?.id !== '' ? fileInfo.pos[0] : marker?.pos[0] } />

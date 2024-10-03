@@ -20,7 +20,7 @@ const useBackgroundGeolocation = () => {
 
       try {
           setLocation([[coords.longitude, coords.latitude], loc.timestamp])
-          locateLngLat.current = [coords.longitude, coords.latitude]r
+          locateLngLat.current = [coords.longitude, coords.latitude]
       } catch (e) {
       }
     })
