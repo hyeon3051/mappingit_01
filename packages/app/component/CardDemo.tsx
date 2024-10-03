@@ -1,7 +1,7 @@
 import { Button, Paragraph, XStack, YStack, SizableText, Stack, Card } from '@my/ui'
 import TamaIcon from '../ui/Icon'
 
-export function CardDemo({ title, description, markerIcon, markerColor, onSelect = () => {} }) {
+export function CardDemo({ title, description, markerIcon, markerColor, onSelect = () => {}, onFileSelect }: { title: string, description: string, markerIcon: string, markerColor: string, onSelect?: () => void, onFileSelect?: () => void }) {
   return (
     <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
       <Card.Header padded>
@@ -32,6 +32,16 @@ export function CardDemo({ title, description, markerIcon, markerColor, onSelect
             px="$4"
             onPress={onSelect}
           />
+          { onFileSelect && (
+            <Button
+              size="$3"
+              icon={<TamaIcon iconName="PlusCircle" size="$2" />}
+              px="$4"
+              onPress={onFileSelect}
+            />
+          )
+
+          }
         </XStack>
       </Card.Footer>
     </Card>

@@ -45,7 +45,6 @@ export function AddFileView() {
       setCurrentFileInfo((prev) => ({
         ...prev,
       }))
-      console.log(fileId)
       if (fileId !== -1) {
         const file = await getFileDataById(fileId, db)
         const routes = await getRouteById(fileId, db)
@@ -70,7 +69,6 @@ export function AddFileView() {
 
   const onFileChange = () => {
     const { title, description } = currentFileInfo
-    console.log(title, description)
     dispatch({ type: 'SET_TITLE', payload: { title, description } })
     if (fileId !== -1 && fileId) {
       router.replace(`/file/selectData/?fileId=${fileId}`)
@@ -106,15 +104,11 @@ export function AddFileView() {
     } else {
       const file = await addFile({ title, description }, db)
       const fileId = file.lastInsertRowId
-      console.log(fileId)
       for await (let route of fileInfo.routes) {
         const routeId = addRoute({ ...route, parent: fileId }, db)
-        console.log(routeId, 'routeId')
       }
-      console.log(markers)
       for await (let marker of fileInfo.markers) {
         const markerId = await addMarker({ ...marker, parent: fileId }, db)
-        console.log(markerId, 'markerId')
       }
       toast.hide()
       toast.show('파일 추가가 완료되었습니다.')

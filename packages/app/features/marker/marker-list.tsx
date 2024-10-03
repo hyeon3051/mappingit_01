@@ -28,6 +28,7 @@ const useMarkerState = create<MarkerState>((set) => ({
     pos: [[0, 0], ''],
     markerIcon: 'PinOff',
     markerColor: '$black10',
+    
   },
   updateMarker(marker) {
     set({ marker })
@@ -35,11 +36,13 @@ const useMarkerState = create<MarkerState>((set) => ({
 }))
 
 const MarkerOnMap = ({ location }) => {
+  const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
+  console.log('marker', marker)
   return (
-    <MapBoxComponent location={[location || [127, 38], '']}>
+    <MapBoxComponent location={marker?.id ? marker.pos[0] : fileInfo.pos[0]}>
       <MapboxGL.PointAnnotation
-        coordinate={marker?.pos[0] || [127, 38]}
+        coordinate={marker?.id  ? marker.pos[0] : fileInfo.pos[0]}
         key={`
          pt-ann-${marker?.id || 'pt-ann'}
         `}
@@ -195,8 +198,8 @@ const MakerImageView = () => {
         mode="horizontal-stack"
         width={420}
         height={324}
-        scrollAnimationDuration={100}
-        data={marker?.imageUri}
+        scrollAnimationDuration={100} 
+        data={typeof marker?.imageUri === 'string' ? [marker?.imageUri] : marker?.imageUri}
         renderItem={({ item }) => <CardImage uri={item} />}
       />
     </Stack>
@@ -213,6 +216,7 @@ export function MarkerView() {
   const layout = useWindowDimensions()
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
+  const fileInfo = useContext(fileState)
   const [routes] = useState([
     { key: 'first', title: 'info' },
     { key: 'second', title: 'Marker' },
@@ -221,7 +225,7 @@ export function MarkerView() {
   useEffect(() => {}, [marker])
   return (
     <>
-      <MarkerOnMap location={marker?.pos[0] || [0, 0]} />
+      <MarkerOnMap location={marker?.id !== '' ? fileInfo.pos[0] : marker?.pos[0] } />
       <TabView
         navigationState={{
           index: tabIdx,

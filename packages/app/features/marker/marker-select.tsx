@@ -17,16 +17,13 @@ export function SelectMarkerView() {
   const marker = parseInt(`${params.marker}` || '-1')
 
   useEffect(() => {
-    console.log('marker', marker)
     if (marker !== -1 && fileInfo?.markers[marker - 1]) {
-      console.log('fileInfo', fileInfo.markers[marker - 1])
       const { markerIcon, markerColor } = fileInfo?.markers[marker - 1]
       setMarkerIcon({
         icon: markerIcon,
         color: markerColor,
       })
     }
-    console.log('params', params)
   }, [params])
 
   const router = useRouter()

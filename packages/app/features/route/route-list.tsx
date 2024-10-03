@@ -1,4 +1,4 @@
-import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
+import { PlusCircle, FileEdit, FileImage } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
@@ -29,33 +29,15 @@ const useMarkerState = create<RouteState>((set) => ({
 const RouteOnMap = ({ location }) => {
   const fileInfo = useContext(fileState)
   const { idx } = useMarkerState()
-  const [route, setRoute] = useState<Route>()
-  const memoizedRoute = useMemo(() => {
-    if (idx !== 0) {
-      return fileInfo?.routes[idx -1]
-    } else {
-      return {
-        title: 'current',
-        description: 'current',
-        path: fileInfo?.currentRoute,
-        lineColor: 'black',
-        lineWidth: 10,
-      }
-    }
-  }, [idx, fileInfo?.routes, fileInfo?.currentRoute])
-
-  useEffect(() => {
-    setRoute(memoizedRoute)
-    console.log('route', route)
-  }, [memoizedRoute])
+  
   return (
     <MapBoxComponent location={location}>
-      {route && (
+      {fileInfo && (
         <>
-          <MapboxGL.PointAnnotation coordinate={[127, 37]} key="start" id="pt-ann-start">
+          <MapboxGL.PointAnnotation coordinate={idx !== 0 ? fileInfo.routes[idx - 1]?.path[0][0] : fileInfo.pos[0]} key="start" id="pt-ann-start">
             <TamaIcon iconName="MapPin" color="$black10" size="$2" />
           </MapboxGL.PointAnnotation>
-          <MapboxGL.PointAnnotation coordinate={location} key="end" id="pt-ann-end">
+          <MapboxGL.PointAnnotation coordinate={idx !== 0 ? fileInfo.routes[idx - 1]?.path[fileInfo.routes[idx -1].path.length - 1][0]: fileInfo.pos[0]} key="end" id="pt-ann-end">
             <TamaIcon iconName="MapPin" color="$black10" size="$2" />
           </MapboxGL.PointAnnotation>
           <MapboxGL.ShapeSource
@@ -65,17 +47,21 @@ const RouteOnMap = ({ location }) => {
               properties: {},
               geometry: {
                 type: 'LineString',
-                coordinates: route?.path?.map((pos) => pos[0]) || [],
+                coordinates: idx === 0 ?
+                 fileInfo.currentRoute.length >= 2 &&
+                  fileInfo.currentRoute.map((route) => route[0]) || [location, location] :
+                   fileInfo.routes[idx - 1]?.path.map((route) => route[0])
               },
             }}
             key="line-source"
           >
             <MapboxGL.LineLayer
               id="line"
+              key='line'
               sourceID="line"
               style={{
-                lineColor: route.lineColor,
-                lineWidth: route.lineWidth,
+                lineColor: idx !== 0 ? fileInfo.routes[idx -1]?.lineColor : 'red',
+                lineWidth: idx !== 0 ? fileInfo.routes[idx -1]?.lineWidth : 3
               }}
             />
           </MapboxGL.ShapeSource>
@@ -159,9 +145,9 @@ export function RouteListView() {
           vertical={true}
           data={[
             {
-              title: 'title',
-              description: 'description',
-              markerIcon: 'MapPin',
+              title: '현재 경로',
+              description: '측정 중인 경로',
+              markerIcon: 'Route',
               markerColor: '$black10',
             },
             ...routes.map((route) => ({
@@ -223,16 +209,16 @@ const renderScreen = SceneMap({
 export function RouteView() {
   const { idx } = useMarkerState()
   const layout = useWindowDimensions()
+  const fileInfo = useContext(fileState)
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
     { key: 'first', title: 'info' },
     { key: 'second', title: 'route' },
   ])
-  useEffect(() => {}, [idx])
   return (
     <>
-      <RouteOnMap location={[127, 38]} />
+      <RouteOnMap location={idx !== 0 ? fileInfo.routes[idx - 1]?.path[0][0] : fileInfo?.currentRoute.length >= 2 ?  fileInfo.currentRoute[0][0] : fileInfo?.pos[0]} />
       <TabView
         navigationState={{
           index: tabIdx,

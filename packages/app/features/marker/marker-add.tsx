@@ -33,7 +33,7 @@ export function AddMarkerView() {
     markerColor: '',
     markerIcon: '',
     imageUri: [],
-    pos: fileInfo?.currentRoute[fileInfo.currentRoute.length - 1],
+    pos: fileInfo?.pos
   })
 
   useEffect(() => {
@@ -140,7 +140,6 @@ export function AddMarkerView() {
               Add Picture
             </Button>
             {markerInfo?.imageUri?.length > 0 &&
-              (console.log(markerInfo?.imageUri),
               (
                 <Carousel
                   loop={true}
@@ -155,7 +154,7 @@ export function AddMarkerView() {
                   data={markerInfo?.imageUri}
                   renderItem={({ item }) => <CardDemo uri={item} />}
                 />
-              ))}
+              )}
           </YStack>
         </YStack>
       </ScrollView>

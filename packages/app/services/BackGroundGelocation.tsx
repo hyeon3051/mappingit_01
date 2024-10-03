@@ -6,7 +6,7 @@ import BackgroundGeolocation, {
 } from 'react-native-background-geolocation'
 import { Pos } from '../types/type'
 import { fileDispatch, fileState } from '../contexts/mapData/fileReducer'
-const MIN_DISTANCE = 1e-7
+const MIN_DISTANCE = 1e-6
 const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const fileInfo = useContext(fileState)
@@ -19,18 +19,9 @@ const useBackgroundGeolocation = () => {
       let coords = loc.coords
 
       try {
-        if (
-          Math.sqrt(
-            Math.abs(locateLngLat.current[0] - coords.longitude) ** 2 +
-              Math.abs(locateLngLat.current[1] - coords.latitude) ** 2
-          ) > MIN_DISTANCE
-        ) {
-          console.log('location', coords.latitude, coords.longitude)
           setLocation([[coords.longitude, coords.latitude], loc.timestamp])
-          locateLngLat.current = [coords.longitude, coords.latitude]
-        }
+          locateLngLat.current = [coords.longitude, coords.latitude]r
       } catch (e) {
-        console.log('error', e)
       }
     })
 
@@ -55,7 +46,6 @@ const useBackgroundGeolocation = () => {
         BackgroundGeolocation.watchPosition((loc: Location) => {
           setEnabled(true)
         })
-        console.log('- BackgroundGeolocation is configured and ready: ', state.enabled)
       }
     )
 
@@ -78,9 +68,8 @@ const useBackgroundGeolocation = () => {
 
   useEffect(() => {
     if (locateLngLat.current[0] === 0 && locateLngLat.current[1] === 0) return
-    console.log(fileInfo?.isRecord)
+    dispatch({ type: 'SET_LOCATION', payload: { location } })
     if (!fileInfo?.isRecord) return
-    console.log('append')
     dispatch({ type: 'APPEND_POS', payload: { pos: location } })
   }, [location, fileInfo?.isRecord])
 

@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Pos, Route, Marker, LocateFile } from 'packages/app/types/type'
+import { Pos, Route, Marker, LocateFile, FileState } from 'packages/app/types/type'
 import React from 'react'
 
 const ADD_MARKER = 'ADD_MARKER'
@@ -16,6 +16,11 @@ export const fileState = React.createContext<LocateFile | null>(null)
 interface SetTitleAction {
   type: 'SET_TITLE'
   payload: { title: string; description: string }
+}
+
+interface SetLocationAction {
+  type: 'SET_LOCATION'
+  payload: { location: Pos }
 }
 
 interface AddMarkerAction {
@@ -61,9 +66,15 @@ interface ChangeIsRecordFalseAction {
   type: 'CHANGE_IS_RECORD_FALSE'
 }
 
+interface setDataAction {
+  type: 'SET_DATA'
+  payload: { data: FileState }
+}
+
 export type LocateFileActions =
   | SetTitleAction
   | { type: 'INIT' }
+  | SetLocationAction
   | AddMarkerAction
   | RemoveMarkerAction
   | EditMarkerAction
@@ -73,6 +84,7 @@ export type LocateFileActions =
   | appendPos
   | ChangeIsRecordTrueAction
   | ChangeIsRecordFalseAction
+  | setDataAction
 
 const fileReducer = (state: LocateFile, action: LocateFileActions) =>
   produce(state, (draft) => {
@@ -86,6 +98,9 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.description = ''
         draft.markers = []
         draft.routes = []
+        break
+      case 'SET_LOCATION':
+        draft.pos = action.payload.location
         break
       case 'ADD_MARKER':
         draft.markers.push(action.payload.marker)
@@ -126,6 +141,8 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
       case 'CHANGE_IS_RECORD_FALSE':
         draft.isRecord = false
         break
+      case 'SET_DATA':
+        return {...draft, ...action.payload.data}
     }
   })
 

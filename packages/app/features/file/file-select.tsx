@@ -67,7 +67,6 @@ export function SelectFileView() {
   useEffect(() => {
     async function setup() {
       let result: File[] | undefined = await db.getAllAsync('SELECT * from file')
-      console.log(result, 'result')
       if (result.length > 0) {
         result = result.map((file) => ({
           ...file,
@@ -76,7 +75,6 @@ export function SelectFileView() {
         setFileList(result)
       }
       setPrevSelected(Array(result?.length).fill(false))
-      console.log(prevSelected)
     }
     setup()
     if (currentFileInfo) {
@@ -94,14 +92,12 @@ export function SelectFileView() {
 
   useEffect(() => {
     async function setupData() {
-      console.log(prevSelected, 'fileList')
       // 만약 prevSelected의 array 중 변경 사항이 있을 경우에만 실행
       // 오직 하나의 인덱스에 대해서만 실행
       if (fileList === undefined) return
       let idx: number = prevSelected.findIndex((check, i) => check !== fileList[i].isSelected)
       let fileId: number = fileList[idx].id
       let check: boolean = fileList[idx].isSelected
-      console.log(check)
       if (check) {
         setFileInfo((prev) => {
           if (!prev) return prev
@@ -113,10 +109,8 @@ export function SelectFileView() {
         })
       } else {
         const result = await getFileDataById(fileId, db)
-        console.log(result, 'result')
         const markers: Marker[] = await getMarkerById(fileId, db)
         const routes: Route[] = await getRouteById(fileId, db)
-        console.log(result, markers, routes, 'resultMR')
         if (result.id) {
           setFileInfo((prev) => {
             if (!prev) return prev
@@ -140,7 +134,6 @@ export function SelectFileView() {
           })
         }
       }
-      console.log(fileInfo)
       setFileList((prev) =>
         prev.map((file, i) => (i === idx ? { ...file, isSelected: !file.isSelected } : file))
       )

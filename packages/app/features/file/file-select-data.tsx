@@ -49,14 +49,11 @@ export function SelectDataView() {
 
   const params = useParams<{ ids?: string; fileId?: number }>()
 
-  console.log(params, 'params')
 
   useEffect(() => {
     if (params.fileId) {
-      console.log(params.fileId, 'fileId')
       async function setup() {
         const file = await getFileDataById(params.fileId, db)
-        console.log(file, 'fileData')
         const routes = await getRouteById(file.id, db)
         const markers = await getMarkerById(file.id, db)
         const { id, title, description } = file
@@ -136,16 +133,13 @@ export function SelectDataView() {
     const { title, description } = fileInfo
     const file = await addFile({ title, description }, db)
     const fileId = file.lastInsertRowId
-    console.log(fileId)
     for await (let route of fileInfo.routes) {
       if (!route.isSelected) continue
       const routeId = await addRoute({ ...route, parent: fileId }, db)
-      console.log(routeId, 'routeId')
     }
     for await (let marker of fileInfo.markers) {
       if (!marker.isSelected) continue
       const markerId = await addMarker({ ...marker, parent: fileId }, db)
-      console.log(markerId, 'markerId')
     }
     toast.hide()
     toast.show('등록완료', {
@@ -166,7 +160,6 @@ export function SelectDataView() {
         ),
       }
     })
-    console.log(fileInfo?.markers[idx])
   }, [])
 
   const onChangeRoueSelected = useCallback((idx: number, value: boolean) => {
@@ -179,7 +172,6 @@ export function SelectDataView() {
         ),
       }
     })
-    console.log(fileInfo?.routes[idx])
   }, [])
 
   return (
@@ -251,7 +243,6 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
 
   const [open, setOpen] = useState(true)
   const [position, setPosition] = useState(0)
-  console.log(markers, 'markers')
   return (
     <>
       <Button

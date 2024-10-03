@@ -2,7 +2,7 @@ import { Button, XStack } from '@my/ui'
 import MapBoxComponent from 'app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
-import { useContext, useEffect, useState } from 'react'
+import { use, useContext, useEffect, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 
@@ -27,7 +27,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   }, [fileInfo?.isRecord])
   return (
     <>
-      <MapBoxComponent location={fileInfo?.currentRoute[fileInfo?.currentRoute.length - 1]}>
+      <MapBoxComponent location={fileInfo?.pos}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />

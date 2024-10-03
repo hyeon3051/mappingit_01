@@ -3,7 +3,7 @@ import { File, Marker, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 
 export async function getFileDataById(id: number, db: ReturnType<typeof useSQLiteContext>) {
-  return await db.getFirstAsync<File>('SELECT * from file where id = ?', [id])
+  return await db.getFirstAsync<File>('SELECT * from File where id = ?', [id])
 }
 
 export async function getMarkerById(id: number, db: ReturnType<typeof useSQLiteContext>) {
@@ -19,9 +19,7 @@ export async function addFile(
   db: ReturnType<typeof useSQLiteContext>
 ) {
   return await db.runAsync(
-    `CREATE TABLE IF NOT EXISTS file (id INTEGER PRIMARY KEY NOT NULL, title TEXT, description TEXT)
-    INSERT INTO file (title, description) VALUES ('${title}', '${description}')
-    `
+    `INSERT INTO File (title, description) VALUES ('${title}', '${description}')`
   )
 }
 
@@ -29,11 +27,13 @@ export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteC
   const { pos, title, description, markerIcon, markerColor, imageUri, parent } = Marker
   const stringifyPos = JSON.stringify(pos)
   const stringifyImgUri = JSON.stringify(imageUri)
-  console.log(stringifyPos)
+
+
   return await db.runAsync(
-    `CREATE TABLE IF NOT EXISTS marker (id INTEGER PRIMARY KEY NOT NULL, pos TEXT, title TEXT, description TEXT, markerIcon TEXT, markerColor TEXT, pathImg TEXT, parent INTEGER, imageUrl TEXT)  
-    INSERT INTO marker (pos, title, description, markerIcon, markerColor, imageUrl, parent) VALUES (
-    '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}, ${parent}
+    `INSERT INTO marker (
+      pos, title, description, markerIcon, markerColor, imageUri, parent
+    ) VALUES (
+      '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}', ${parent}
     )`
   )
 }
@@ -41,11 +41,12 @@ export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteC
 export async function addRoute(Route: Route, db: ReturnType<typeof useSQLiteContext>) {
   const { path, title, description, lineWidth, lineColor, parent } = Route
   const stringifyPath = JSON.stringify(path)
-  console.log(stringifyPath)
+
   return await db.runAsync(
-    `CREATE TABLE IF NOT EXISTS route (id INTEGER PRIMARY KEY NOT NULL, path TEXT, title TEXT, description TEXT, lineWidth TEXT, lineColor TEXT, parent INTEGER)
-    INSERT INTO route (path, title, description, lineWdith, lineColor, parent) VALUES (
-    '${stringifyPath}', '${title}', '${description}', '${lineWidth}', '${lineColor}', ${parent}
+    `INSERT INTO route (
+      path, title, description, lineWidth, lineColor, parent
+    ) VALUES (
+      '${stringifyPath}', '${title}', '${description}', '${lineWidth}', '${lineColor}', ${parent}
     )`
   )
 }
@@ -63,7 +64,7 @@ export async function deleteRoute(routeId: number, db: ReturnType<typeof useSQLi
 }
 
 export async function deleteFile(id: number, db: ReturnType<typeof useSQLiteContext>) {
-  await db.execAsync(`DELETE FROM file WHERE id = ${id}`)
+  await db.execAsync(`DELETE FROM File WHERE id = ${id}`)
 }
 
 export async function updateFile(
@@ -72,6 +73,6 @@ export async function updateFile(
   db: ReturnType<typeof useSQLiteContext>
 ) {
   await db.execAsync(
-    `UPDATE file SET title = ${title}, description = ${description} WHERE id = ${fileId}`
+    `UPDATE File SET title = ${title}, description = ${description} WHERE id = ${fileId}`
   )
 }

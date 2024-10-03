@@ -87,7 +87,6 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
-    console.log(routeInfo)
     if (routeIdx !== -1 && routeId) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {

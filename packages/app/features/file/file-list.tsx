@@ -5,7 +5,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileDispatch, fileState } from 'packages/app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { Marker, File, FileState, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
@@ -21,9 +21,11 @@ export function FileView() {
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
+  const dispatch = useContext(fileDispatch)
   const [check, setCheck] = useState(false)
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState>()
+  const [save, setSave] = useState(false)
   const currentFileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -72,7 +74,6 @@ export function FileView() {
       if (check) {
         const markers: Marker[] = await getMarkerById(result.id, db)
         const routes: Route[] = await getRouteById(result.id, db)
-        console.log(result, markers, routes)
         if (result.id) {
           setFileInfo({
             id: id,
@@ -96,7 +97,6 @@ export function FileView() {
     } else {
       setFileInfo(currentFileInfo)
     }
-    console.log(fileInfo)
   }, [idx, check])
 
   const onSelect = () => {
@@ -106,6 +106,13 @@ export function FileView() {
   useEffect(() => {
     setCheck(false)
   }, [idx])
+
+  useEffect(() => {
+    if (save) {
+      dispatch({ type: 'SET_DATA', payload: { data: fileInfo } })
+      setSave(false)
+    }
+  }, [save])
   return (
     <>
       <MapBoxComponent>
@@ -139,29 +146,6 @@ export function FileView() {
           </MapboxGL.ShapeSource>
         ))}
       </MapBoxComponent>
-      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center">
-        <XStack
-          backgroundColor="$blue10"
-          f={2}
-          w="80%"
-          jc="space-around"
-          p="$2"
-          m="$2"
-          borderRadius="$10"
-        >
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            정보
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            마커
-          </SizableText>
-          <Separator alignSelf="stretch" vertical marginHorizontal={15} />
-          <SizableText size="$4" fontWeight="800" color="$white1">
-            사진
-          </SizableText>
-        </XStack>
-      </Stack>
       <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
         <Carousel
           loop={false}
@@ -197,6 +181,7 @@ export function FileView() {
                 markerColor={markerColor}
                 key={data.index}
                 onSelect={() => onSelect(data.index)}
+                onFileSelect={() => setSave(true)}
               />
             )
           }}
