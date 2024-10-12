@@ -17,7 +17,6 @@ const initalData = {
 export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'config'>) {
   const colorScheme = useColorScheme()
   const [state, dispatch] = useReducer(fileReducer, initalData)
-
   return (
     <TamaguiProvider
       config={config}

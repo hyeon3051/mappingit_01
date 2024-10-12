@@ -98,9 +98,9 @@ packagingOptions {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.yourprojectsname.app'
+    namespace 'com.hyeon3051.mappingit'
     defaultConfig {
-        applicationId 'com.yourprojectsname.app'
+        applicationId 'com.hyeon3051.mappingit'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -113,6 +113,12 @@ packagingOptions {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+    release {
+      storeFile file('hyeon3051.keystore')
+      storePassword 'tjqtjq12'
+      keyAlias 'hyeon3051_alias'
+      keyPassword 'tjqtjq12'
+    }
     }
     buildTypes {
         debug {
@@ -121,7 +127,7 @@ packagingOptions {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

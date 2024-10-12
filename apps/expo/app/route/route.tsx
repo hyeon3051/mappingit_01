@@ -9,7 +9,7 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Route',
+          title: '경로',
           presentation: 'modal',
           animation: 'slide_from_left',
           gestureEnabled: true,

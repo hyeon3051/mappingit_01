@@ -32,14 +32,6 @@ export function AddFileView() {
     markers: [],
   })
 
-  const fileSelectProps = useLink({
-    href: `/file/selectFile`,
-  })
-
-  const fileDataSelectProps = useLink({
-    href: `/file/selectData/?fileId=${fileId}`,
-  })
-
   useEffect(() => {
     async function setup() {
       setCurrentFileInfo((prev) => ({
@@ -93,7 +85,7 @@ export function AddFileView() {
   const handleRemove = async () => {
     if (fileId === -1 && fileId) return
     await deleteFile(fileId, db)
-    router.replace('/file/file')
+    router.back()
   }
 
   const handleChange = async () => {
@@ -123,7 +115,7 @@ export function AddFileView() {
       batch.push(markerId)
       batch.excute()
       */
-    router.replace('/file/file')
+    router.back()
   }
 
   return (

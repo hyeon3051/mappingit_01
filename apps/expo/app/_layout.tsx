@@ -47,6 +47,7 @@ function RootLayoutNav() {
     <Provider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
+          initialRouteName='Home'
           screenOptions={{
             headerRight: () => (
               <Button {...userLink} circular backgroundColor={'transparent'}>

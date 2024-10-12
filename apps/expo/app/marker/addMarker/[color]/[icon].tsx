@@ -9,7 +9,7 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          title: 'addMarker',
+          title: '마커 추가',
           presentation: 'modal',
           animation: 'default',
           gestureEnabled: true,

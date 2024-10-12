@@ -84,7 +84,6 @@ export function AddMarkerView() {
   const handleChange = () => {
     if (!marker) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
-      console.log('add marker')
     } else {
       dispatch({
         type: 'EDIT_MARKER',
@@ -94,7 +93,6 @@ export function AddMarkerView() {
     router.back()
     router.back()
   }
-  console.log(marker)
 
   return (
     <>

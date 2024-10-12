@@ -5,10 +5,29 @@ import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { use, useContext, useEffect, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-
+import * as Notifications from 'expo-notifications';
 import TamaIcon from 'packages/app/ui/Icon'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
+  async function registerForPushNotificationsAsync() {
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+    }
+    return
+  }
+
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+  }, [])
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const changeIsRecordTrue = () => {
@@ -29,7 +48,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
     <>
       <MapBoxComponent location={fileInfo?.pos}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
-          <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
+          <MapboxGL.PointAnnotation key={"key" + id.toString()} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
         ))}

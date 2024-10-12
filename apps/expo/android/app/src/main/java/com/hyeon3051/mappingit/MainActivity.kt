@@ -1,4 +1,4 @@
-package com.yourprojectsname.app
+package com.hyeon3051.mappingit
 
 import android.os.Build
 import android.os.Bundle

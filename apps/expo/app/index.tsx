@@ -12,14 +12,14 @@ export default function Screen() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen
-        name="Home"
+        name="홈"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => <TamaIcon iconName="Home" color={color} size="$1" />,
         }}
       />
       <Tab.Screen
-        name="Route"
+        name="경로"
         component={RouteView}
         options={{
           tabBarIcon: ({ color }) => <TamaIcon iconName="Route" color={color} size="$1" />,
@@ -27,14 +27,14 @@ export default function Screen() {
       />
 
       <Tab.Screen
-        name="Marker"
+        name="마커"
         component={MarkerView}
         options={{
           tabBarIcon: ({ color }) => <TamaIcon iconName="MapPin" color={color} size="$1" />,
         }}
       />
       <Tab.Screen
-        name="File"
+        name="파일"
         component={FileView}
         options={{
           tabBarIcon: ({ color }) => <TamaIcon iconName="File" color={color} size="$1" />,

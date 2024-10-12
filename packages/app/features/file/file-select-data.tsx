@@ -147,7 +147,8 @@ export function SelectDataView() {
     })
 
     dispatch({ type: 'INIT' })
-    router.replace('/file/file')
+    router.back()
+    router.back()
   }
 
   const onChangeMarkerSelected = useCallback((idx: number, value: boolean) => {
@@ -176,7 +177,7 @@ export function SelectDataView() {
 
   return (
     <>
-      <MapBoxComponent location={[[127, 38], '']} zoomLevel={3}>
+      <MapBoxComponent location={[[127.001, 38.001], '']} zoomLevel={3}>
         {fileInfo?.markers?.map(
           ({ pos, markerIcon, markerColor, id, isSelected }) =>
             isSelected && (

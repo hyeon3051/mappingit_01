@@ -1,7 +1,7 @@
 import { Button, XStack, SizableText, Card, Stack, YStack, Paragraph, Image } from '@my/ui'
 import { PlusCircle, FileEdit, X, MonitorSpeaker } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import React, { use, useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -22,10 +22,10 @@ interface MarkerState {
 
 const useMarkerState = create<MarkerState>((set) => ({
   marker: {
-    id: '',
+    id: 'current',
     title: '',
     description: '',
-    pos: [[0, 0], ''],
+    pos: [[127.001, 37.001], ''],
     markerIcon: 'PinOff',
     markerColor: '$black10',
     
@@ -35,17 +35,16 @@ const useMarkerState = create<MarkerState>((set) => ({
   },
 }))
 
-const MarkerOnMap = ({ location }) => {
+const MarkerOnMap = () => {
   const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
+  console.log(marker)
   return (
-    <MapBoxComponent location={marker?.id && marker.pos[0], []}>
+    <MapBoxComponent location={marker?.id && marker.pos ? marker.pos : fileInfo?.pos}>
       <MapboxGL.PointAnnotation
-        coordinate={marker?.id  ? marker.pos[0] : fileInfo.pos[0]}
-        key={`
-         pt-ann-${marker?.id || 'pt-ann'}
-        `}
-        id="pt-ann"
+        coordinate={marker?.pos[0]}
+        key={marker.id ? "marker-" + marker.id.toString() : "current"}
+        id={marker.id ? "marker-" + marker.id.toString() : "current"}
       >
         <TamaIcon
           iconName={marker?.markerIcon || 'PinOff'}
@@ -91,20 +90,25 @@ const MarkerListView = () => {
           ref={carouselRef}
           height={300}
           vertical={true}
-          data={fileInfo?.markers}
+          data={fileInfo?.markers.map(data => {
+            return {
+              ...data,
+              key: data.id
+            }
+          })}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
             setIdx(index + 1)
           }}
           renderItem={(data) => {
-            const { title, description, markerIcon, markerColor } = data.item
+            const { title, description, markerIcon, markerColor, id } = data.item
             return (
               <CardDemo
                 title={title}
                 description={description}
                 markerIcon={markerIcon}
                 markerColor={markerColor}
-                key={data.index}
+                key={id}
               />
             )
           }}
@@ -206,24 +210,22 @@ const MakerImageView = () => {
 }
 
 const renderScreen = SceneMap({
-  first: MarkerInfoView,
-  second: MarkerListView,
-  three: MakerImageView,
+  markerInfo: MarkerInfoView,
+  markerList: MarkerListView,
+  markerImage: MakerImageView,
 })
 export function MarkerView() {
-  const { marker } = useMarkerState()
   const layout = useWindowDimensions()
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
-  const fileInfo = useContext(fileState)
   const [routes] = useState([
-    { key: 'first', title: 'info' },
-    { key: 'second', title: 'Marker' },
-    { key: 'three', title: 'Image' },
+    { key: 'markerInfo', title: 'info' },
+    { key: 'markerList', title: 'Marker' },
+    { key: 'markerImage', title: 'Image' },
   ])
   return (
     <>
-      <MarkerOnMap location={marker?.id !== '' ? fileInfo.pos[0] : marker?.pos[0] } />
+      <MarkerOnMap />
       <TabView
         navigationState={{
           index: tabIdx,

@@ -1,4 +1,4 @@
-package com.yourprojectsname.app
+package com.hyeon3051.mappingit
 
 import android.app.Application
 import android.content.res.Configuration

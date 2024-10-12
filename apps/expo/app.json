@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "yourprojectsname",
-    "slug": "yourprojectsname",
-    "scheme": "yourprojectsname",
+    "name": "mappingit",
+    "slug": "mappingit",
+    "scheme": "mappingit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,7 +34,7 @@
         ]
       },
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourprojectsname.app"
+      "bundleIdentifier": "com.mappingit.app"
     },
     "android": {
       "permissions": [
@@ -49,7 +49,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.yourprojectsname.app"
+      "package": "com.mappingit.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

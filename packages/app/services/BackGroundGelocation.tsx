@@ -11,8 +11,8 @@ const useBackgroundGeolocation = () => {
   const dispatch = useContext(fileDispatch)
   const fileInfo = useContext(fileState)
   const [enabled, setEnabled] = useState<boolean>(false)
-  const [location, setLocation] = useState<Pos>([[0, 0], ''])
-  const locateLngLat = useRef<[number, number]>([0, 0])
+  const [location, setLocation] = useState<Pos>([[127.001, 37.001], ''])
+  const locateLngLat = useRef<[number, number]>([127.001, 37.001])
 
   useEffect(() => {
     const onLocation = BackgroundGeolocation.onLocation((loc: Location) => {
@@ -38,6 +38,11 @@ const useBackgroundGeolocation = () => {
         startOnBoot: true,
         debug: false,
         stopOnTerminate: true,
+        notification: {
+          layout: "my_notification_layout",  // <-- custom layout xml file
+          title: "The Notification Title",
+          text: "The Notification Text",
+        },
         isMoving: true,
         logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
       },
@@ -67,7 +72,7 @@ const useBackgroundGeolocation = () => {
   }, [enabled])
 
   useEffect(() => {
-    if (locateLngLat.current[0] === 0 && locateLngLat.current[1] === 0) return
+    if (locateLngLat.current[0] === 127.001 && locateLngLat.current[1] === 37.001) return
     dispatch({ type: 'SET_LOCATION', payload: { location } })
     if (!fileInfo?.isRecord) return
     dispatch({ type: 'APPEND_POS', payload: { pos: location } })

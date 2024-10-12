@@ -70,7 +70,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                     onChangeIdx(idx + 1)
                     setOpen(false)
                   }}
-                  iconAfter={<TamaIcon iconName="AArrowUp" color="$black10" size="$6" />}
+                  iconAfter={<TamaIcon iconName={file["markerIcon"] || "PinOff"} color={file["markerColor"] || "$black10"} size="$6" />}
                 />
                 <YStack gap="$2" ml={20}>
                   <H2>{file['title'] || 'example'}</H2>

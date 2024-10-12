@@ -32,14 +32,6 @@ export function FileView() {
     href: `/file/addFile`,
   })
 
-  useEffect(() => {
-    async function setup() {
-      console.log(await db.getAllAsync('SELECT * from file')  )
-      console.log(await db.getAllAsync('SELECT * from marker')  )
-      console.log(await db.getAllAsync('SELECT * from route')  )
-    }
-    setup()
-  }, [])
 
   const editLinkProps = useLink({
     href: `/file/addFile/?fileId=${fileInfo?.id}`,
@@ -60,18 +52,7 @@ export function FileView() {
       }
     }
     setup()
-    if (currentFileInfo) {
-      const { title, description, routes, markers } = currentFileInfo
-      const fileInfo = {
-        id: '1',
-        title: title,
-        description: description,
-        routes: routes,
-        markers: markers,
-      }
-      setFileInfo(fileInfo)
-    }
-  }, [])
+}, [idx])
 
   useEffect(() => {
     async function setupData() {
@@ -83,7 +64,6 @@ export function FileView() {
       if (idx && check) {
         const markers: Marker[] = await getMarkerById(result.id, db)
         const routes: Route[] = await getRouteById(result.id, db)
-        console.log(markers)
         if (result.id) {
           setFileInfo({
             id: id,
@@ -91,7 +71,7 @@ export function FileView() {
             description: description,
             markers: markers.map((marker) => ({
               ...marker,
-              pos: JSON.parse(marker.pos),
+              pos: JSON.parse(marker.pos)
             })),
             routes: routes.map((route) => ({
               ...route,
@@ -102,7 +82,6 @@ export function FileView() {
         }
       }
     }
-    console.log(idx)
     if (idx !== 0) {
       setupData()
     } else {
@@ -120,14 +99,13 @@ export function FileView() {
 
   useEffect(() => {
     if (save) {
-      console.log(fileInfo)
       dispatch({ type: 'SET_DATA', payload: { data: fileInfo } })
       setSave(false)
     }
   }, [save])
   return (
     <>
-      <MapBoxComponent>
+      <MapBoxComponent location={fileInfo?.routes?.[0]?.path[0] || fileInfo?.pos}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />

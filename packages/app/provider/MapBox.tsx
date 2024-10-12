@@ -17,11 +17,10 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
 
   useEffect(() => {
       camera.current?.setCamera({
-        animationDuration: 1000,
-        centerCoordinate: currLocation[0],
-        zoomLevel: 15,
+        animationDuration: 200,
+        centerCoordinate: location[0] ? location[0] : currLocation[0],
       })
-  }, [location, currLocation])
+  }, [location])
 
 
   return (
@@ -37,6 +36,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         <MapboxGL.Camera
           ref={camera}
           animationMode="easeTo"
+          zoomLevel={15}
         />
         {children}
       </MapboxGL.MapView>

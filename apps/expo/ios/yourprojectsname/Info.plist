@@ -12,7 +12,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>yourprojectsname</string>
+    <string>mappingit</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -32,14 +32,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>yourprojectsname</string>
-          <string>com.yourprojectsname.app</string>
+          <string>mappingit</string>
+          <string>com.hyeon3051.mappingit</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>exp+yourprojectsname</string>
+          <string>exp+mappingit</string>
         </array>
       </dict>
     </array>

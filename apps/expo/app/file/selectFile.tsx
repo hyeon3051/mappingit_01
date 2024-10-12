@@ -9,7 +9,7 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          title: 'File',
+          title: '파일 선택',
           presentation: 'modal',
           animation: 'slide_from_bottom',
           gestureEnabled: true,

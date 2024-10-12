@@ -1,4 +1,4 @@
-rootProject.name = 'yourprojectsname'
+rootProject.name = 'mappingit'
 
 dependencyResolutionManagement {
   versionCatalogs {
