@@ -33,66 +33,68 @@ const RouteOnMap = () => {
     startIdx: '',
     endIdx: '',
     shapeIdx: '',
-    lineIdx: ''
+    lineIdx: '',
   })
 
-  const routeId = idx !== 0 ? fileInfo?.routes[idx - 1]?.id : "current";
-  const startCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[0] : fileInfo?.pos;
-  const endCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0] : fileInfo?.pos[0];
+  const routeId = idx !== 0 ? fileInfo?.routes[idx - 1]?.id : 'current'
+  const startCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[0] : fileInfo?.pos
+  const endCoordinate =
+    idx !== 0
+      ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
+      : fileInfo?.pos[0]
 
-  useEffect(() =>{
+  useEffect(() => {
     useIdxSet({
       startIdx: `start-${routeId}`,
       endIdx: `end-${routeId}`,
       shapeIdx: `shape-${routeId}`,
-      lineIdx: `line-${routeId}`
-    });
-
+      lineIdx: `line-${routeId}`,
+    })
   }, [idx])
 
-  if(!fileInfo){
+  if (!fileInfo) {
     return
   }
-return (
-  <MapBoxComponent location={startCoordinate}>
-    <MapboxGL.PointAnnotation
-      coordinate={startCoordinate[0]}
-      key={idxSet.startIdx}
-      id={idxSet.startIdx}
-    >
-      <TamaIcon iconName="MapPin" color="$black10" size="$2" />
-    </MapboxGL.PointAnnotation>
-    <MapboxGL.PointAnnotation
-      coordinate={endCoordinate}
-      key={idxSet.endIdx}
-      id={idxSet.endIdx}
-    >
-      <TamaIcon iconName="MapPin" color="$black10" size="$2" />
-    </MapboxGL.PointAnnotation>
-    <MapboxGL.ShapeSource
-      id={idxSet.shapeIdx}
-      shape={{
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: idx === 0
-            ? (fileInfo.currentRoute.length >= 2 ? fileInfo.currentRoute : [fileInfo.pos, fileInfo.pos]).map(route => route[0])
-            : fileInfo.routes[idx - 1]?.path.map(route => route[0]),
-        },
-      }}
-    >
-      <MapboxGL.LineLayer
-        id={idxSet.lineIdx}
-        sourceID={idxSet.lineIdx}
-        style={{
-          lineColor: idx > 0 ? fileInfo.routes[idx - 1]?.lineColor : 'red',
-          lineWidth: idx > 0 ? fileInfo.routes[idx - 1]?.lineWidth : 3,
+  return (
+    <MapBoxComponent location={startCoordinate ? startCoordinate : fileInfo.pos}>
+      <MapboxGL.PointAnnotation
+        coordinate={startCoordinate ? startCoordinate[0] : fileInfo.pos[0]}
+        key={idxSet.startIdx}
+        id={idxSet.startIdx}
+      >
+        <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+      </MapboxGL.PointAnnotation>
+      <MapboxGL.PointAnnotation coordinate={endCoordinate} key={idxSet.endIdx} id={idxSet.endIdx}>
+        <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+      </MapboxGL.PointAnnotation>
+      <MapboxGL.ShapeSource
+        id="shapeSource"
+        shape={{
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates:
+              idx === 0
+                ? (fileInfo.currentRoute.length >= 2
+                    ? fileInfo.currentRoute
+                    : [fileInfo.pos, fileInfo.pos]
+                  ).map((route) => route[0])
+                : fileInfo.routes[idx - 1]?.path.map((route) => route[0]),
+          },
         }}
-      />
-    </MapboxGL.ShapeSource>
-  </MapBoxComponent>
-);
+      >
+        <MapboxGL.LineLayer
+          id="lineIdx"
+          sourceID="shapeSource"
+          style={{
+            lineColor: idx > 0 ? fileInfo.routes[idx - 1]?.lineColor : 'red',
+            lineWidth: idx > 0 ? fileInfo.routes[idx - 1]?.lineWidth : 3,
+          }}
+        />
+      </MapboxGL.ShapeSource>
+    </MapBoxComponent>
+  )
 }
 
 const RouteInfoView = () => {
@@ -101,12 +103,14 @@ const RouteInfoView = () => {
   const start_at = new Date(fileInfo?.currentRoute?.[0]?.[1] || new Date())
   const startDate = start_at.toLocaleDateString()
   const startTime = start_at.toLocaleTimeString()
-  const end_at = new Date(fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] || new Date())
+  const end_at = new Date(
+    fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] || new Date()
+  )
   const endDate = end_at.toLocaleDateString()
   const endTime = end_at.toLocaleTimeString()
   return (
     <>
-      <Stack zIndex={3} pos="absolute" left={0} bottom={'20%'} height="20%">
+      <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
         <Card size="$4" width="100%" height="100%" backgroundColor="$black0" mx="$2" px="$2">
           <Card.Header padded>
             <Paragraph></Paragraph>
@@ -120,8 +124,10 @@ const RouteInfoView = () => {
           >
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
-                <SizableText size="$8">{idx !== 0 && fileInfo?.routes[idx -1]?.title}</SizableText>
-                <Paragraph size="$1">{idx !== 0 && fileInfo?.routes[idx - 1]?.description}</Paragraph>
+                <SizableText size="$8">{idx !== 0 && fileInfo?.routes[idx - 1]?.title}</SizableText>
+                <Paragraph size="$1">
+                  {idx !== 0 && fileInfo?.routes[idx - 1]?.description}
+                </Paragraph>
                 <Paragraph size="$1">{startDate}</Paragraph>
                 <Paragraph size="$1">{startTime}</Paragraph>
                 <Paragraph size="$1">{endDate}</Paragraph>
@@ -160,34 +166,33 @@ export function RouteListView() {
     <>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center"></Stack>
       <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
-      <Carousel
-      loop={false}
-      width={224}
-      ref={carouselRef}
-      height={300}
-      vertical={true}
-      data={fileInfo?.routes.map(route=>({
-        ...route,
-        key: route.id
-      }))}
-      scrollAnimationDuration={100}
-      onSnapToItem={(index) => {
-        setIdx(index + 1)
-      }}
-      renderItem={(data) => {
-    const { title, description, id } = data.item
-    return (
-      <CardDemo
-      title={title}
-      description={description}
-      markerIcon="MapPin"
-      markerColor="$black10"
-      key={id}
-    />
-    )
-  }}
-/>
-
+        <Carousel
+          loop={false}
+          width={224}
+          ref={carouselRef}
+          height={300}
+          vertical={true}
+          data={fileInfo?.routes.map((route) => ({
+            ...route,
+            key: route.id,
+          }))}
+          scrollAnimationDuration={100}
+          onSnapToItem={(index) => {
+            setIdx(index + 1)
+          }}
+          renderItem={(data) => {
+            const { title, description, id } = data.item
+            return (
+              <CardDemo
+                title={title}
+                description={description}
+                markerIcon="MapPin"
+                markerColor="$black10"
+                key={id}
+              />
+            )
+          }}
+        />
       </Stack>
       <XStack
         f={2}
@@ -230,11 +235,10 @@ export function RouteView() {
     { key: 'second', title: 'route' },
   ])
 
-  
-  return (  
+  return (
     <>
-  <RouteOnMap/>
-  <TabView
+      <RouteOnMap />
+      <TabView
         navigationState={{
           index: tabIdx,
           routes,

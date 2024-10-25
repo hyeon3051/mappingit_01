@@ -28,7 +28,6 @@ const useMarkerState = create<MarkerState>((set) => ({
     pos: [[127.001, 37.001], ''],
     markerIcon: 'PinOff',
     markerColor: '$black10',
-    
   },
   updateMarker(marker) {
     set({ marker })
@@ -43,8 +42,8 @@ const MarkerOnMap = () => {
     <MapBoxComponent location={marker?.id && marker.pos ? marker.pos : fileInfo?.pos}>
       <MapboxGL.PointAnnotation
         coordinate={marker?.pos[0]}
-        key={marker.id ? "marker-" + marker.id.toString() : "current"}
-        id={marker.id ? "marker-" + marker.id.toString() : "current"}
+        key={marker.id ? 'marker-' + marker.id.toString() : 'current'}
+        id={marker.id ? 'marker-' + marker.id.toString() : 'current'}
       >
         <TamaIcon
           iconName={marker?.markerIcon || 'PinOff'}
@@ -83,17 +82,18 @@ const MarkerListView = () => {
   }, [idx])
   return (
     <>
-      <Stack zIndex={3} pos="absolute" left={0} bottom="30%" height="30%">
+      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center"></Stack>
+      <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
         <Carousel
           loop={false}
           width={224}
           ref={carouselRef}
           height={300}
           vertical={true}
-          data={fileInfo?.markers.map(data => {
+          data={fileInfo?.markers.map((data) => {
             return {
               ...data,
-              key: data.id
+              key: data.id,
             }
           })}
           scrollAnimationDuration={100}
@@ -115,14 +115,16 @@ const MarkerListView = () => {
         />
       </Stack>
       <XStack
-        f={1}
+        f={2}
         jc="space-between"
+        gap="$4"
         w="100%"
         zIndex={3}
         pos="absolute"
         bottom={0}
-        px="$4"
-        height="10%"
+        left={0}
+        p="$4"
+        right={0}
       >
         <Button {...linkProps} icon={PlusCircle}>
           추가
@@ -147,7 +149,7 @@ const MarkerInfoView = () => {
   const markerDateStr = markerDate.toLocaleDateString()
   return (
     <>
-      <Stack zIndex={3} pos="absolute" left={0} bottom={'20%'} height="20%">
+      <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
         <Card size="$4" width="100%" height="100%" backgroundColor="$black0" mx="$2" px="$2">
           <Card.Header padded>
             <Paragraph></Paragraph>
@@ -191,7 +193,7 @@ export function CardImage({ uri }) {
 const MakerImageView = () => {
   const { marker } = useMarkerState()
   return (
-    <Stack zIndex={3} pos="absolute" left={0} bottom="20%" height="30%">
+    <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
       <Carousel
         loop={true}
         modeConfig={{
@@ -201,7 +203,7 @@ const MakerImageView = () => {
         mode="horizontal-stack"
         width={420}
         height={324}
-        scrollAnimationDuration={100} 
+        scrollAnimationDuration={100}
         data={typeof marker?.imageUri === 'string' ? [marker?.imageUri] : marker?.imageUri}
         renderItem={({ item }) => <CardImage uri={item} />}
       />
@@ -231,7 +233,7 @@ export function MarkerView() {
           index: tabIdx,
           routes,
         }}
-        style={{ width: '100%', height: '100%', zIndex: zIndex }}
+        style={{ width: '100%', height: '90%', zIndex: zIndex }}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}
         initialLayout={{ width: layout.width, height: layout.height }}
