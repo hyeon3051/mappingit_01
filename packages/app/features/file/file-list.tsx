@@ -32,7 +32,6 @@ export function FileView() {
     href: `/file/addFile`,
   })
 
-
   const editLinkProps = useLink({
     href: `/file/addFile/?fileId=${fileInfo?.id}`,
   })
@@ -52,7 +51,7 @@ export function FileView() {
       }
     }
     setup()
-}, [idx])
+  }, [idx])
 
   useEffect(() => {
     async function setupData() {
@@ -71,7 +70,7 @@ export function FileView() {
             description: description,
             markers: markers.map((marker) => ({
               ...marker,
-              pos: JSON.parse(marker.pos)
+              pos: JSON.parse(marker.pos),
             })),
             routes: routes.map((route) => ({
               ...route,
@@ -110,9 +109,9 @@ export function FileView() {
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
-               ))}
-          {fileInfo?.routes?.map((route, idx) => (
-            <MapboxGL.ShapeSource
+        ))}
+        {fileInfo?.routes?.map((route, idx) => (
+          <MapboxGL.ShapeSource
             key={String(idx)}
             id={'line' + String(idx)}
             lineMetrics={true}
@@ -145,9 +144,9 @@ export function FileView() {
           vertical={true}
           data={[
             {
-              title: 'title',
-              description: 'description',
-              markerIcon: 'MapPin',
+              title: '현재 파일',
+              description: '현재 저장 중인 파일',
+              markerIcon: 'Globe',
               markerColor: '$black10',
             },
             ...(fileList?.map((file) => ({

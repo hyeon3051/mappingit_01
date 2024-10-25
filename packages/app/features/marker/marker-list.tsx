@@ -221,9 +221,9 @@ export function MarkerView() {
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
-    { key: 'markerInfo', title: 'info' },
-    { key: 'markerList', title: 'Marker' },
-    { key: 'markerImage', title: 'Image' },
+    { key: 'markerInfo', title: '정보' },
+    { key: 'markerList', title: '리스트' },
+    { key: 'markerImage', title: '사진' },
   ])
   return (
     <>
@@ -240,10 +240,10 @@ export function MarkerView() {
       />
       <Button
         onPress={() => setZIndex(zIndex === 1 ? 10 : 1)}
-        backgroundColor={'$white10'}
+        backgroundColor={'$white100'}
         zIndex={10}
       >
-        press the map view
+        {zIndex === 1 ? '마커 뷰로 돌아가기' : '맵 뷰로 돌아가기'}
       </Button>
     </>
   )

@@ -255,7 +255,7 @@ function SheetDemo({ fileList, onChangeSelected }) {
                 <TamaIcon iconName="AArrowUp" color="$black10" size="$6" />
 
                 <YStack gap="$2" ml={20}>
-                  <H2>{file['title'] || 'example'}</H2>
+                  <H2>{file['title'] || '제목'}</H2>
                   <Paragraph>{file['description']}</Paragraph>
                 </YStack>
               </XStack>

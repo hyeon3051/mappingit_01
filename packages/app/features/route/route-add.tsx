@@ -104,23 +104,23 @@ export function AddRouteView() {
       <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">
         <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
           <YStack>
-            <H3>{title || 'example'}</H3>
-            <H6>Lorem ipsum</H6>
+            <H3>{title || '제목'}</H3>
+            <H6>제목</H6>
           </YStack>
         </XStack>
         <XStack gap="$4" p="$2" w="80%" ml={20} ai="center">
           <Separator backgroundColor={lineColor} borderColor={lineColor} borderWidth={lineWidth} />
         </XStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>name</H5>
+          <H5>이름</H5>
           <Input onChangeText={onNameChange} value={title} />
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>description</H5>
+          <H5>설명</H5>
           <TextArea onChangeText={onDescriptionChange} value={description} />
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>color</H5>
+          <H5>색상</H5>
           <XStack gap="$2" jc="space-between">
             {['#FF0000', '#00FF00', '#0000FF', '#FF00FF'].map((color, index) => (
               <Square
@@ -145,7 +145,7 @@ export function AddRouteView() {
           </XStack>
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>width</H5>
+          <H5>너비</H5>
           <SimpleSlider onValueChange={onWidthChange} />
         </YStack>
 

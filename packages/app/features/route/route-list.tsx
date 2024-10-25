@@ -231,8 +231,8 @@ export function RouteView() {
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
-    { key: 'first', title: 'info' },
-    { key: 'second', title: 'route' },
+    { key: 'first', title: '정보' },
+    { key: 'second', title: '루트' },
   ])
 
   return (
@@ -250,10 +250,10 @@ export function RouteView() {
       />
       <Button
         onPress={() => setZIndex(zIndex === 1 ? 10 : 1)}
-        backgroundColor={'$white10'}
+        backgroundColor={'$white100'}
         zIndex={10}
       >
-        press the map view
+        {zIndex === 1 ? '루트 뷰로 돌아가기' : '맵 뷰로 돌아가기'}
       </Button>
     </>
   )

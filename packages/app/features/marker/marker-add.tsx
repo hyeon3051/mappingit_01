@@ -33,7 +33,7 @@ export function AddMarkerView() {
     markerColor: '',
     markerIcon: '',
     imageUri: [],
-    pos: fileInfo?.pos
+    pos: fileInfo?.pos,
   })
 
   useEffect(() => {
@@ -106,20 +106,20 @@ export function AddMarkerView() {
               backgroundColor={params.color}
             />
             <YStack>
-              <H3>{title || 'example'}</H3>
-              <H6>Lorem ipsum</H6>
+              <H3>{title || '제목'}</H3>
+              <H6>제목</H6>
             </YStack>
           </XStack>
           <YStack gap="$4" p="$2" w="80%" m={20}>
-            <H5>name</H5>
+            <H5>"마커 이름"</H5>
             <Input onChangeText={onNameChange} value={title} />
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
-            <H5>description</H5>
+            <H5>설명</H5>
             <TextArea onChangeText={onDescriptionChange} value={description} />
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
-            <H5>Picture</H5>
+            <H5>사진</H5>
             <Button
               onPress={() =>
                 ImagePicker.openPicker({
@@ -135,24 +135,23 @@ export function AddMarkerView() {
                 })
               }
             >
-              Add Picture
+              사진 추가
             </Button>
-            {markerInfo?.imageUri?.length > 0 &&
-              (
-                <Carousel
-                  loop={true}
-                  modeConfig={{
-                    mode: 'stack',
-                    stackInterval: 18,
-                  }}
-                  mode="horizontal-stack"
-                  width={300}
-                  height={300}
-                  scrollAnimationDuration={100}
-                  data={markerInfo?.imageUri}
-                  renderItem={({ item }) => <CardDemo uri={item} />}
-                />
-              )}
+            {markerInfo?.imageUri?.length > 0 && (
+              <Carousel
+                loop={true}
+                modeConfig={{
+                  mode: 'stack',
+                  stackInterval: 18,
+                }}
+                mode="horizontal-stack"
+                width={300}
+                height={300}
+                scrollAnimationDuration={100}
+                data={markerInfo?.imageUri}
+                renderItem={({ item }) => <CardDemo uri={item} />}
+              />
+            )}
           </YStack>
         </YStack>
       </ScrollView>
