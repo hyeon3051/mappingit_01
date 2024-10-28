@@ -127,6 +127,7 @@ export function SelectFileView() {
                 ...prev?.routes,
                 ...routes.map((route) => ({
                   ...route,
+                  lineWidth: parseInt(route.lineWidth),
                   path: JSON.parse(route.path),
                 })),
               ],
@@ -243,7 +244,7 @@ function SheetDemo({ fileList, onChangeSelected }) {
               </YStack>
             </XStack>
             {fileList?.map((file, idx) => (
-              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={file.id}>
                 <XStack gap="$2">
                   <Checkbox
                     value={file['isSelected']}

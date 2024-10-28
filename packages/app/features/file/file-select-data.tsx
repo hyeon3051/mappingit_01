@@ -49,7 +49,6 @@ export function SelectDataView() {
 
   const params = useParams<{ ids?: string; fileId?: number }>()
 
-
   useEffect(() => {
     if (params.fileId) {
       async function setup() {
@@ -113,6 +112,7 @@ export function SelectDataView() {
                   ...routes.map((route) => ({
                     ...route,
                     path: JSON.parse(route.path),
+                    lineWidth: JSON.parse(route.lineWidth),
                     isSelected: true,
                   })),
                 ],

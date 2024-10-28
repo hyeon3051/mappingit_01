@@ -51,7 +51,7 @@ export function FileView() {
       }
     }
     setup()
-  }, [idx])
+  }, [currentFileInfo?.title, idx])
 
   useEffect(() => {
     async function setupData() {
