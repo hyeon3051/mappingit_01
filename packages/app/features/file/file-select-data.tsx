@@ -123,7 +123,7 @@ export function SelectDataView() {
       }
       setup()
     }
-  }, [])
+  }, [params.fileId, params.ids])
 
   const onEnroll = async () => {
     toast.show('등록중', {
@@ -243,6 +243,7 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
   const toast = useToastController()
 
   const [open, setOpen] = useState(true)
+  const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
   const [position, setPosition] = useState(0)
   return (
     <>
@@ -250,13 +251,13 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
         size="$6"
         icon={open ? ChevronDown : ChevronUp}
         circular
-        onPress={() => setOpen((x) => !x)}
+        onPress={() => toggleOpen()}
       />
       <Sheet
         modal
         animation="medium"
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={() => toggleOpen()}
         snapPoints={[60]}
         position={position}
         onPositionChange={setPosition}

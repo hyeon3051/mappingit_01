@@ -19,10 +19,9 @@ const useBackgroundGeolocation = () => {
       let coords = loc.coords
 
       try {
-          setLocation([[coords.longitude, coords.latitude], loc.timestamp])
-          locateLngLat.current = [coords.longitude, coords.latitude]
-      } catch (e) {
-      }
+        setLocation([[coords.longitude, coords.latitude], loc.timestamp])
+        locateLngLat.current = [coords.longitude, coords.latitude]
+      } catch (e) {}
     })
 
     const onMotionChange: Subscription = BackgroundGeolocation.onMotionChange((event) => {})
@@ -37,11 +36,10 @@ const useBackgroundGeolocation = () => {
         distanceFilter: 10,
         startOnBoot: true,
         debug: false,
-        stopOnTerminate: true,
         notification: {
-          layout: "my_notification_layout",  // <-- custom layout xml file
-          title: "The Notification Title",
-          text: "The Notification Text",
+          layout: '맵핑잇',
+          title: '위치 정보 수집 중',
+          text: '위치 정보 수집 중입니다.',
         },
         isMoving: true,
         logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
