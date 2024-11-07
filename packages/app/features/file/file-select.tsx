@@ -111,7 +111,7 @@ export function SelectFileView() {
         const result = await getFileDataById(fileId, db)
         const markers: Marker[] = await getMarkerById(fileId, db)
         const routes: Route[] = await getRouteById(fileId, db)
-        if (result.id) {
+        if (result?.id) {
           setFileInfo((prev) => {
             if (!prev) return prev
             return {

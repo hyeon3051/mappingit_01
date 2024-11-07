@@ -41,8 +41,6 @@ export function SelectMarkerView() {
     router.replace('/marker/marker')
   }
 
-  useEffect(() => {}, [markerIcon])
-
   return (
     <>
       <ScrollView>

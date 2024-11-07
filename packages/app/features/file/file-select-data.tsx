@@ -29,21 +29,11 @@ import {
 
 export function SelectDataView() {
   const db = useSQLiteContext()
-  const [idx, setIdx] = useState(0)
   const toast = useToastController()
-  const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState | undefined>()
   const currentFileInfo = useContext(fileState)
 
   const dispatch = useContext(fileDispatch)
-
-  const linkProps = useLink({
-    href: `/file/addFile`,
-  })
-
-  const editLinkProps = useLink({
-    href: `/file/selectData/?ids=${fileList?.filter((file) => file.isSelected).map((file) => file.id)}`,
-  })
 
   const router = useRouter()
 
@@ -135,11 +125,11 @@ export function SelectDataView() {
     const fileId = file.lastInsertRowId
     for await (let route of fileInfo.routes) {
       if (!route.isSelected) continue
-      const routeId = await addRoute({ ...route, parent: fileId }, db)
+      await addRoute({ ...route, parent: fileId }, db)
     }
     for await (let marker of fileInfo.markers) {
       if (!marker.isSelected) continue
-      const markerId = await addMarker({ ...marker, parent: fileId }, db)
+      await addMarker({ ...marker, parent: fileId }, db)
     }
     toast.hide()
     toast.show('등록완료', {
@@ -240,8 +230,6 @@ export function SelectDataView() {
 }
 
 function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelected }) {
-  const toast = useToastController()
-
   const [open, setOpen] = useState(true)
   const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
   const [position, setPosition] = useState(0)

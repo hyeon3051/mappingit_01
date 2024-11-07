@@ -5,22 +5,25 @@ import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { use, useContext, useEffect, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-import * as Notifications from 'expo-notifications';
+import * as Notifications from 'expo-notifications'
 import TamaIcon from 'packages/app/ui/Icon'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
-  async function registerForPushNotificationsAsync() {
+  const [isRecord, setIsRecord] = useState(false)
+  const fileInfo = useContext(fileState)
+  const dispatch = useContext(fileDispatch)
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+  async function registerForPushNotificationsAsync() {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
+    let finalStatus = existingStatus
 
     if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+      const { status } = await Notifications.requestPermissionsAsync()
+      finalStatus = status
     }
     if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
+      alert('Failed to get push token for push notification!')
+      return
     }
     return
   }
@@ -28,15 +31,6 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   useEffect(() => {
     registerForPushNotificationsAsync()
   }, [])
-  const fileInfo = useContext(fileState)
-  const dispatch = useContext(fileDispatch)
-  const changeIsRecordTrue = () => {
-    dispatch({ type: 'CHANGE_IS_RECORD_TRUE' })
-  }
-  const changeIsRecordFalse = () => {
-    dispatch({ type: 'CHANGE_IS_RECORD_FALSE' })
-  }
-  const [isRecord, setIsRecord] = useState(false)
   useEffect(() => {
     if (fileInfo?.isRecord) {
       setIsRecord(true)
@@ -44,11 +38,18 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
       setIsRecord(false)
     }
   }, [fileInfo?.isRecord])
+
+  const changeIsRecordTrue = () => {
+    dispatch({ type: 'CHANGE_IS_RECORD_TRUE' })
+  }
+  const changeIsRecordFalse = () => {
+    dispatch({ type: 'CHANGE_IS_RECORD_FALSE' })
+  }
   return (
     <>
       <MapBoxComponent location={fileInfo?.pos}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
-          <MapboxGL.PointAnnotation key={"key" + id.toString()} coordinate={pos[0]} id="pt-ann">
+          <MapboxGL.PointAnnotation key={'key' + id.toString()} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
           </MapboxGL.PointAnnotation>
         ))}
@@ -113,10 +114,19 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
         p="$4"
         right={0}
       >
-        {isRecord ? 
-          <Button onPress={changeIsRecordFalse} icon={<TamaIcon iconName="CameraOff" color="red" />} disabled>경로에서 종료</Button> :
-          <Button onPress={changeIsRecordTrue} icon={<TamaIcon iconName="Camera" color="green" />}>측정 시작</Button>
-        }
+        {isRecord ? (
+          <Button
+            onPress={changeIsRecordFalse}
+            icon={<TamaIcon iconName="CameraOff" color="red" />}
+            disabled
+          >
+            경로에서 종료
+          </Button>
+        ) : (
+          <Button onPress={changeIsRecordTrue} icon={<TamaIcon iconName="Camera" color="green" />}>
+            측정 시작
+          </Button>
+        )}
         <Button>측정 여부</Button>
       </XStack>
     </>
