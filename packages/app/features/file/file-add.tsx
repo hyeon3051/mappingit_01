@@ -97,10 +97,10 @@ export function AddFileView() {
       const file = await addFile({ title, description }, db)
       const fileId = file.lastInsertRowId
       for await (let route of fileInfo.routes) {
-        const routeId = addRoute({ ...route, parent: fileId }, db)
+        addRoute({ ...route, parent: fileId }, db)
       }
       for await (let marker of fileInfo.markers) {
-        const markerId = await addMarker({ ...marker, parent: fileId }, db)
+        addMarker({ ...marker, parent: fileId }, db)
       }
       toast.hide()
       toast.show('파일 추가가 완료되었습니다.')
