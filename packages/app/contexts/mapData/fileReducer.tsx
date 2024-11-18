@@ -30,12 +30,12 @@ interface AddMarkerAction {
 
 interface RemoveMarkerAction {
   type: typeof REMOVE_MARKER
-  payload: { markerId: string }
+  payload: { markerId: number }
 }
 
 interface EditMarkerAction {
   type: typeof EDIT_MARKER
-  payload: { marker: Marker; markerId: string }
+  payload: { marker: Marker; markerId: number }
 }
 
 interface AddRouteAction {
@@ -106,7 +106,7 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.markers.push(action.payload.marker)
         break
       case 'REMOVE_MARKER':
-        draft.markers = draft.markers.filter((marker) => marker.id == action.payload.markerId)
+        draft.markers = draft.markers.filter((marker) => marker.id != action.payload.markerId)
         break
       // 마커 수정
       // 1. 마커 이름, 추가 설명, 아이콘, 색상 수정
@@ -121,7 +121,7 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.currentRoute = []
         break
       case 'REMOVE_ROUTE':
-        draft.routes = draft.routes.filter((route) => route.id == action.payload.routeId)
+        draft.routes = draft.routes.filter((route) => route.id != action.payload.routeId)
         break
       // 경로 수정
       // 1. 경로 이름, 추가 설명, 색상, 두께 수정

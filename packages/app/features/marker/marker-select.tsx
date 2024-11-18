@@ -38,7 +38,7 @@ export function SelectMarkerView() {
       type: 'REMOVE_MARKER',
       payload: { markerId: marker },
     })
-    router.replace('/marker/marker')
+    router.back()
   }
 
   return (

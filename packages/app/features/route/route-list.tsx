@@ -19,7 +19,7 @@ interface RouteState {
   setIdx: (idx: number) => void
 }
 
-const useMarkerState = create<RouteState>((set) => ({
+const useRouteState = create<RouteState>((set) => ({
   idx: 0,
   setIdx(idx: number) {
     set({ idx })
@@ -28,7 +28,7 @@ const useMarkerState = create<RouteState>((set) => ({
 
 const RouteOnMap = () => {
   const fileInfo = useContext(fileState)
-  const { idx } = useMarkerState()
+  const { idx } = useRouteState()
   const [idxSet, useIdxSet] = useState({
     startIdx: '',
     endIdx: '',
@@ -98,12 +98,15 @@ const RouteOnMap = () => {
 }
 
 const RouteInfoView = () => {
-  const { idx } = useMarkerState()
+  const { idx } = useRouteState()
   const fileInfo = useContext(fileState)
-  const start_at = new Date(fileInfo?.currentRoute?.[0]?.[1] || new Date())
+  const start_at = new Date(
+    fileInfo?.routes[idx - 1]?.path?.[0]?.[1] || fileInfo?.currentRoute?.[0]?.[1] || new Date()
+  )
   const startDate = start_at.toLocaleDateString()
   const startTime = start_at.toLocaleTimeString()
   const end_at = new Date(
+    fileInfo?.routes[idx - 1]?.path?.[fileInfo?.routes[idx - 1]?.path?.length - 1]?.[1] ||
     fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] || new Date()
   )
   const endDate = end_at.toLocaleDateString()
@@ -144,7 +147,7 @@ const RouteInfoView = () => {
 
 export function RouteListView() {
   const carouselRef = useRef(null)
-  const { idx, setIdx } = useMarkerState()
+  const { idx, setIdx } = useRouteState()
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -152,7 +155,7 @@ export function RouteListView() {
   })
 
   const editLinkProps = useLink({
-    href: `/route/addRoute/?routeId=${idx}`,
+    href: `/route/addRoute/?routeId=${idx -1}`,
   })
 
   const onChageIdx = (index) => {
