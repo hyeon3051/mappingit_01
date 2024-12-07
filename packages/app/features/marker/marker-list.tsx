@@ -178,6 +178,7 @@ const MarkerInfoView = () => {
 }
 
 export function CardImage({ uri }) {
+  console.log(uri)
   return (
     <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
       <Image source={{ uri: uri, width: 420, height: 324 }} />

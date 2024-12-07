@@ -18,7 +18,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   useEffect(() => {
       camera.current?.setCamera({
         animationDuration: 200,
-        centerCoordinate: location[0] ? location[0] : currLocation[0],
+        centerCoordinate: location ? location[0] : currLocation[0],
       })
   }, [location])
 
