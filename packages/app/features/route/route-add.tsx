@@ -99,6 +99,9 @@ export function AddRouteView() {
     router.back()
   }
 
+  const changeRoutePath = () => {
+    router.push(`/route/editRoute/${routeId}`)
+  }
   return (
     <>
       <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">
@@ -145,14 +148,19 @@ export function AddRouteView() {
           </XStack>
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>너비</H5>
+          <H5>너비</H5>
           <SimpleSlider onValueChange={onWidthChange} />
         </YStack>
 
         <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
           <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
           <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+          <Button icon={<TamaIcon iconName="Check" />} onPress={changeRoutePath}></Button>
+          {routeIdx !== -1 && (
+            <>
+              <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+            </>
+          )}
         </XStack>
       </YStack>
     </>

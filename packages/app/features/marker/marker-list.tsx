@@ -37,7 +37,6 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = () => {
   const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
-  console.log(marker)
   return (
     <MapBoxComponent location={marker?.id && marker.pos ? marker.pos : fileInfo?.pos}>
       <MapboxGL.PointAnnotation
