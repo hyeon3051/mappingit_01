@@ -15,7 +15,7 @@ import {
 } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
-import { useParams, useRouter } from 'solito/navigation'
+import { useLink, useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
@@ -99,9 +99,14 @@ export function AddRouteView() {
     router.back()
   }
 
+  const linkProps = useLink({
+    href: `/route/editRoute/${routeId}`,
+  })
+
   const changeRoutePath = () => {
-    router.push(`/route/editRoute/${routeId}`)
+    linkProps.onPress()
   }
+
   return (
     <>
       <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">

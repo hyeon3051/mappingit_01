@@ -12,9 +12,10 @@ import {
   Slider,
   SliderProps,
   Separator,
+  Sheet,
 } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { Route } from 'packages/app/types/type'
@@ -22,90 +23,145 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
+import { ChevronUp } from '@tamagui/lucide-icons'
+import { ChevronDown } from '@tamagui/lucide-icons'
+import { create } from 'zustand'
+
+interface RouteState {
+  route: Route
+  updateRoute: (route: Route) => void
+}
+
+const useRouteState = create<RouteState>((set) => ({
+  route: {
+    id: 'current',
+    title: '',
+    description: '',
+    path: [],
+    lineWidth: 3,
+    lineColor: '#fbfbfb',
+  },
+  updateRoute(route) {
+    set({ route })
+  },
+}))
 
 export function EditRoutePathView() {
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ id: string }>()
   const routeIdx = params.id ? parseInt(params.id) - 1 : -1
-  const [routeInfo, setRouteInfo] = useState<Route>({
-    id: uuidv4(),
-    title: '',
-    description: '',
-    path: fileInfo?.currentRoute || [],
-    lineWidth: 3,
-    lineColor: '#fbfbfb',
-  })
-  
+  const { route, updateRoute } = useRouteState()
+
   useEffect(() => {
     const selectedRoute = fileInfo?.routes[routeIdx]
-    if (!selectedRoute) return;
+    if (!selectedRoute) return
     const { id, title, description, lineColor, lineWidth, path } = selectedRoute
-    setRouteInfo((prev) => ({
-      ...prev,
+    updateRoute({
       id: id,
       title: title,
       description: description,
       path: path,
       lineColor: lineColor,
       lineWidth: lineWidth,
-    }))
-
+    })
   }, [routeIdx])
-  const startPos = routeInfo.path.length > 0 ? routeInfo.path[0] : fileInfo?.pos[0]
-  const endPos = routeInfo.path.length > 0 ? routeInfo.path[routeInfo.path.length - 1] : fileInfo?.pos[0]
+  const startPos = route.path.length > 0 ? route.path[0] : fileInfo?.pos?.[0]
+  const endPos = route.path.length > 0 ? route.path[route.path.length - 1] : fileInfo?.pos?.[0]
 
   const router = useRouter()
   return (
     <>
-        <MapBoxComponent location={routeIdx && startPos ? startPos : (fileInfo?.pos as [Position, string])} zoomLevel={15}>
-          <MapboxGL.PointAnnotation
-            coordinate={startPos[0]}
-            key={String(routeIdx)}
-            id={String(routeIdx)}
-          >
-            <TamaIcon iconName="MapPin" color="$black10" size="$2" />
-          </MapboxGL.PointAnnotation>
-          <MapboxGL.PointAnnotation
-            coordinate={endPos[0]}
-            key={`end-${routeIdx}`}
-            id={`end-${routeIdx}`}
-          >
-            <TamaIcon iconName="MapPin" color="$black10" size="$2" />
-          </MapboxGL.PointAnnotation>
-          <MapboxGL.ShapeSource
-            id={'line' + String(routeIdx)}
-            lineMetrics={true}
-            shape={{
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: routeInfo.path.map((pos) => pos[0]),
-              },
+      <MapBoxComponent
+        location={routeIdx && startPos ? startPos : (fileInfo?.pos as [Position, string])}
+        zoomLevel={15}
+      >
+        <MapboxGL.PointAnnotation
+          coordinate={startPos?.[0]}
+          key={String(routeIdx)}
+          id={String(routeIdx)}
+        >
+          <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+        </MapboxGL.PointAnnotation>
+        <MapboxGL.PointAnnotation
+          coordinate={endPos?.[0]}
+          key={`end-${routeIdx}`}
+          id={`end-${routeIdx}`}
+        >
+          <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+        </MapboxGL.PointAnnotation>
+        <MapboxGL.ShapeSource
+          id={'line' + String(routeIdx)}
+          lineMetrics={true}
+          shape={{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: route.path.map((pos) => pos[0]),
+            },
+          }}
+        >
+          <MapboxGL.LineLayer
+            id="lineIdx"
+            sourceID="shapeSource"
+            style={{
+              lineColor: route.lineColor,
+              lineWidth: route.lineWidth,
             }}
-          >
-        <MapboxGL.LineLayer
-          id="lineIdx"
-          sourceID="shapeSource"
-              style={{
-                lineColor: routeInfo.lineColor,
-                lineWidth: routeInfo.lineWidth,
-              }}
-            />
-          </MapboxGL.ShapeSource>
-        </MapBoxComponent>
+          />
+        </MapboxGL.ShapeSource>
+      </MapBoxComponent>
 
-        <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-          <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
+      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
+        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
+        <RouteSheet />
       </XStack>
     </>
   )
-} 
+}
 
-function SimpleSlider({ children, ...props }: SliderProps) {
+function RouteSheet() {
+  const [open, setOpen] = useState(true)
+  const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
+  const [position, setPosition] = useState(0)
+  const { route, updateRoute } = useRouteState()
   return (
-    <Slider defaultValue={[2]} max={15} step={1} {...props}>
+    <>
+      <Button
+        size="$6"
+        icon={<TamaIcon iconName={open ? 'ChevronDown' : 'ChevronUp'} color="$black10" size="$4" />}
+        circular
+        onPress={() => setOpen((x) => !x)}
+      />
+      <Sheet
+        modal
+        animation="medium"
+        open={open}
+        onOpenChange={() => toggleOpen()}
+        snapPoints={[60]}
+        position={position}
+        onPositionChange={setPosition}
+        dismissOnSnapToBottom
+      >
+        <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
+          <XStack gap="$4">
+            <SimpleSlider
+              defaultValue={[Math.floor(route.path.length / 2)]}
+              max={route.path.length}
+              step={1}
+            />
+            <H3>{route.path.length}</H3>
+          </XStack>
+        </Sheet.Frame>
+      </Sheet>
+    </>
+  )
+}
+
+function SimpleSlider({ defaultValue, max, children, ...props }: SliderProps) {
+  return (
+    <Slider defaultValue={defaultValue} max={max} step={1} {...props}>
       <Slider.Track>
         <Slider.TrackActive />
       </Slider.Track>
