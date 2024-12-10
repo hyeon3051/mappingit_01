@@ -8,6 +8,12 @@ import { NativeToast } from '@my/ui/src/NativeToast'
 import TamaIcon from 'app/ui/Icon'
 import { Avatar, Button, ButtonIcon } from '@my/ui'
 import { useLink } from 'solito/navigation'
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated'
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Disable strict mode
+})
 
 export const unstable_settings = {
   // Ensure that reloading on `/user` keeps a back button present.
@@ -47,7 +53,7 @@ function RootLayoutNav() {
     <Provider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
-          initialRouteName='Home'
+          initialRouteName="Home"
           screenOptions={{
             headerRight: () => (
               <Button {...userLink} circular backgroundColor={'transparent'}>
