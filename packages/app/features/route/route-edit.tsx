@@ -1,19 +1,4 @@
-import {
-  Button,
-  XStack,
-  YStack,
-  Input,
-  TextArea,
-  H3,
-  H6,
-  H5,
-  useToastController,
-  Square,
-  Slider,
-  SliderProps,
-  Separator,
-  Sheet,
-} from '@my/ui'
+import { Button, XStack, H3, Sheet } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
@@ -23,9 +8,9 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
-import { ChevronUp } from '@tamagui/lucide-icons'
-import { ChevronDown } from '@tamagui/lucide-icons'
+import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { create } from 'zustand'
+import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 interface RouteState {
   route: Route
@@ -146,27 +131,19 @@ function RouteSheet() {
       >
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
-            <SimpleSlider
-              defaultValue={[Math.floor(route.path.length / 2)]}
-              max={route.path.length}
+            <MultiSlider
+              isMarkersSeparated={true}
+              customMarkerLeft={() => <ChevronLeft />}
+              customMarkerRight={() => <ChevronRight />}
+              values={[0, route.path.length]}
+              max={Math.max(1, route.path.length)}
+              min={0}
               step={1}
             />
-            <H3>{route.path.length}</H3>
           </XStack>
+          <H3>{route.path.length}</H3>
         </Sheet.Frame>
       </Sheet>
     </>
-  )
-}
-
-function SimpleSlider({ defaultValue, max, children, ...props }: SliderProps) {
-  return (
-    <Slider defaultValue={defaultValue} max={max} step={1} {...props}>
-      <Slider.Track>
-        <Slider.TrackActive />
-      </Slider.Track>
-      <Slider.Thumb size="$2" index={0} circular />
-      {children}
-    </Slider>
   )
 }
