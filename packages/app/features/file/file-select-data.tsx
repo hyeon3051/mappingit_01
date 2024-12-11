@@ -41,21 +41,31 @@ export function SelectDataView() {
 
   useEffect(() => {
     if (params.fileId) {
-      async function setup() {
-        const file = await getFileDataById(params.fileId, db)
-        const routes = await getRouteById(file.id, db)
-        const markers = await getMarkerById(file.id, db)
+      async function fileSetup() {
+        const fileId = parseInt(params.fileId)
+        const file = await getFileDataById(fileId, db)
+        const routes = await getRouteById(fileId, db)
+        const markers = await getMarkerById(fileId, db)
         const { id, title, description } = file
         setFileInfo((prev) => ({
           ...prev,
           id: id,
           title: title,
           description: description,
-          routes: routes,
-          markers: markers,
+          routes: routes.map((route) => ({
+            ...route,
+            path: JSON.parse(route.path),
+            lineWidth: JSON.parse(route.lineWidth),
+            isSelected: true,
+          })),
+          markers: markers.map((marker) => ({
+            ...marker,
+            pos: JSON.parse(marker.pos),
+            isSelected: true,
+          })),
         }))
       }
-      setup()
+      fileSetup()
     } else {
       let ids = params.ids.split(',').map((id) => parseInt(id))
       if (currentFileInfo) {
@@ -75,7 +85,7 @@ export function SelectDataView() {
         }
         setFileInfo(fileInfo)
       }
-      async function setup() {
+      async function multiFileSetup() {
         await Promise.all(
           ids.map(async (fileId) => {
             const markers: Marker[] = await db.getAllAsync(
@@ -111,7 +121,7 @@ export function SelectDataView() {
           })
         )
       }
-      setup()
+      multiFileSetup()
     }
   }, [params.fileId, params.ids])
 
@@ -141,7 +151,7 @@ export function SelectDataView() {
     router.back()
   }
 
-  const onChangeMarkerSelected = useCallback((idx: number, value: boolean) => {
+  const onChangeMarkerSelected = (idx: number, value: boolean) => {
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -151,9 +161,9 @@ export function SelectDataView() {
         ),
       }
     })
-  }, [])
+  }
 
-  const onChangeRoueSelected = useCallback((idx: number, value: boolean) => {
+  const onChangeRoueSelected = (idx: number, value: boolean) => {
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -163,7 +173,11 @@ export function SelectDataView() {
         ),
       }
     })
-  }, [])
+  }
+
+  useEffect(() => {
+    console.log(fileInfo?.routes)
+  }, [fileInfo])
 
   return (
     <>
@@ -176,33 +190,35 @@ export function SelectDataView() {
               </MapboxGL.PointAnnotation>
             )
         )}
-        {fileInfo?.routes?.map(
-          ({ path, lineColor, lineWidth, isSelected }, idx) =>
-            isSelected && (
-              <MapboxGL.ShapeSource
-                key={String(idx)}
-                id={'line' + String(idx)}
-                lineMetrics={true}
-                shape={{
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'LineString',
-                    coordinates: path.map((pos) => pos[0]),
-                  },
-                }}
-              >
-                <MapboxGL.LineLayer
-                  id={'line' + idx}
-                  sourceID={'line' + idx}
-                  style={{
-                    lineColor: lineColor || '#FFFFFF',
-                    lineWidth: lineWidth || 3,
+        {fileInfo?.routes &&
+          fileInfo?.routes?.map(({ path, lineColor, lineWidth, isSelected }, idx) => {
+            return (
+              isSelected && (
+                <MapboxGL.ShapeSource
+                  key={String(idx)}
+                  id={'line' + String(idx)}
+                  lineMetrics={true}
+                  shape={{
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                      type: 'LineString',
+                      coordinates: Array.isArray(path) ? path.map((pos) => pos[0]) : [],
+                    },
                   }}
-                />
-              </MapboxGL.ShapeSource>
+                >
+                  <MapboxGL.LineLayer
+                    id={'line' + idx}
+                    sourceID={'line' + idx}
+                    style={{
+                      lineColor: lineColor || '#FFFFFF',
+                      lineWidth: lineWidth || 3,
+                    }}
+                  />
+                </MapboxGL.ShapeSource>
+              )
             )
-        )}
+          })}
       </MapBoxComponent>
       <XStack
         f={2}
@@ -251,7 +267,6 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
         onPositionChange={setPosition}
         dismissOnSnapToBottom
       >
-        <Sheet.Handle width="100%" h="10px" bg="$gray10" />
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
             <Paragraph ta="center">

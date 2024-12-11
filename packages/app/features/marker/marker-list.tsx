@@ -41,8 +41,8 @@ const MarkerOnMap = () => {
     <MapBoxComponent location={marker?.id && marker.pos ? marker.pos : fileInfo?.pos}>
       <MapboxGL.PointAnnotation
         coordinate={marker?.pos[0]}
-        key={marker.id ? 'marker-' + marker.id.toString() : 'current'}
-        id={marker.id ? 'marker-' + marker.id.toString() : 'current'}
+        key={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
+        id={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
       >
         <TamaIcon
           iconName={marker?.markerIcon || 'PinOff'}

@@ -15,6 +15,10 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider'
 interface RouteState {
   route: Route
   updateRoute: (route: Route) => void
+  start: number
+  end: number
+  setStart: (start: number) => void
+  setEnd: (end: number) => void
 }
 
 const useRouteState = create<RouteState>((set) => ({
@@ -29,6 +33,14 @@ const useRouteState = create<RouteState>((set) => ({
   updateRoute(route) {
     set({ route })
   },
+  start: 0,
+  end: 0,
+  setStart(start) {
+    set({ start })
+  },
+  setEnd(end) {
+    set({ end })
+  },
 }))
 
 export function EditRoutePathView() {
@@ -36,7 +48,7 @@ export function EditRoutePathView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ id: string }>()
   const routeIdx = params.id ? parseInt(params.id) - 1 : -1
-  const { route, updateRoute } = useRouteState()
+  const { route, updateRoute, start, end, setStart, setEnd } = useRouteState()
 
   useEffect(() => {
     const selectedRoute = fileInfo?.routes[routeIdx]
@@ -50,9 +62,10 @@ export function EditRoutePathView() {
       lineColor: lineColor,
       lineWidth: lineWidth,
     })
+    setEnd(path.length)
   }, [routeIdx])
-  const startPos = route.path.length > 0 ? route.path[0] : fileInfo?.pos?.[0]
-  const endPos = route.path.length > 0 ? route.path[route.path.length - 1] : fileInfo?.pos?.[0]
+  const startPos = route.path.length > 0 ? route.path[start] : fileInfo?.pos?.[0]
+  const endPos = route.path.length > 0 ? route.path[end] : fileInfo?.pos?.[0]
 
   const router = useRouter()
   return (
@@ -83,7 +96,7 @@ export function EditRoutePathView() {
             properties: {},
             geometry: {
               type: 'LineString',
-              coordinates: route.path.map((pos) => pos[0]),
+              coordinates: route.path.slice(start, end).map((pos) => pos[0]),
             },
           }}
         >
@@ -98,9 +111,18 @@ export function EditRoutePathView() {
         </MapboxGL.ShapeSource>
       </MapBoxComponent>
 
-      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
+      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2} zIndex={3}>
+        <Button
+          ai="flex-start"
+          icon={<TamaIcon iconName="ChevronLeft" />}
+          onPress={() => router.back()}
+        ></Button>
         <RouteSheet />
+        <Button
+          ai="flex-end"
+          icon={<TamaIcon iconName="ChevronRight" />}
+          onPress={() => router.back()}
+        ></Button>
       </XStack>
     </>
   )
@@ -110,15 +132,16 @@ function RouteSheet() {
   const [open, setOpen] = useState(true)
   const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
   const [position, setPosition] = useState(0)
-  const { route, updateRoute } = useRouteState()
+  const { route, updateRoute, start, end, setStart, setEnd } = useRouteState()
   return (
     <>
       <Button
         size="$6"
-        icon={<TamaIcon iconName={open ? 'ChevronDown' : 'ChevronUp'} color="$black10" size="$4" />}
         circular
         onPress={() => setOpen((x) => !x)}
-      />
+        icon={<TamaIcon iconName={open ? 'ChevronDown' : 'ChevronUp'} color="$black10" size="$4" />}
+        zIndex={3}
+      ></Button>
       <Sheet
         modal
         animation="medium"
@@ -137,6 +160,10 @@ function RouteSheet() {
               customMarkerRight={() => <ChevronRight />}
               values={[0, route.path.length]}
               max={Math.max(1, route.path.length)}
+              onValuesChangeFinish={(values: number[]) => {
+                setStart(values[0])
+                setEnd(values[1])
+              }}
               min={0}
               step={1}
             />
