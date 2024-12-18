@@ -1,11 +1,10 @@
 import { Button, XStack, H3, Sheet } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useContext, useEffect, useState, useCallback } from 'react'
+import { useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
-import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-import { Pos, Route } from 'packages/app/types/type'
+import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
-import { v4 as uuidv4 } from 'uuid'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -31,14 +30,22 @@ export function EditRoutePathView() {
   const params = useParams<{ id: number }>()
   const router = useRouter()
   const [route, setRoute] = useState<Route | undefined>(undefined)
-  const { start, end } = useRouteState()
+  const { start, end, setEnd } = useRouteState()
 
   useEffect(() => {
-    if (params.id !== -1) {
-      setRoute(fileInfo?.routes[params.id - 1])
+    if (params.id === -1) return
+    async function fetchRouteData() {
+      const selectedRoute = fileInfo?.routes[Number(params.id) - 1]
+      if (selectedRoute) {
+        setRoute(selectedRoute)
+        setEnd(selectedRoute?.path.length - 1 ?? 0)
+      }
     }
+    fetchRouteData()
   }, [params.id, fileInfo?.routes])
+
   if (!route) return null
+
   return (
     <>
       <MapBoxComponent location={route.path[0]}>
@@ -56,7 +63,7 @@ export function EditRoutePathView() {
             properties: {},
             geometry: {
               type: 'LineString',
-              coordinates: route.path.slice(start, end).map((pos) => pos[0]),
+              coordinates: route.path.slice(start, end).map((pos) => pos[0]) ?? [],
             },
           }}
         >
