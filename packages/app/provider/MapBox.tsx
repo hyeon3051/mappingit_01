@@ -10,18 +10,22 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   const { location: currLocation } = useBackgroundGeolocation()
   const camera = useRef<Camera>(null) // Corrected here
   const mapRef = useRef<MapboxGL.MapView>(null)
-
+  const zoomLevel = useRef(15)
   const img_url =
     'https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80'
 
-
   useEffect(() => {
+    if (
+      (location && location[0][0] !== 0 && location[0][1] !== 0) ||
+      (currLocation && currLocation[0][0] !== 0 && currLocation[0][1] !== 0)
+    ) {
       camera.current?.setCamera({
         animationDuration: 200,
         centerCoordinate: location ? location[0] : currLocation[0],
+        zoomLevel: zoomLevel.current,
       })
-  }, [location])
-
+    }
+  }, [location, currLocation])
 
   return (
     <>
@@ -33,11 +37,7 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         ref={mapRef}
       >
         <MapboxGL.UserLocation visible={true} animated={true} />
-        <MapboxGL.Camera
-          ref={camera}
-          animationMode="easeTo"
-          zoomLevel={15}
-        />
+        <MapboxGL.Camera ref={camera} animationMode="easeTo" zoomLevel={zoomLevel.current} />
         {children}
       </MapboxGL.MapView>
     </>

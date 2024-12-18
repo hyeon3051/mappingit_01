@@ -3,7 +3,7 @@ import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
-import { Route } from 'packages/app/types/type'
+import { Pos, Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 import MapBoxComponent from 'packages/app/provider/MapBox'
@@ -13,8 +13,6 @@ import { create } from 'zustand'
 import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 interface RouteState {
-  route: Route
-  updateRoute: (route: Route) => void
   start: number
   end: number
   setStart: (start: number) => void
@@ -22,17 +20,6 @@ interface RouteState {
 }
 
 const useRouteState = create<RouteState>((set) => ({
-  route: {
-    id: 'current',
-    title: '',
-    description: '',
-    path: [],
-    lineWidth: 3,
-    lineColor: '#fbfbfb',
-  },
-  updateRoute(route) {
-    set({ route })
-  },
   start: 0,
   end: 0,
   setStart(start) {
@@ -45,51 +32,29 @@ const useRouteState = create<RouteState>((set) => ({
 
 export function EditRoutePathView() {
   const fileInfo = useContext(fileState)
-  const dispatch = useContext(fileDispatch)
-  const params = useParams<{ id: string }>()
-  const routeIdx = params.id ? parseInt(params.id) - 1 : -1
-  const { route, updateRoute, start, end, setStart, setEnd } = useRouteState()
+  const params = useParams<{ id: number }>()
+  const router = useRouter()
+  const [route, setRoute] = useState<Route | undefined>(undefined)
+  const { start, end } = useRouteState()
 
   useEffect(() => {
-    const selectedRoute = fileInfo?.routes[routeIdx]
-    if (!selectedRoute) return
-    const { id, title, description, lineColor, lineWidth, path } = selectedRoute
-    updateRoute({
-      id: id,
-      title: title,
-      description: description,
-      path: path,
-      lineColor: lineColor,
-      lineWidth: lineWidth,
-    })
-    setEnd(path.length)
-  }, [routeIdx])
-  const startPos = route.path.length > 0 ? route.path[start] : fileInfo?.pos?.[0]
-  const endPos = route.path.length > 0 ? route.path[end] : fileInfo?.pos?.[0]
-
-  const router = useRouter()
+    if (params.id === -1) {
+      return
+    }
+    setRoute(fileInfo?.routes[Number(params.id) - 1])
+  }, [params.id])
+  if (!route) return null
   return (
     <>
-      <MapBoxComponent
-        location={routeIdx && startPos ? startPos : (fileInfo?.pos as [Position, string])}
-        zoomLevel={15}
-      >
-        <MapboxGL.PointAnnotation
-          coordinate={startPos?.[0]}
-          key={String(routeIdx)}
-          id={String(routeIdx)}
-        >
+      <MapBoxComponent location={route.path[0]}>
+        <MapboxGL.PointAnnotation coordinate={route.path[start][0]} key={'start'} id={'start'}>
           <TamaIcon iconName="MapPin" color="$black10" size="$2" />
         </MapboxGL.PointAnnotation>
-        <MapboxGL.PointAnnotation
-          coordinate={endPos?.[0]}
-          key={`end-${routeIdx}`}
-          id={`end-${routeIdx}`}
-        >
+        <MapboxGL.PointAnnotation coordinate={route.path[end][0]} key={'end'} id={'end'}>
           <TamaIcon iconName="MapPin" color="$black10" size="$2" />
         </MapboxGL.PointAnnotation>
         <MapboxGL.ShapeSource
-          id={'line' + String(routeIdx)}
+          id={'line'}
           lineMetrics={true}
           shape={{
             type: 'Feature',
@@ -101,8 +66,8 @@ export function EditRoutePathView() {
           }}
         >
           <MapboxGL.LineLayer
-            id="lineIdx"
-            sourceID="shapeSource"
+            id={'line'}
+            sourceID={'line'}
             style={{
               lineColor: route.lineColor,
               lineWidth: route.lineWidth,
@@ -111,13 +76,28 @@ export function EditRoutePathView() {
         </MapboxGL.ShapeSource>
       </MapBoxComponent>
 
-      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2} zIndex={3}>
+      <XStack
+        f={1}
+        jc="space-between"
+        ai="flex-end"
+        gap="$4"
+        p={2}
+        w="100%"
+        m={2}
+        h="$10"
+        pos="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+      >
         <Button
           ai="flex-start"
           icon={<TamaIcon iconName="ChevronLeft" />}
-          onPress={() => router.back()}
+          onPress={() => {
+            router.back()
+          }}
         ></Button>
-        <RouteSheet />
+        <RouteSheet route={route} />
         <Button
           ai="flex-end"
           icon={<TamaIcon iconName="ChevronRight" />}
@@ -128,11 +108,12 @@ export function EditRoutePathView() {
   )
 }
 
-function RouteSheet() {
+function RouteSheet({ route }: { route: Route }) {
   const [open, setOpen] = useState(true)
   const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
   const [position, setPosition] = useState(0)
-  const { route, updateRoute, start, end, setStart, setEnd } = useRouteState()
+  const { start, end, setStart, setEnd } = useRouteState()
+  const max = route?.path.length - 1 ?? 0
   return (
     <>
       <Button
@@ -147,7 +128,7 @@ function RouteSheet() {
         animation="medium"
         open={open}
         onOpenChange={() => toggleOpen()}
-        snapPoints={[60]}
+        snapPoints={[20]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
@@ -158,8 +139,8 @@ function RouteSheet() {
               isMarkersSeparated={true}
               customMarkerLeft={() => <ChevronLeft />}
               customMarkerRight={() => <ChevronRight />}
-              values={[0, route.path.length]}
-              max={Math.max(1, route.path.length)}
+              values={[0, max]}
+              max={Math.max(1, max)}
               onValuesChangeFinish={(values: number[]) => {
                 setStart(values[0])
                 setEnd(values[1])
@@ -168,7 +149,7 @@ function RouteSheet() {
               step={1}
             />
           </XStack>
-          <H3>{route.path.length}</H3>
+          <H3>{end - start}</H3>
         </Sheet.Frame>
       </Sheet>
     </>

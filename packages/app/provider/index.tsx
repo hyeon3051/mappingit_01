@@ -3,9 +3,10 @@ import { CustomToast, TamaguiProvider, TamaguiProviderProps, ToastProvider, conf
 import { ToastViewport } from './ToastViewport'
 import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import fileReducer from 'packages/app/contexts/mapData/fileReducer'
-import { useReducer } from 'react'
+import { useReducer, useRef } from 'react'
 import { SQLiteProvider } from 'expo-sqlite'
-
+import MapBoxComponent from './MapBox'
+import MapboxGL from '@rnmapbox/maps'
 const initalData = {
   title: '',
   routes: [],
@@ -38,7 +39,9 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
           assetSource={{ assetId: require('../mappingit.db') }}
         >
           <fileState.Provider value={state}>
-            <fileDispatch.Provider value={dispatch}>{children}</fileDispatch.Provider>
+            <fileDispatch.Provider value={dispatch}>
+              <MapBoxComponent location={state.pos}>{children}</MapBoxComponent>
+            </fileDispatch.Provider>
           </fileState.Provider>
         </SQLiteProvider>
         <CustomToast />
