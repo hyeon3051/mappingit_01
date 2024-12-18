@@ -22,12 +22,8 @@ interface RouteState {
 const useRouteState = create<RouteState>((set) => ({
   start: 0,
   end: 0,
-  setStart(start) {
-    set({ start })
-  },
-  setEnd(end) {
-    set({ end })
-  },
+  setStart: (start) => set((state) => (state.start !== start ? { start } : state)),
+  setEnd: (end) => set((state) => (state.end !== end ? { end } : state)),
 }))
 
 export function EditRoutePathView() {
@@ -38,11 +34,10 @@ export function EditRoutePathView() {
   const { start, end } = useRouteState()
 
   useEffect(() => {
-    if (params.id === -1) {
-      return
+    if (params.id !== -1) {
+      setRoute(fileInfo?.routes[params.id - 1])
     }
-    setRoute(fileInfo?.routes[Number(params.id) - 1])
-  }, [params.id])
+  }, [params.id, fileInfo?.routes])
   if (!route) return null
   return (
     <>
@@ -139,9 +134,9 @@ function RouteSheet({ route }: { route: Route }) {
               isMarkersSeparated={true}
               customMarkerLeft={() => <ChevronLeft />}
               customMarkerRight={() => <ChevronRight />}
-              values={[0, max]}
+              values={[start, end]} // 초기값을 상태로 동기화
               max={Math.max(1, max)}
-              onValuesChangeFinish={(values: number[]) => {
+              onValuesChangeFinish={(values) => {
                 setStart(values[0])
                 setEnd(values[1])
               }}
