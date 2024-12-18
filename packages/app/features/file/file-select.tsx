@@ -11,7 +11,7 @@ import {
 } from '@my/ui'
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -24,39 +24,12 @@ import {
   getRouteById,
 } from 'packages/app/contexts/fileData/fileReducer'
 
-export function Header() {
-  const db = useSQLiteContext()
-  const [version, setVersion] = useState('')
-  useEffect(() => {
-    async function setup() {
-      const result = await db.getFirstAsync<{ 'sqlite_version()': string }>(
-        'SELECT sqlite_version()'
-      )
-      if (result) {
-        setVersion(result['sqlite_version()'])
-      }
-    }
-    setup()
-  }, [])
-  return (
-    <XStack gap="$4" p="$4">
-      <H2>SQLite Version: {version}</H2>
-    </XStack>
-  )
-}
-
 export function SelectFileView() {
-  const carouselRef = useRef(null)
   const db = useSQLiteContext()
-  const [idx, setIdx] = useState(0)
   const [fileList, setFileList] = useState<File[]>()
   const [fileInfo, setFileInfo] = useState<FileState | undefined>()
   const currentFileInfo = useContext(fileState)
   const [prevSelected, setPrevSelected] = useState<boolean[]>([])
-
-  const linkProps = useLink({
-    href: `/file/addFile`,
-  })
 
   const editLinkProps = useLink({
     href: `/file/selectData/?ids=${fileList?.filter((file) => file.isSelected).map((file) => file.id)}`,
@@ -78,15 +51,18 @@ export function SelectFileView() {
     }
     setup()
     if (currentFileInfo) {
-      const { title, description, routes, markers } = currentFileInfo
-      const fileInfo = {
-        id: '1',
-        title: title,
-        description: description,
-        routes: routes,
-        markers: markers,
+      async function setupFile() {
+        const { title, description, routes, markers } = currentFileInfo
+        const fileInfo = {
+          id: '1',
+          title: title,
+          description: description,
+          routes: routes,
+          markers: markers,
+        }
+        setFileInfo(fileInfo)
       }
-      setFileInfo(fileInfo)
+      setupFile()
     }
   }, [])
 
@@ -142,12 +118,15 @@ export function SelectFileView() {
     setupData()
   }, [prevSelected])
 
-  const onChangeSelected = (index: number) => {
-    setPrevSelected(prevSelected.map((check, i) => (i === index ? !check : check)))
-  }
+  const onChangeSelected = useCallback(
+    (index: number) => {
+      setPrevSelected(prevSelected.map((check, i) => (i === index ? !check : check)))
+    },
+    [prevSelected]
+  )
   return (
-    <>  
-      <MapBoxComponent location={fileInfo?.pos}>
+    <>
+      <MapBoxComponent location={fileInfo?.routes[0]?.path[0] || currentFileInfo?.pos}>
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
@@ -199,8 +178,6 @@ export function SelectFileView() {
 }
 
 function SheetDemo({ fileList, onChangeSelected }) {
-  const toast = useToastController()
-
   const [open, setOpen] = useState(true)
   const [position, setPosition] = useState(0)
 

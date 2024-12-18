@@ -16,7 +16,7 @@ import { useLink, useParams, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
 import { fileDispatch, fileState } from 'packages/app/contexts/mapData/fileReducer'
-import { File, FileState, Marker, Route } from 'packages/app/types/type'
+import { File, FileState, Marker, Pos, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 import {
   addFile,
@@ -32,7 +32,7 @@ export function SelectDataView() {
   const toast = useToastController()
   const [fileInfo, setFileInfo] = useState<FileState | undefined>()
   const currentFileInfo = useContext(fileState)
-
+  const [currentLocation, setCurrentLocation] = useState<Pos | undefined>(undefined)
   const dispatch = useContext(fileDispatch)
 
   const router = useRouter()
@@ -67,25 +67,27 @@ export function SelectDataView() {
       }
       fileSetup()
     } else {
-      let ids = params.ids.split(',').map((id) => parseInt(id))
-      if (currentFileInfo) {
-        const { title, description, routes, markers } = currentFileInfo
-        const fileInfo = {
-          id: '1',
-          title: title,
-          description: description,
-          routes: routes.map((route) => ({
-            ...route,
-            isSelected: true,
-          })),
-          markers: markers.map((marker) => ({
-            ...marker,
-            isSelected: true,
-          })),
-        }
-        setFileInfo(fileInfo)
-      }
       async function multiFileSetup() {
+        let ids = params.ids.split(',').map((id) => parseInt(id))
+        if (currentFileInfo) {
+          const { title, description, routes, markers } = currentFileInfo
+          const fileInfo = {
+            id: '1',
+            title: title,
+            description: description,
+            routes: routes.map((route) => ({
+              ...route,
+              isSelected: true,
+              key: route.id,
+            })),
+            markers: markers.map((marker) => ({
+              ...marker,
+              isSelected: true,
+              key: marker.id,
+            })),
+          }
+          setFileInfo(fileInfo)
+        }
         await Promise.all(
           ids.map(async (fileId) => {
             const markers: Marker[] = await db.getAllAsync(
@@ -105,6 +107,7 @@ export function SelectDataView() {
                     ...marker,
                     pos: JSON.parse(marker.pos),
                     isSelected: true,
+                    key: marker.id,
                   })),
                 ],
                 routes: [
@@ -114,6 +117,7 @@ export function SelectDataView() {
                     path: JSON.parse(route.path),
                     lineWidth: JSON.parse(route.lineWidth),
                     isSelected: true,
+                    key: route.id,
                   })),
                 ],
               }
@@ -151,7 +155,9 @@ export function SelectDataView() {
     router.back()
   }
 
-  const onChangeMarkerSelected = (idx: number, value: boolean) => {
+  const onChangeMarkerSelected = useCallback((idx: number, value: boolean) => {
+    const marker = fileInfo?.markers[idx]
+    setCurrentLocation(marker?.pos)
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -161,9 +167,11 @@ export function SelectDataView() {
         ),
       }
     })
-  }
+  }, [])
 
-  const onChangeRoueSelected = (idx: number, value: boolean) => {
+  const onChangeRoueSelected = useCallback((idx: number, value: boolean) => {
+    const route = fileInfo?.routes[idx]
+    setCurrentLocation(route?.path[0])
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -173,15 +181,11 @@ export function SelectDataView() {
         ),
       }
     })
-  }
-
-  useEffect(() => {
-    console.log(fileInfo?.routes)
-  }, [fileInfo])
+  }, [])
 
   return (
     <>
-      <MapBoxComponent location={fileInfo?.pos} zoomLevel={3}>
+      <MapBoxComponent location={currentLocation || fileInfo?.pos} zoomLevel={3}>
         {fileInfo?.markers?.map(
           ({ pos, markerIcon, markerColor, id, isSelected }) =>
             isSelected && (

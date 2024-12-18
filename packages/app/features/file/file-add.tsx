@@ -20,9 +20,8 @@ export function AddFileView() {
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ fileId: number }>()
+  const [fileId, setFileId] = useState<number>(params.fileId || -1)
   const db = useSQLiteContext()
-
-  const fileId = params.fileId || -1
 
   const [currentFileInfo, setCurrentFileInfo] = useState<FileState>({
     id: -1,
@@ -33,27 +32,32 @@ export function AddFileView() {
   })
 
   useEffect(() => {
+    setFileId(Number(params.fileId) || -1)
+  }, [params.fileId])
+
+  useEffect(() => {
     async function setup() {
-      setCurrentFileInfo((prev) => ({
-        ...prev,
-      }))
-      if (fileId !== -1) {
-        const file = await getFileDataById(fileId, db)
-        const routes = await getRouteById(fileId, db)
-        const markers = await getMarkerById(fileId, db)
-        const { id, title, description } = file
+      if (fileId === -1) {
         setCurrentFileInfo((prev) => ({
           ...prev,
-          id: id,
-          title: title,
-          description: description,
-          routes: routes,
-          markers: markers,
         }))
+        return
       }
+      const file = await getFileDataById(fileId, db)
+      const routes = await getRouteById(fileId, db)
+      const markers = await getMarkerById(fileId, db)
+      const { id, title, description } = file
+      setCurrentFileInfo((prev) => ({
+        ...prev,
+        id: id,
+        title: title,
+        description: description,
+        routes: routes,
+        markers: markers,
+      }))
     }
     setup()
-  }, [params])
+  }, [fileId])
 
   const { title, description, routes, markers } = currentFileInfo
 
