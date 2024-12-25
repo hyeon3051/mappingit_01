@@ -41,7 +41,7 @@ const RouteOnMap = () => {
   const endCoordinate =
     idx !== 0
       ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
-      : fileInfo?.pos[0]
+      : fileInfo?.pos?.[0]
 
   useEffect(() => {
     useIdxSet({
@@ -58,7 +58,7 @@ const RouteOnMap = () => {
   return (
     <MapBoxComponent location={startCoordinate ? startCoordinate : fileInfo.pos}>
       <MapboxGL.PointAnnotation
-        coordinate={startCoordinate ? startCoordinate[0] : fileInfo.pos[0]}
+        coordinate={startCoordinate?.[0]}
         key={idxSet.startIdx}
         id={idxSet.startIdx}
       >
@@ -79,8 +79,8 @@ const RouteOnMap = () => {
                 ? (fileInfo.currentRoute.length >= 2
                     ? fileInfo.currentRoute
                     : [fileInfo.pos, fileInfo.pos]
-                  ).map((route) => route[0])
-                : fileInfo.routes[idx - 1]?.path.map((route) => route[0]),
+                  ).map((route) => route?.[0])
+                : fileInfo.routes[idx - 1]?.path?.map((route) => route?.[0]),
           },
         }}
       >

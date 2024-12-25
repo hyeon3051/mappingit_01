@@ -1,8 +1,8 @@
-import { Button, XStack, H3, Sheet } from '@my/ui'
+import { Button, XStack, H3, Sheet, YStack } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
 import { Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import MapBoxComponent from 'packages/app/provider/MapBox'
@@ -27,6 +27,7 @@ const useRouteState = create<RouteState>((set) => ({
 
 export function EditRoutePathView() {
   const fileInfo = useContext(fileState)
+  const dispatch = useContext(fileDispatch)
   const params = useParams<{ id: number }>()
   const router = useRouter()
   const [route, setRoute] = useState<Route | undefined>(undefined)
@@ -45,6 +46,23 @@ export function EditRoutePathView() {
   }, [params.id, fileInfo?.routes])
 
   if (!route) return null
+
+  const handleSave = () => {
+    const routePath = route.path.slice(start, end)
+    console.log(params.id)
+    dispatch({
+      type: 'EDIT_ROUTE',
+      payload: {
+        routeId: String(params.id),
+        route: {
+          ...route,
+          path: routePath,
+        },
+      },
+    })
+    router.back()
+    router.back()
+  }
 
   return (
     <>
@@ -99,7 +117,7 @@ export function EditRoutePathView() {
             router.back()
           }}
         ></Button>
-        <RouteSheet route={route} />
+        <RouteSheet route={route} save={handleSave} />
         <Button
           ai="flex-end"
           icon={<TamaIcon iconName="ChevronRight" />}
@@ -110,7 +128,7 @@ export function EditRoutePathView() {
   )
 }
 
-function RouteSheet({ route }: { route: Route }) {
+function RouteSheet({ route, save }: { route: Route; save: () => void }) {
   const [open, setOpen] = useState(true)
   const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
   const [position, setPosition] = useState(0)
@@ -130,7 +148,7 @@ function RouteSheet({ route }: { route: Route }) {
         animation="medium"
         open={open}
         onOpenChange={() => toggleOpen()}
-        snapPoints={[20]}
+        snapPoints={[30]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
@@ -152,6 +170,15 @@ function RouteSheet({ route }: { route: Route }) {
             />
           </XStack>
           <H3>{end - start}</H3>
+          <XStack>
+            <Button onPress={save}>
+              <TamaIcon iconName="Save" />
+            </Button>
+            <Button>
+              <TamaIcon iconName="Delete" />
+              <H3>삭제</H3>
+            </Button>
+          </XStack>
         </Sheet.Frame>
       </Sheet>
     </>

@@ -106,14 +106,15 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.markers.push(action.payload.marker)
         break
       case 'REMOVE_MARKER':
-        draft.markers = draft.markers.filter((marker) => marker.id != action.payload.markerId)
+        draft.markers = draft.markers.filter((marker) => marker.id !== String(action.payload.markerId))
         break
       // 마커 수정
       // 1. 마커 이름, 추가 설명, 아이콘, 색상 수정
       // 2. 마커 위치 가상 이동 수정
       case 'EDIT_MARKER':
+        console.log(action.payload.markerId, 'action.payload.markerId')
         draft.markers = draft.markers.map((marker) =>
-          marker.id === action.payload.markerId ? action.payload.marker : marker
+          marker.id === String(action.payload.markerId) ? action.payload.marker : marker
         )
         break
       case 'ADD_ROUTE':
@@ -121,14 +122,14 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.currentRoute = []
         break
       case 'REMOVE_ROUTE':
-        draft.routes = draft.routes.filter((route) => route.id != action.payload.routeId)
+        draft.routes = draft.routes.filter((route) => route.id !== String(action.payload.routeId))
         break
       // 경로 수정
       // 1. 경로 이름, 추가 설명, 색상, 두께 수정
       // 2. 경로 범위 수정
       case 'EDIT_ROUTE':
         draft.routes = draft.routes.map((route) =>
-          route.id === action.payload.routeId ? action.payload.route : route
+          String(route.id) === action.payload.routeId ? action.payload.route : route
         )
         break
       // 위치 추적
