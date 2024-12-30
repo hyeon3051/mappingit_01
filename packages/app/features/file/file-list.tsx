@@ -16,8 +16,10 @@ import {
 } from 'packages/app/contexts/fileData/fileReducer'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
+import { useColorScheme } from 'react-native'
 
 export function FileView() {
+  const colorScheme = useColorScheme()
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
@@ -144,16 +146,16 @@ export function FileView() {
           vertical={true}
           data={[
             {
-              title: '현재 파일',
+              title: '현재 파일', 
               description: '현재 저장 중인 파일',
               markerIcon: 'Globe',
-              markerColor: '$black10',
+              markerColor: colorScheme === 'dark' ? '$white10' : '$black10',
             },
             ...(fileList?.map((file) => ({
               title: file['title'],
               description: file['description'],
               markerIcon: 'MapPin',
-              markerColor: '$black10',
+              markerColor: colorScheme === 'dark' ? '$white10' : '$black10',
             })) || []),
           ]}
           scrollAnimationDuration={100}

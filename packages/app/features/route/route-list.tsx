@@ -13,6 +13,7 @@ import { TabView, SceneMap } from 'react-native-tab-view'
 import { useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
 import { useEffect } from 'react'
+import { useColorScheme } from 'react-native'
 
 interface RouteState {
   idx: number
@@ -27,6 +28,7 @@ const useRouteState = create<RouteState>((set) => ({
 }))
 
 const RouteOnMap = () => {
+  const colorScheme = useColorScheme()
   const fileInfo = useContext(fileState)
   const { idx } = useRouteState()
   const [idxSet, useIdxSet] = useState({
@@ -62,10 +64,10 @@ const RouteOnMap = () => {
         key={idxSet.startIdx}
         id={idxSet.startIdx}
       >
-        <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+        <TamaIcon iconName="MapPin" color={colorScheme === 'dark' ? '$white10' : '$black10'} size="$2" />
       </MapboxGL.PointAnnotation>
       <MapboxGL.PointAnnotation coordinate={endCoordinate} key={idxSet.endIdx} id={idxSet.endIdx}>
-        <TamaIcon iconName="MapPin" color="$black10" size="$2" />
+        <TamaIcon iconName="MapPin" color={colorScheme === 'dark' ? '$white10' : '$black10'} size="$2" />
       </MapboxGL.PointAnnotation>
       <MapboxGL.ShapeSource
         id="shapeSource"
@@ -99,6 +101,7 @@ const RouteOnMap = () => {
 
 const RouteInfoView = () => {
   const { idx } = useRouteState()
+  const colorScheme = useColorScheme()
   const fileInfo = useContext(fileState)
   const start_at = new Date(
     fileInfo?.routes[idx - 1]?.path?.[0]?.[1] || fileInfo?.currentRoute?.[0]?.[1] || new Date()
@@ -114,14 +117,11 @@ const RouteInfoView = () => {
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
-        <Card size="$4" width="100%" height="100%" backgroundColor="$black0" mx="$2" px="$2">
+        <Card size="$4" width="100%" height="100%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} mx="$2" px="$2">
           <Card.Header padded>
             <Paragraph></Paragraph>
           </Card.Header>
           <Stack
-            borderColor="$white075"
-            backgroundColor="$white075"
-            borderWidth="$1"
             width="$15"
             height="$20"
           >
@@ -146,6 +146,7 @@ const RouteInfoView = () => {
 }
 
 export function RouteListView() {
+  const colorScheme = useColorScheme()
   const carouselRef = useRef(null)
   const { idx, setIdx } = useRouteState()
   const fileInfo = useContext(fileState)
@@ -167,13 +168,13 @@ export function RouteListView() {
 
   return (
     <>
-      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center"></Stack>
-      <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
-        <Carousel
-          loop={false}
-          width={224}
-          ref={carouselRef}
-          height={300}
+      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}></Stack>
+        <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
+          <Carousel
+            loop={false}
+            width={224}
+            ref={carouselRef}
+            height={300}
           vertical={true}
           data={fileInfo?.routes.map((route) => ({
             ...route,
@@ -231,6 +232,7 @@ const renderScreen = SceneMap({
 })
 export function RouteView() {
   const layout = useWindowDimensions()
+  const colorScheme = useColorScheme()
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([
@@ -246,7 +248,7 @@ export function RouteView() {
           index: tabIdx,
           routes,
         }}
-        style={{ width: '100%', height: '100%', zIndex: zIndex }}
+        style={{ width: '100%', height: '100%', zIndex: zIndex}}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}
         initialLayout={{ width: layout.width, height: layout.height }}

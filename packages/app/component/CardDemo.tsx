@@ -1,16 +1,13 @@
 import { Button, Paragraph, XStack, YStack, SizableText, Stack, Card } from '@my/ui'
 import TamaIcon from '../ui/Icon'
+import { useColorScheme } from 'react-native'
 
 export function CardDemo({ title, description, markerIcon, markerColor, onSelect = () => {}, onFileSelect }: { title: string, description: string, markerIcon: string, markerColor: string, onSelect?: () => void, onFileSelect?: () => void }) {
-  return (
-    <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
-      <Card.Header padded>
-        <Paragraph></Paragraph>
-      </Card.Header>
+  const colorScheme = useColorScheme()
+    return (
+    <Card size="$4" width="100%" height="90%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} m="$2" p="$2">
       <Stack
-        borderColor="$white075"
-        backgroundColor="$white075"
-        borderWidth="$1"
+        borderColor={colorScheme === 'dark' ? '$white075' : '$black075'}
         alignSelf="flex-start"
         py="$4"
         width="$15"

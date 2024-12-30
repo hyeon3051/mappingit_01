@@ -14,6 +14,7 @@ import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation
 import { TabView, SceneMap } from 'react-native-tab-view'
 import { useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
+import { useColorScheme } from 'react-native'
 
 interface MarkerState {
   marker: Marker
@@ -142,6 +143,7 @@ const MarkerListView = () => {
 }
 
 const MarkerInfoView = () => {
+  const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
   const markerDate = new Date(marker?.pos[1]) || new Date()
   const markerTimeStr = markerDate.toLocaleTimeString()
@@ -149,14 +151,11 @@ const MarkerInfoView = () => {
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
-        <Card size="$4" width="100%" height="100%" backgroundColor="$black0" mx="$2" px="$2">
+        <Card size="$4" width="100%" height="100%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} mx="$2" px="$2">
           <Card.Header padded>
             <Paragraph></Paragraph>
           </Card.Header>
           <Stack
-            borderColor="$white075"
-            backgroundColor="$white075"
-            borderWidth="$1"
             width="$15"
             height="$20"
           >
@@ -177,9 +176,9 @@ const MarkerInfoView = () => {
 }
 
 export function CardImage({ uri }) {
-  console.log(uri)
+  const colorScheme = useColorScheme()  
   return (
-    <Card size="$4" width="100%" height="90%" backgroundColor="$black0" m="$2" p="$2">
+    <Card size="$4" width="100%" height="90%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} m="$2" p="$2">
       <Image source={{ uri: uri, width: 420, height: 324 }} />
       <Card.Footer>
         <XStack flex={1} m="$2" jc="flex-end" px="$4">
@@ -191,6 +190,7 @@ export function CardImage({ uri }) {
 }
 
 const MakerImageView = () => {
+  const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
   return (
     <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
