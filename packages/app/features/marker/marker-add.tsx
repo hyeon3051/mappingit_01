@@ -35,6 +35,7 @@ export function AddMarkerView() {
     imageUri: [],
     pos: fileInfo?.pos,
   })
+  console.log(markerInfo, params.marker)
 
   useEffect(() => {
     const { icon, color, marker } = params
@@ -137,7 +138,7 @@ export function AddMarkerView() {
             >
               사진 추가
             </Button>
-            {markerInfo?.imageUri?.length > 0 && (
+            {markerInfo?.imageUri && markerInfo.imageUri.length > 0 && (
               <Carousel
                 loop={true}
                 modeConfig={{
@@ -148,7 +149,7 @@ export function AddMarkerView() {
                 width={300}
                 height={300}
                 scrollAnimationDuration={100}
-                data={markerInfo?.imageUri}
+                data={params.marker ? markerInfo.imageUri : JSON.parse(markerInfo.imageUri)}
                 renderItem={({ item }) => <CardDemo uri={item} />}
               />
             )}
