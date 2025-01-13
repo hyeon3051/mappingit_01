@@ -28,7 +28,6 @@ export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteC
   const stringifyPos = JSON.stringify(pos)
   const stringifyImgUri = JSON.stringify(imageUri)
 
-
   return await db.runAsync(
     `INSERT INTO marker (
       pos, title, description, markerIcon, markerColor, imageUri, parent
@@ -75,4 +74,16 @@ export async function updateFile(
   await db.execAsync(
     `UPDATE File SET title = ${title}, description = ${description} WHERE id = ${fileId}`
   )
+}
+
+export async function getIcons(db: ReturnType<typeof useSQLiteContext>) {
+  return await db.getAllAsync<string[]>('SELECT * from icon')
+}
+
+export async function addIcon(icon: string, db: ReturnType<typeof useSQLiteContext>) {
+  return await db.runAsync(`INSERT INTO icon (icon) VALUES (${icon})`)
+}
+
+export async function deleteIcon(icon: string, db: ReturnType<typeof useSQLiteContext>) {
+  return await db.runAsync(`DELETE FROM icon WHERE icon = ${icon}`)
 }

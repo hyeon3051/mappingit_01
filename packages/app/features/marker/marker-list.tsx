@@ -98,6 +98,7 @@ const MarkerListView = () => {
           })}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
+            console.log(index)
             setIdx(index + 1)
           }}
           renderItem={(data) => {
@@ -151,14 +152,18 @@ const MarkerInfoView = () => {
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
-        <Card size="$4" width="100%" height="100%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} mx="$2" px="$2">
+        <Card
+          size="$4"
+          width="100%"
+          height="100%"
+          backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+          mx="$2"
+          px="$2"
+        >
           <Card.Header padded>
             <Paragraph></Paragraph>
           </Card.Header>
-          <Stack
-            width="$15"
-            height="$20"
-          >
+          <Stack width="$15" height="$20">
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
                 <SizableText size="$8">{marker?.title}</SizableText>
@@ -176,9 +181,16 @@ const MarkerInfoView = () => {
 }
 
 export function CardImage({ uri }) {
-  const colorScheme = useColorScheme()  
+  const colorScheme = useColorScheme()
   return (
-    <Card size="$4" width="100%" height="90%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} m="$2" p="$2">
+    <Card
+      size="$4"
+      width="100%"
+      height="90%"
+      backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+      m="$2"
+      p="$2"
+    >
       <Image source={{ uri: uri, width: 420, height: 324 }} />
       <Card.Footer>
         <XStack flex={1} m="$2" jc="flex-end" px="$4">

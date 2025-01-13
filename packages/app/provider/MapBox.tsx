@@ -1,8 +1,7 @@
-import React, { use, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import MapboxGL, { Camera, SymbolLayer } from '@rnmapbox/maps'
 import { Pos } from '../types/type'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
-import { useColorScheme } from 'react-native'
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
 )
@@ -12,7 +11,6 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   const camera = useRef<Camera>(null) // Corrected here
   const mapRef = useRef<MapboxGL.MapView>(null)
   const zoomLevel = useRef(15)
-  const colorScheme = useColorScheme()
   const img_url =
     'https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80'
 
@@ -39,7 +37,6 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
           position: 'absolute',
           width: '100%',
           height: '100%',
-          backgroundColor: colorScheme === 'dark' ? 'black' : 'white',
         }}
         logoEnabled={false}
         attributionEnabled={false}

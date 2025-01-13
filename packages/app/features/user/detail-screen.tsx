@@ -10,31 +10,34 @@ import {
   YGroup,
   YStack,
 } from '@my/ui'
-import { ChevronLeft } from '@tamagui/lucide-icons'
-import TamaIcon from 'packages/app/ui/Icon'
-import { useParams, useRouter } from 'solito/navigation'
+import { ChevronLeft, Link } from '@tamagui/lucide-icons'
+import { useLink, useParams, useRouter } from 'solito/navigation'
+import { useUser } from '@clerk/clerk-expo'
 
 export function UserDetailScreen() {
+  const params = useParams<{ id: number }>()
   const router = useRouter()
-  const { id } = useParams()
 
+  const linkProps = useLink({
+    href: `/icon/${params.id}`,
+  })
+
+  const { user } = useUser()
   return (
     <>
       <ScrollView bg="$background">
         <YStack f={1} bg="$background">
+          <Button {...linkProps} icon={Link} />
           <XStack gap="$4" p="$4">
             <Avatar circular size="$8">
-              <Avatar.Image
-                accessibilityLabel="Cam"
-                src="https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80"
-              />
+              <Avatar.Image accessibilityLabel="Cam" src={user?.imageUrl} />
               <Avatar.Fallback backgroundColor="$blue10" />
             </Avatar>
             <YStack gap="$2">
               <Paragraph fow="700" col="$blue10">
-                hyeon3051 (구독 중)
+                {user?.firstName} {user?.lastName} (구독 중)
               </Paragraph>
-              <Paragraph col="$black10">google 계정으로 로그인</Paragraph>
+              <Paragraph col="$black10">{user?.emailAddresses[0].emailAddress}</Paragraph>
             </YStack>
           </XStack>
           <YGroup>

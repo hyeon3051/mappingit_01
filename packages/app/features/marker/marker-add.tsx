@@ -78,7 +78,7 @@ export function AddMarkerView() {
     if (marker === -1) return
     dispatch({
       type: 'REMOVE_MARKER',
-      payload: { markerId: marker -1 },
+      payload: { markerId: marker - 1 },
     })
   }
 

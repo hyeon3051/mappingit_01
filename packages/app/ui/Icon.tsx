@@ -6,6 +6,7 @@ const TamaIcon = ({
   size = '$5',
   backgroundColor = '$white0',
   borderRadius = '$0',
+  ...props
 }) => {
   const IconComponent = Icons[iconName]
 
@@ -19,6 +20,7 @@ const TamaIcon = ({
       color={color}
       backgroundColor={backgroundColor}
       borderRadius={borderRadius}
+      {...props}
     />
   )
 }

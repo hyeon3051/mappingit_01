@@ -4,8 +4,12 @@ import { selectedIcon } from 'packages/app/types/type'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
 import { useLink, useRouter, useParams } from 'solito/navigation'
+import { useIconStore } from 'packages/app/store/icon'
+import { usecolorStore } from 'packages/app/store/color'
 
 export function SelectMarkerView() {
+  const { icons } = useIconStore()
+  const { colors } = usecolorStore()
   const [markerIcon, setMarkerIcon] = useState<selectedIcon>({
     icon: '',
     color: '$black10',
@@ -41,13 +45,15 @@ export function SelectMarkerView() {
     router.back()
   }
 
+  console.log(marker)
+
   return (
     <>
       <ScrollView>
         <YStack f={1} ai="center" gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
           <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
             <Paragraph>즐겨찾기</Paragraph>
-            <XStack gap="$3" jc="space-around">
+            <XStack gap="$5" jc="flex-start" flexWrap="wrap">
               {['PinOff', 'PinOff', 'PinOff', 'PinOff'].map((iconName, index) => (
                 <Button
                   key={index}
@@ -61,17 +67,8 @@ export function SelectMarkerView() {
           </Stack>
           <Stack p="$2" gap="$2" jc="flex-start" mt="$2" w="100%">
             <Paragraph>마커</Paragraph>
-            <XStack gap="$2" jc="space-around" flexWrap="wrap">
-              {[
-                'PinOff',
-                'Eraser',
-                'AArrowUp',
-                'MapPinOff',
-                'MapPin',
-                'Pin',
-                'TreePine',
-                'ShoppingBag',
-              ].map((iconName: string, index) => (
+            <XStack gap="$5" jc="space-around" flexWrap="wrap">
+              {icons?.map((iconName: string, index) => (
                 <Button
                   key={index}
                   size="$7"
@@ -89,35 +86,13 @@ export function SelectMarkerView() {
               ))}
             </XStack>
           </Stack>
-          <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
+          <Stack p="$2" gap="$2" jc="flex-start" mt="$2" w="100%">
             <Paragraph>색상</Paragraph>
-            <XStack gap="$3" jc="space-around">
-              {['$red10', '$blue10', '$purple10', '$green10'].map((color, index) => (
+            <XStack gap="$5" jc="flex-start" flexWrap="wrap">
+              {colors?.map((color, index) => (
                 <Square
                   key={index}
-                  size="$8"
-                  hoverStyle={{
-                    scale: 1.5,
-                  }}
-                  pressStyle={{
-                    scale: 0.9,
-                  }}
-                  onPress={() =>
-                    setMarkerIcon({
-                      ...markerIcon,
-                      color,
-                    })
-                  }
-                  backgroundColor={color}
-                  elevation={color === '$red10' ? '$5' : undefined}
-                />
-              ))}
-            </XStack>
-            <XStack gap="$3" jc="space-around">
-              {['$red10', '$blue10', '$purple10', '$green10'].map((color, index) => (
-                <Square
-                  key={index}
-                  size="$8"
+                  size="$7"
                   onPress={() =>
                     setMarkerIcon({
                       ...markerIcon,
@@ -142,7 +117,7 @@ export function SelectMarkerView() {
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
           돌아가기
         </Button>
-        {marker !== -1 && (
+        {marker !== 0 && (
           <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
             삭제
           </Button>

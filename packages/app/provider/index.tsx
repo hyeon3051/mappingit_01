@@ -7,6 +7,10 @@ import { useReducer, useRef } from 'react'
 import { SQLiteProvider } from 'expo-sqlite'
 import MapBoxComponent from './MapBox'
 import MapboxGL from '@rnmapbox/maps'
+import { ClerkProvider } from '@clerk/clerk-expo'
+import { tokenCache } from 'app/cache'
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 const initalData = {
   title: '',
   routes: [],
@@ -24,29 +28,31 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
       defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}
       {...rest}
     >
-      <ToastProvider
-        swipeDirection="horizontal"
-        duration={6000}
-        native={
-          [
-            /* uncomment the next line to do native toasts on mobile. NOTE: it'll require you making a dev build and won't work with Expo Go */
-            // 'mobile'
-          ]
-        }
-      >
-        <SQLiteProvider
-          databaseName="mappingit.db"
-          assetSource={{ assetId: require('../mappingit.db') }}
+      <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+        <ToastProvider
+          swipeDirection="horizontal"
+          duration={6000}
+          native={
+            [
+              /* uncomment the next line to do native toasts on mobile. NOTE: it'll require you making a dev build and won't work with Expo Go */
+              // 'mobile'
+            ]
+          }
         >
-          <fileState.Provider value={state}>
-            <fileDispatch.Provider value={dispatch}>
-              <MapBoxComponent location={state.pos}>{children}</MapBoxComponent>
-            </fileDispatch.Provider>
-          </fileState.Provider>
-        </SQLiteProvider>
-        <CustomToast />
-        <ToastViewport />
-      </ToastProvider>
+          <SQLiteProvider
+            databaseName="mappingit.db"
+            assetSource={{ assetId: require('../mappingit.db') }}
+          >
+            <fileState.Provider value={state}>
+              <fileDispatch.Provider value={dispatch}>
+                <MapBoxComponent location={state.pos}>{children}</MapBoxComponent>
+              </fileDispatch.Provider>
+            </fileState.Provider>
+          </SQLiteProvider>
+          <CustomToast />
+          <ToastViewport />
+        </ToastProvider>
+      </ClerkProvider>
     </TamaguiProvider>
   )
 }
