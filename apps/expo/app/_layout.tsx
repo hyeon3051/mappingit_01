@@ -2,13 +2,15 @@ import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
-import { SplashScreen, Stack } from 'expo-router'
+import { Link, SplashScreen, Stack } from 'expo-router'
 import { Provider } from 'app/provider'
 import { NativeToast } from '@my/ui/src/NativeToast'
-import TamaIcon from 'app/ui/Icon'
-import { Avatar, Button, ButtonIcon } from '@my/ui'
+import { AvatarFallback, Avatar, Text, AvatarImage, Button } from '@my/ui'
+import { ClerkProvider, SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
 import { useLink } from 'solito/navigation'
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated'
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -44,32 +46,53 @@ export default function App() {
 }
 
 function RootLayoutNav() {
+  const colorScheme = useColorScheme()
+  return (
+    <Provider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <NativeToast />
+        <StackComponent />
+      </ThemeProvider>
+    </Provider>
+  )
+}
+
+function StackComponent() {
   const userLink = useLink({
     href: '/user/23',
   })
   const colorScheme = useColorScheme()
-
+  const signInLink = useLink({
+    href: '/(auth)/sign-in',
+  })
+  const signUpLink = useLink({
+    href: '/(auth)/sign-up',
+  })
+  const { isLoaded, isSignedIn, user } = useUser()
   return (
-    <Provider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack
-          initialRouteName="Home"
-          screenOptions={{
-            headerRight: () => (
-              <Button {...userLink} circular backgroundColor={'transparent'}>
-                <Avatar circular size="$3">
-                  <Avatar.Image
-                    accessibilityLabel="Cam"
-                    src="https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80"
-                  />
-                  <Avatar.Fallback backgroundColor="$blue10" />
+    <Stack
+      initialRouteName="Home"
+      screenOptions={{
+        headerRight: () => (
+          <>
+            <SignedIn>
+              <Button {...userLink} className="flex-row items-center" circular>
+                <Avatar>
+                  <AvatarImage src={user?.imageUrl} />
                 </Avatar>
               </Button>
-            ),
-          }}
-        />
-        <NativeToast />
-      </ThemeProvider>
-    </Provider>
+            </SignedIn>
+            <SignedOut>
+              <Link {...signInLink}>
+                <Text>Sign in</Text>
+              </Link>
+              <Link {...signUpLink}>
+                <Text>Sign up</Text>
+              </Link>
+            </SignedOut>
+          </>
+        ),
+      }}
+    />
   )
 }

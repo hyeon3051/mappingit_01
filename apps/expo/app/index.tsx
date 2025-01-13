@@ -5,12 +5,18 @@ import { RouteView } from 'app/features/route/route-list'
 import { MarkerView } from 'app/features/marker/marker-list'
 import { FileView } from 'app/features/file/file-list'
 import TamaIcon from 'packages/app/ui/Icon'
+import { useColorScheme } from 'react-native'
 
 const Tab = createBottomTabNavigator()
 
 export default function Screen() {
+  const colorScheme = useColorScheme()
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Tab.Screen
         name="홈"
         component={HomeScreen}
