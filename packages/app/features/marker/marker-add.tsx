@@ -4,6 +4,7 @@ import {
   YStack,
   Stack,
   Input,
+  Text,
   TextArea,
   H3,
   Card,
@@ -11,6 +12,7 @@ import {
   H5,
   ScrollView,
   Image,
+  Separator,
 } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
@@ -21,11 +23,13 @@ import { Marker } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import ImagePicker from 'react-native-image-crop-picker'
 import { v4 as uuidv4 } from 'uuid'
+import { Badge } from '@tamagui/lucide-icons'
 export function AddMarkerView() {
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
-  const marker = parseInt(`${params.marker}` || '-1')
+  const marker = parseInt(`${params.marker}` || '0')
+  const [hashTags, setHashTags] = useState<string[]>([])
   const [markerInfo, setMarkerInfo] = useState<Marker>({
     id: uuidv4(),
     title: '',
@@ -44,7 +48,7 @@ export function AddMarkerView() {
       markerIcon: icon,
       markerColor: color,
     }))
-    if (marker !== -1 && fileInfo?.markers[marker - 1]) {
+    if (marker !== 0 && fileInfo?.markers[marker - 1]) {
       const selectedMarker = fileInfo?.markers[marker - 1]
       const { id, title, description, imageUri } = selectedMarker
       setMarkerInfo((prev) => ({
@@ -75,7 +79,7 @@ export function AddMarkerView() {
   }
 
   const handleRemove = () => {
-    if (marker === -1) return
+    if (marker === 0) return
     dispatch({
       type: 'REMOVE_MARKER',
       payload: { markerId: marker - 1 },
@@ -154,6 +158,10 @@ export function AddMarkerView() {
               />
             )}
           </YStack>
+          <YStack gap="$4" p="$2" w="80%" m={20}>
+            <H5>해시태그</H5>
+            <HashTagCard hashTags={hashTags} setHashTags={setHashTags} />
+          </YStack>
         </YStack>
       </ScrollView>
 
@@ -164,7 +172,7 @@ export function AddMarkerView() {
         <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
           뒤로가기
         </Button>
-        {marker !== -1 ? (
+        {marker !== 0 ? (
           <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
             삭제
           </Button>
@@ -186,5 +194,43 @@ export function CardDemo({ uri }) {
         </XStack>
       </Card.Footer>
     </Card>
+  )
+}
+
+export function HashTagCard({
+  hashTags,
+  setHashTags,
+}: {
+  hashTags: string[]
+  setHashTags: (hashTags: string[]) => void
+}) {
+  const [hashTag, setHashTag] = useState('')
+  const onEnroll = () => {
+    setHashTags([...hashTags, hashTag.split('\n')])
+    setHashTag('')
+  }
+  return (
+    <>
+      <XStack flex={1} ai="center" jc="center" flexWrap="wrap" gap="$4" p="$2">
+        {hashTags.map((tag) => (
+          <YStack key={tag} position="relative" backgroundColor="$black0">
+            <Button
+              onPress={() => setHashTags(hashTags.filter((t) => t !== tag))}
+              backgroundColor="$black0"
+            >
+              <Text>{tag}</Text>
+              <TamaIcon iconName="X" size="$1" />
+            </Button>
+          </YStack>
+        ))}
+        <Separator />
+        <XStack>
+          <Input w="80%" placeholder="해시태그" value={hashTag} onChangeText={setHashTag} />
+          <Button onPress={onEnroll}>
+            <TamaIcon iconName="PlusCircle" size="$2" />
+          </Button>
+        </XStack>
+      </XStack>
+    </>
   )
 }

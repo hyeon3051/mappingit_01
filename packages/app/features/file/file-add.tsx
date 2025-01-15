@@ -2,7 +2,7 @@ import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
-import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import { FileState } from 'packages/app/types/type'
 import {
   addFile,

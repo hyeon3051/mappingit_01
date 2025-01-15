@@ -4,7 +4,7 @@ import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { useContext, useEffect, useState } from 'react'
 import { useLink } from 'solito/navigation'
-import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import * as Notifications from 'expo-notifications'
 import TamaIcon from 'packages/app/ui/Icon'
 

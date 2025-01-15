@@ -16,7 +16,7 @@ import {
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
-import { fileState, fileDispatch } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import { Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
@@ -26,7 +26,7 @@ export function AddRouteView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ routeId: number }>()
 
-  const routeIdx = params.routeId || -1
+  const routeIdx = params.routeId
 
   const [routeInfo, setRouteInfo] = useState<Route>({
     id: uuidv4(),
@@ -38,7 +38,7 @@ export function AddRouteView() {
   })
 
   useEffect(() => {
-    if (routeIdx !== -1 && fileInfo?.routes[routeIdx]) {
+    if (routeIdx !== 0 && fileInfo?.routes[routeIdx]) {
       const selectedRoute = fileInfo?.routes[routeIdx]
       const { id, title, description, lineColor, lineWidth, path } = selectedRoute
       setRouteInfo((prev) => ({
@@ -78,7 +78,7 @@ export function AddRouteView() {
   }
 
   const handleRemove = () => {
-    if (routeIdx === -1 && routeId) return
+    if (routeIdx === 0 && routeId) return
     dispatch({
       type: 'REMOVE_ROUTE',
       payload: { routeId: routeId },
@@ -87,7 +87,7 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
-    if (routeIdx !== -1 && routeId) {
+    if (routeIdx !== 0 && routeId) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
       dispatch({
@@ -161,7 +161,7 @@ export function AddRouteView() {
           <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
           <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
           <Button icon={<TamaIcon iconName="Check" />} onPress={changeRoutePath}></Button>
-          {routeIdx !== -1 && (
+          {routeIdx !== 0 && (
             <>
               <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
             </>

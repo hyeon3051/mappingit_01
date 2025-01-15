@@ -2,17 +2,19 @@ import React, { useEffect, useRef } from 'react'
 import MapboxGL, { Camera, SymbolLayer } from '@rnmapbox/maps'
 import { Pos } from '../types/type'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
+import { useUser } from '@clerk/clerk-expo'
+
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA'
 )
 
 const MapBoxComponent = ({ location, children }: { location?: Pos; children: React.ReactNode }) => {
+  const { user } = useUser()
   const { location: currLocation } = useBackgroundGeolocation()
   const camera = useRef<Camera>(null) // Corrected here
   const mapRef = useRef<MapboxGL.MapView>(null)
   const zoomLevel = useRef(15)
-  const img_url =
-    'https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80'
+  const img_url = user?.imageUrl
 
   useEffect(() => {
     if (
@@ -43,7 +45,10 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         zoomEnabled={true}
         ref={mapRef}
       >
-        <MapboxGL.UserLocation visible={true} animated={true} />
+        <MapboxGL.UserLocation visible={true} animated={true}>
+          <MapboxGL.LocationPuck bearingImage={img_url} />
+        </MapboxGL.UserLocation>
+
         <MapboxGL.Camera ref={camera} animationMode="easeTo" zoomLevel={zoomLevel.current} />
         {children}
       </MapboxGL.MapView>

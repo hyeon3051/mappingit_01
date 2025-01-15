@@ -15,7 +15,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useLink, useRouter } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState } from 'app/contexts/mapData/fileReducer'
 import { File, FileState, Marker, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
 import {

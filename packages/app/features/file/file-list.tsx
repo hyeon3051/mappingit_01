@@ -5,7 +5,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
-import { fileDispatch, fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileDispatch, fileState } from 'app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { Marker, File, FileState, Route } from 'packages/app/types/type'
 import { useSQLiteContext } from 'expo-sqlite'
@@ -146,7 +146,7 @@ export function FileView() {
           vertical={true}
           data={[
             {
-              title: '현재 파일', 
+              title: '현재 파일',
               description: '현재 저장 중인 파일',
               markerIcon: 'Globe',
               markerColor: colorScheme === 'dark' ? '$white10' : '$black10',

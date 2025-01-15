@@ -4,7 +4,7 @@ import { useContext, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState } from 'app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
@@ -64,10 +64,18 @@ const RouteOnMap = () => {
         key={idxSet.startIdx}
         id={idxSet.startIdx}
       >
-        <TamaIcon iconName="MapPin" color={colorScheme === 'dark' ? '$white10' : '$black10'} size="$2" />
+        <TamaIcon
+          iconName="MapPin"
+          color={colorScheme === 'dark' ? '$white10' : '$black10'}
+          size="$2"
+        />
       </MapboxGL.PointAnnotation>
       <MapboxGL.PointAnnotation coordinate={endCoordinate} key={idxSet.endIdx} id={idxSet.endIdx}>
-        <TamaIcon iconName="MapPin" color={colorScheme === 'dark' ? '$white10' : '$black10'} size="$2" />
+        <TamaIcon
+          iconName="MapPin"
+          color={colorScheme === 'dark' ? '$white10' : '$black10'}
+          size="$2"
+        />
       </MapboxGL.PointAnnotation>
       <MapboxGL.ShapeSource
         id="shapeSource"
@@ -110,21 +118,26 @@ const RouteInfoView = () => {
   const startTime = start_at.toLocaleTimeString()
   const end_at = new Date(
     fileInfo?.routes[idx - 1]?.path?.[fileInfo?.routes[idx - 1]?.path?.length - 1]?.[1] ||
-    fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] || new Date()
+      fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] ||
+      new Date()
   )
   const endDate = end_at.toLocaleDateString()
   const endTime = end_at.toLocaleTimeString()
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
-        <Card size="$4" width="100%" height="100%" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'} mx="$2" px="$2">
+        <Card
+          size="$4"
+          width="100%"
+          height="100%"
+          backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+          mx="$2"
+          px="$2"
+        >
           <Card.Header padded>
             <Paragraph></Paragraph>
           </Card.Header>
-          <Stack
-            width="$15"
-            height="$20"
-          >
+          <Stack width="$15" height="$20">
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
                 <SizableText size="$8">{idx !== 0 && fileInfo?.routes[idx - 1]?.title}</SizableText>
@@ -156,7 +169,7 @@ export function RouteListView() {
   })
 
   const editLinkProps = useLink({
-    href: `/route/addRoute/?routeId=${idx -1}`,
+    href: `/route/addRoute/?routeId=${idx - 1}`,
   })
 
   const onChageIdx = (index) => {
@@ -168,21 +181,41 @@ export function RouteListView() {
 
   return (
     <>
-      <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center" backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}></Stack>
-        <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
-          <Carousel
-            loop={false}
-            width={224}
-            ref={carouselRef}
-            height={300}
+      <Stack
+        top={25}
+        flex={1}
+        zIndex={3}
+        pos="absolute"
+        width="100%"
+        ai="center"
+        backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+      ></Stack>
+      <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
+        <Carousel
+          loop={false}
+          width={224}
+          ref={carouselRef}
+          height={300}
           vertical={true}
-          data={fileInfo?.routes.map((route) => ({
-            ...route,
-            key: route.id,
-          }))}
+          data={[
+            {
+              id: 'current',
+              title: '현재 위치',
+              description: '',
+              path: fileInfo?.currentRoute,
+              markerIcon: 'PinOff',
+              markerColor: '$black10',
+            },
+            ...(fileInfo?.routes.map((route) => {
+              return {
+                ...route,
+                key: route.id,
+              }
+            }) || []),
+          ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            setIdx(index + 1)
+            setIdx(index)
           }}
           renderItem={(data) => {
             const { title, description, id } = data.item
@@ -248,7 +281,7 @@ export function RouteView() {
           index: tabIdx,
           routes,
         }}
-        style={{ width: '100%', height: '100%', zIndex: zIndex}}
+        style={{ width: '100%', height: '100%', zIndex: zIndex }}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}
         initialLayout={{ width: layout.width, height: layout.height }}

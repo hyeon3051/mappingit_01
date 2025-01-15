@@ -5,7 +5,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
-import { fileState } from 'packages/app/contexts/mapData/fileReducer'
+import { fileState } from 'app/contexts/mapData/fileReducer'
 import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
@@ -90,16 +90,26 @@ const MarkerListView = () => {
           ref={carouselRef}
           height={300}
           vertical={true}
-          data={fileInfo?.markers.map((data) => {
-            return {
-              ...data,
-              key: data.id,
-            }
-          })}
+          data={[
+            {
+              id: 'current',
+              title: '현재 위치',
+              description: '',
+              pos: currLocation,
+              markerIcon: 'PinOff',
+              markerColor: '$black10',
+            },
+            ...(fileInfo?.markers.map((data) => {
+              return {
+                ...data,
+                key: data.id,
+              }
+            }) || []),
+          ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
             console.log(index)
-            setIdx(index + 1)
+            setIdx(index)
           }}
           renderItem={(data) => {
             const { title, description, markerIcon, markerColor, id } = data.item
