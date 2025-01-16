@@ -29,7 +29,6 @@ export function AddMarkerView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
   const marker = parseInt(`${params.marker}` || '0')
-  const [hashTags, setHashTags] = useState<string[]>([])
   const [markerInfo, setMarkerInfo] = useState<Marker>({
     id: uuidv4(),
     title: '',
@@ -37,6 +36,7 @@ export function AddMarkerView() {
     markerColor: '',
     markerIcon: '',
     imageUri: [],
+    hashTags: [],
     pos: fileInfo?.pos,
   })
   console.log(markerInfo, params.marker)
@@ -50,18 +50,19 @@ export function AddMarkerView() {
     }))
     if (marker !== 0 && fileInfo?.markers[marker - 1]) {
       const selectedMarker = fileInfo?.markers[marker - 1]
-      const { id, title, description, imageUri } = selectedMarker
+      const { id, title, description, imageUri, hashTags } = selectedMarker
       setMarkerInfo((prev) => ({
         ...prev,
         id: id,
         title: title,
         description: description,
         imageUri: imageUri,
+        hashTags: hashTags,
       }))
     }
   }, [params])
 
-  const { title, description } = markerInfo
+  const { title, description, hashTags } = markerInfo
 
   const router = useRouter()
 
@@ -75,6 +76,13 @@ export function AddMarkerView() {
     setMarkerInfo((prev) => ({
       ...prev,
       description: text,
+    }))
+  }
+
+  const onHashTagChange = (text) => {
+    setMarkerInfo((prev) => ({
+      ...prev,
+      hashTags: [...prev.hashTags, text],
     }))
   }
 
@@ -160,7 +168,7 @@ export function AddMarkerView() {
           </YStack>
           <YStack gap="$4" p="$2" w="80%" m={20}>
             <H5>해시태그</H5>
-            <HashTagCard hashTags={hashTags} setHashTags={setHashTags} />
+            <HashTagCard hashTags={hashTags} setHashTags={onHashTagChange} />
           </YStack>
         </YStack>
       </ScrollView>
@@ -206,8 +214,10 @@ export function HashTagCard({
 }) {
   const [hashTag, setHashTag] = useState('')
   const onEnroll = () => {
-    setHashTags([...hashTags, hashTag.split('\n')])
-    setHashTag('')
+    if (hashTag) {
+      setHashTags(hashTag)
+      setHashTag('')
+    }
   }
   return (
     <>

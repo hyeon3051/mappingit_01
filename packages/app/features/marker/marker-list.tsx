@@ -1,4 +1,15 @@
-import { Button, XStack, SizableText, Card, Stack, YStack, Paragraph, Image } from '@my/ui'
+import {
+  Button,
+  XStack,
+  SizableText,
+  Card,
+  Stack,
+  YStack,
+  Paragraph,
+  Image,
+  Text,
+  Separator,
+} from '@my/ui'
 import { PlusCircle, FileEdit, X, MonitorSpeaker } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import { useContext, useEffect, useRef, useState } from 'react'
@@ -72,13 +83,13 @@ const MarkerListView = () => {
   const onChageIdx = (index) => {
     setIdx(index)
     if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index: index - 1 })
+      carouselRef.current.scrollTo({ index: index })
     }
   }
   useEffect(() => {
     const markers = fileInfo?.markers || []
     const tempSelectedMarker = idx !== 0 ? markers[idx - 1] : { pos: currLocation }
-    updateMarker(tempSelectedMarker)
+    updateMarker(tempSelectedMarker as Marker)
   }, [idx])
   return (
     <>
@@ -159,31 +170,64 @@ const MarkerInfoView = () => {
   const markerDate = new Date(marker?.pos[1]) || new Date()
   const markerTimeStr = markerDate.toLocaleTimeString()
   const markerDateStr = markerDate.toLocaleDateString()
+  const hashTags = marker?.hashTags || []
+  console.log(marker)
+  const stringToColor = (str: string) => {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    let color = '#'
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff
+      color += value.toString(16).padStart(2, '0')
+    }
+    return color
+  }
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
         <Card
-          size="$4"
-          width="100%"
-          height="100%"
-          backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+          width="$15"
+          height="$15"
+          backgroundColor={colorScheme === 'dark' ? '#000000AA' : '#ffffffAA'}
           mx="$2"
           px="$2"
+          py="$2"
         >
-          <Card.Header padded>
-            <Paragraph></Paragraph>
+          <Card.Header>
+            <SizableText size="$5" weight="bold">
+              {marker?.title}
+            </SizableText>
           </Card.Header>
-          <Stack width="$15" height="$20">
-            <XStack gap="$3" ai="flex-start" jc="center" px="$4">
+          <XStack ml="$2">
+            {hashTags?.map((tag) => (
+              <>
+                <Text
+                  theme="alt2"
+                  size="$3"
+                  key={tag}
+                  mx="$2"
+                  color={stringToColor(tag) + 'AA'}
+                  borderRadius="$10"
+                >
+                  {tag}
+                </Text>
+                <Separator vertical />
+              </>
+            ))}
+          </XStack>
+          <Card.Footer>
+            <XStack gap="$3" ai="flex-start" jc="center">
               <YStack alignContent="center" w="80%">
-                <SizableText size="$8">{marker?.title}</SizableText>
-                <Paragraph size="$1">{marker?.description}</Paragraph>
-                <Paragraph size="$1">{markerDateStr}</Paragraph>
-                <Paragraph size="$1">{markerTimeStr}</Paragraph>
+                <Paragraph size="$2" fontWeight="light">
+                  {marker?.description}
+                </Paragraph>
+                <Paragraph size="$4">{markerDateStr}</Paragraph>
+                <Paragraph size="$4">{markerTimeStr}</Paragraph>
               </YStack>
             </XStack>
-          </Stack>
-          <Card.Footer></Card.Footer>
+          </Card.Footer>
         </Card>
       </Stack>
     </>

@@ -16,6 +16,7 @@ export type Route = {
   parent?: number
   delete_flag?: boolean
   isSelected?: boolean
+  hashTags?: string[]
 }
 // TODO endTrackingDate는 isRecord가 false일때 채워짐 true 일때는 startDate
 // 위치 추적시 이름을 지정하고 움직임
@@ -31,6 +32,7 @@ export type Marker = {
   parent?: number
   isSelected?: boolean
   delete_flag?: boolean
+  hashTags?: string[]
 }
 
 export interface LocateFile {
