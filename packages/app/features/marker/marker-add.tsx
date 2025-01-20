@@ -215,7 +215,7 @@ export function HashTagCard({
   const [hashTag, setHashTag] = useState('')
   const onEnroll = () => {
     if (hashTag) {
-      setHashTags(hashTag)
+      setHashTags([...hashTags, hashTag])
       setHashTag('')
     }
   }

@@ -88,12 +88,9 @@ export default function Page() {
       />
       <Button onPress={onSignInPress}>Sign in</Button>
       <YStack>
-        <Text>Don't have an account?</Text>
         <Button onPress={onGoogleOAuthPress}>Google</Button>
         <Button onPress={onAppleOAuthPress}>Apple</Button>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
+        <Button onPress={() => router.replace('/sign-up')}>Sign up</Button>
       </YStack>
     </YStack>
   )

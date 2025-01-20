@@ -9,10 +9,21 @@ import {
   ScrollView,
   Input,
 } from '@my/ui'
-import { ChevronDown, Search } from '@tamagui/lucide-icons'
+import { Cannabis, ChevronDown, Search } from '@tamagui/lucide-icons'
 import { useState, useEffect } from 'react'
 import TamaIcon from '../ui/Icon'
-import { useColorScheme } from 'react-native'
+import { useColorScheme, Text, Image } from 'react-native'
+
+import {
+  TestIds,
+  NativeAd,
+  NativeAdView,
+  NativeAsset,
+  NativeAssetType,
+  NativeMediaView,
+  BannerAd,
+  BannerAdSize,
+} from 'react-native-google-mobile-ads'
 
 export function SheetDemo({ onChangeIdx, data, type }) {
   const [search, setSearch] = useState('')
@@ -127,6 +138,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
               </XStack>
             ))}
           </ScrollView>
+          <NativeComponent />
           <Button
             size="$6"
             circular
@@ -138,5 +150,35 @@ export function SheetDemo({ onChangeIdx, data, type }) {
         </Sheet.Frame>
       </Sheet>
     </>
+  )
+}
+
+const NativeComponent = () => {
+  const [nativeAd, setNativeAd] = useState<NativeAd>()
+
+  useEffect(() => {
+    console.log('NativeAd:', NativeAd) // Check if this logs undefined
+    if (NativeAd) {
+      NativeAd.createForAdRequest(TestIds.NATIVE).then(setNativeAd).catch(console.error)
+    }
+  }, [])
+
+  if (!nativeAd) {
+    return null
+  }
+
+  return (
+    <NativeAdView nativeAd={nativeAd}>
+      {nativeAd.icon && (
+        <NativeAsset assetType={NativeAssetType.ICON}>
+          <Image source={{ uri: nativeAd.icon.url }} width={24} height={24} />
+        </NativeAsset>
+      )}
+      <NativeAsset assetType={NativeAssetType.HEADLINE}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+      </NativeAsset>
+      <Text>Sponsored</Text>
+      <NativeMediaView />
+    </NativeAdView>
   )
 }
