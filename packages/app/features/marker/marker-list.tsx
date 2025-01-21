@@ -119,7 +119,6 @@ const MarkerListView = () => {
           ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            console.log(index)
             setIdx(index)
           }}
           renderItem={(data) => {
@@ -171,7 +170,6 @@ const MarkerInfoView = () => {
   const markerTimeStr = markerDate.toLocaleTimeString()
   const markerDateStr = markerDate.toLocaleDateString()
   const hashTags = marker?.hashTags || []
-  console.log(marker)
   const stringToColor = (str: string) => {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
@@ -259,7 +257,7 @@ const MakerImageView = () => {
   const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
   return (
-    <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
+    <Stack zIndex={3} pos="absolute" left={0} bottom={20} w="100%" h="100%">
       <Carousel
         loop={true}
         modeConfig={{

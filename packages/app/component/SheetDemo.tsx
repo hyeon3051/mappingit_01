@@ -70,9 +70,9 @@ export function SheetDemo({ onChangeIdx, data, type }) {
         open={open}
         onOpenChange={setOpen}
         snapPoints={[80]}
+        dismissOnSnapToBottom
         position={position}
         onPositionChange={setPosition}
-        dismissOnSnapToBottom
       >
         <Sheet.Frame
           ai="center"
@@ -114,31 +114,36 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                 <Paragraph>{'description'}</Paragraph>
               </YStack>
             </XStack>
-            {filterdData?.map((file, idx) => (
-              <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={idx}>
-                <Button
-                  size="$5"
-                  circular
-                  onPress={() => {
-                    onChangeIdx(idx + 1)
-                    setOpen(false)
-                  }}
-                  iconAfter={
-                    <TamaIcon
-                      iconName={file['markerIcon'] || 'PinOff'}
-                      color={file['markerColor'] || '$black10'}
-                      size="$6"
+            {filterdData?.map((file, idx) => {
+              const Ad_flag = idx % 2 === 0 && idx !== 0
+              return (
+                <>
+                  {Ad_flag && <NativeComponent />}
+                  <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={idx}>
+                    <Button
+                      size="$5"
+                      circular
+                      onPress={() => {
+                        onChangeIdx(idx + 1)
+                        setOpen(false)
+                      }}
+                      iconAfter={
+                        <TamaIcon
+                          iconName={file['markerIcon'] || 'PinOff'}
+                          color={file['markerColor'] || '$black10'}
+                          size="$6"
+                        />
+                      }
                     />
-                  }
-                />
-                <YStack gap="$2" ml={20}>
-                  <H2>{file['title'] || 'example'}</H2>
-                  <Paragraph>{file['description']}</Paragraph>
-                </YStack>
-              </XStack>
-            ))}
+                    <YStack gap="$2" ml={20}>
+                      <H2>{file['title'] || 'example'}</H2>
+                      <Paragraph>{file['description']}</Paragraph>
+                    </YStack>
+                  </XStack>
+                </>
+              )
+            })}
           </ScrollView>
-          <NativeComponent />
           <Button
             size="$6"
             circular
@@ -168,17 +173,34 @@ const NativeComponent = () => {
   }
 
   return (
-    <NativeAdView nativeAd={nativeAd}>
+    <NativeAdView
+      nativeAd={nativeAd}
+      style={{
+        backgroundColor: 'white',
+        borderRadius: 10,
+        border: '1px solid black',
+        margin: 15,
+        paddingLeft: 10,
+        paddingRight: 10,
+      }}
+    >
       {nativeAd.icon && (
         <NativeAsset assetType={NativeAssetType.ICON}>
-          <Image source={{ uri: nativeAd.icon.url }} width={24} height={24} />
+          <Image
+            source={{ uri: nativeAd.icon.url }}
+            width={60}
+            height={60}
+            style={{ borderRadius: 10, border: '1px solid black' }}
+          />
         </NativeAsset>
       )}
       <NativeAsset assetType={NativeAssetType.HEADLINE}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+        <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+      </NativeAsset>
+      <NativeAsset assetType={NativeAssetType.BODY}>
+        <Text style={{ fontSize: 12, fontWeight: 'normal' }}>{nativeAd.body}</Text>
       </NativeAsset>
       <Text>Sponsored</Text>
-      <NativeMediaView />
     </NativeAdView>
   )
 }

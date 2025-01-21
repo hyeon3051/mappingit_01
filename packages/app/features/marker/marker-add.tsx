@@ -39,7 +39,6 @@ export function AddMarkerView() {
     hashTags: [],
     pos: fileInfo?.pos,
   })
-  console.log(markerInfo, params.marker)
 
   useEffect(() => {
     const { icon, color, marker } = params
@@ -215,7 +214,7 @@ export function HashTagCard({
   const [hashTag, setHashTag] = useState('')
   const onEnroll = () => {
     if (hashTag) {
-      setHashTags([...hashTags, hashTag])
+      setHashTags(hashTag)
       setHashTag('')
     }
   }

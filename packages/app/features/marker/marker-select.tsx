@@ -45,7 +45,6 @@ export function SelectMarkerView() {
     router.back()
   }
 
-  console.log(marker)
 
   return (
     <>

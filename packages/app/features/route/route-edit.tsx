@@ -34,8 +34,6 @@ export function EditRoutePathView() {
   const { start, end, setEnd } = useRouteState()
 
   useEffect(() => {
-    console.log(params.id)
-    if (params.id === -1) return
     async function fetchRouteData() {
       const selectedRoute = fileInfo?.routes.find((route) => route.id === params.id)
       if (selectedRoute) {
@@ -44,14 +42,12 @@ export function EditRoutePathView() {
       }
     }
     fetchRouteData()
-    console.log(route)
   }, [params.id, fileInfo?.routes])
 
   if (!route) return null
 
   const handleSave = () => {
     const routePath = route.path.slice(start, end)
-    console.log(params.id)
     dispatch({
       type: 'EDIT_ROUTE',
       payload: {

@@ -37,7 +37,7 @@ export function CardDemo({
         </XStack>
       </Stack>
       <Card.Footer>
-        <XStack flex={1} m="$2" jc="flex-end">
+        <XStack flex={1} m="$2" jc="flex-end" pos="absolute" bottom={20} left={0} right={0}>
           <Button
             size="$3"
             icon={<TamaIcon iconName="Check" size="$2" />}

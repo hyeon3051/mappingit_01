@@ -6,7 +6,6 @@ import fileReducer from 'app/contexts/mapData/fileReducer'
 import { useReducer, useRef } from 'react'
 import { SQLiteProvider } from 'expo-sqlite'
 import MapBoxComponent from './MapBox'
-import MapboxGL from '@rnmapbox/maps'
 import { ClerkProvider } from '@clerk/clerk-expo'
 import { tokenCache } from 'app/cache'
 
@@ -44,9 +43,7 @@ export function Provider({ children, ...rest }: Omit<TamaguiProviderProps, 'conf
             assetSource={{ assetId: require('../mappingit.db') }}
           >
             <fileState.Provider value={state}>
-              <fileDispatch.Provider value={dispatch}>
-                <MapBoxComponent location={state.pos}>{children}</MapBoxComponent>
-              </fileDispatch.Provider>
+              <fileDispatch.Provider value={dispatch}>{children}</fileDispatch.Provider>
             </fileState.Provider>
           </SQLiteProvider>
           <CustomToast />

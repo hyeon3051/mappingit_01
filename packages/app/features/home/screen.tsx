@@ -1,14 +1,13 @@
-import { Button, XStack } from '@my/ui'
+import { Button, XStack, YStack } from '@my/ui'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
 import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { useContext, useEffect, useState } from 'react'
-import { useLink } from 'solito/navigation'
 import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import * as Notifications from 'expo-notifications'
 import TamaIcon from 'packages/app/ui/Icon'
 
-export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
+export function HomeScreen() {
   const [isRecord, setIsRecord] = useState(false)
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
@@ -31,6 +30,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
   useEffect(() => {
     registerForPushNotificationsAsync()
   }, [])
+
   useEffect(() => {
     if (fileInfo?.isRecord) {
       setIsRecord(true)
@@ -107,7 +107,7 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
         jc="space-between"
         gap="$1"
         w="100%"
-        zIndex={3}
+        zIndex={5}
         pos="absolute"
         bottom={0}
         left={0}

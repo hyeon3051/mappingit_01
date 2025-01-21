@@ -21,7 +21,7 @@ configureReanimatedLogger({
 
 export const unstable_settings = {
   // Ensure that reloading on `/user` keeps a back button present.
-  initialRouteName: '홈',
+  initialRouteName: 'index',
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -41,7 +41,7 @@ export default function App() {
   }, [interLoaded, interError])
 
   if (!interLoaded && !interError) {
-    return null
+    return <Text>Loading...</Text>
   }
 
   return <RootLayoutNav />
@@ -64,7 +64,6 @@ function StackComponent() {
     href: '/user/23',
   })
 
-  const colorScheme = useColorScheme()
   const signInLink = useLink({
     href: '/(auth)/sign-in',
   })
@@ -82,7 +81,7 @@ function StackComponent() {
               </Button>
             </SignedIn>
             <SignedOut>
-              <Button {...signInLink} variant="ghost">
+              <Button {...signInLink} variant="outlined">
                 <UserCircle />
               </Button>
             </SignedOut>
