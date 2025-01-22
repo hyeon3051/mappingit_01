@@ -1,7 +1,7 @@
 import { Button, XStack, SizableText, Separator, Stack } from '@my/ui'
 import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -55,40 +55,43 @@ export function FileView() {
     setup()
   }, [currentFileInfo?.title, idx])
 
-  useEffect(() => {
-    async function setupData() {
-      let { id, title, description } = fileList[idx - 1]
-      const result = await getFileDataById(id, db)
-      if (!result) {
-        return
-      }
-      if (idx && check) {
-        const markers: Marker[] = await getMarkerById(result.id, db)
-        const routes: Route[] = await getRouteById(result.id, db)
-        if (result.id) {
-          setFileInfo({
-            id: id,
-            title: title,
-            description: description,
-            markers: markers.map((marker) => ({
-              ...marker,
-              pos: JSON.parse(marker.pos),
-            })),
-            routes: routes.map((route) => ({
-              ...route,
-              lineWidth: parseInt(route.lineWidth),
-              path: JSON.parse(route.path),
-            })),
-          })
-        }
+  const setupData = useCallback(async () => {
+    let { id, title, description } = fileList[idx - 1]
+    const result = await getFileDataById(id, db)
+    if (!result) {
+      return
+    }
+    if (idx && check) {
+      const markers: Marker[] = await getMarkerById(result.id, db)
+      const routes: Route[] = await getRouteById(result.id, db)
+      if (result.id) {
+        setFileInfo({
+          id: id,
+          title: title,
+          description: description,
+          markers: markers.map((marker) => ({
+            ...marker,
+            pos: JSON.parse(marker.pos),
+            hashTags: JSON.parse(marker.hashTags),
+          })),
+          routes: routes.map((route) => ({
+            ...route,
+            lineWidth: parseInt(route.lineWidth),
+            path: JSON.parse(route.path),
+            hashTags: JSON.parse(route.hashTags),
+          })),
+        })
       }
     }
+  }, [idx, check])
+
+  useEffect(() => {
     if (idx !== 0) {
       setupData()
     } else {
       setFileInfo(currentFileInfo)
     }
-  }, [idx, check])
+  }, [setupData])
 
   const onSelect = () => {
     setCheck(!check)
@@ -106,7 +109,11 @@ export function FileView() {
   }, [save])
   return (
     <>
-      <MapBoxComponent location={fileInfo?.routes?.[0]?.path[0] || fileInfo?.pos}>
+      <MapBoxComponent
+        location={
+          fileInfo?.routes?.[0]?.path[0] || fileInfo?.markers?.[0]?.pos || currentFileInfo?.pos?.[0]
+        }
+      >
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
           <MapboxGL.PointAnnotation key={id} coordinate={pos[0]} id="pt-ann">
             <TamaIcon iconName={markerIcon} color={markerColor} />
@@ -171,7 +178,7 @@ export function FileView() {
                 markerIcon={markerIcon}
                 markerColor={markerColor}
                 key={data.index}
-                onSelect={() => onSelect(data.index)}
+                onSelect={() => onSelect(data.id)}
                 onFileSelect={() => setSave(true)}
               />
             )

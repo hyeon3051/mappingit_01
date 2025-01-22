@@ -35,12 +35,13 @@ export function AddRouteView() {
     path: fileInfo?.currentRoute || [],
     lineWidth: 3,
     lineColor: '#fbfbfb',
+    hashTags: [],
   })
 
   useEffect(() => {
     if (routeIdx !== 0 && fileInfo?.routes[routeIdx]) {
       const selectedRoute = fileInfo?.routes[routeIdx]
-      const { id, title, description, lineColor, lineWidth, path } = selectedRoute
+      const { id, title, description, lineColor, lineWidth, path, hashTags } = selectedRoute
       setRouteInfo((prev) => ({
         ...prev,
         id: id,
@@ -49,11 +50,12 @@ export function AddRouteView() {
         path: path,
         lineColor: lineColor,
         lineWidth: lineWidth,
+        hashTags: hashTags,
       }))
     }
   }, [params])
 
-  const { title, description, id: routeId, lineColor, lineWidth } = routeInfo
+  const { title, description, id: routeId, lineColor, lineWidth, hashTags } = routeInfo
 
   const router = useRouter()
 
@@ -87,7 +89,7 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
-    if (routeIdx !== 0 && routeId) {
+    if (routeIdx !== undefined) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
       dispatch({

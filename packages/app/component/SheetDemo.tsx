@@ -8,11 +8,13 @@ import {
   H2,
   ScrollView,
   Input,
+  Stack,
+  Text,
 } from '@my/ui'
 import { Cannabis, ChevronDown, Search } from '@tamagui/lucide-icons'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import TamaIcon from '../ui/Icon'
-import { useColorScheme, Text, Image } from 'react-native'
+import { useColorScheme, Image, Platform } from 'react-native'
 
 import {
   TestIds,
@@ -25,37 +27,49 @@ import {
   BannerAdSize,
 } from 'react-native-google-mobile-ads'
 
-export function SheetDemo({ onChangeIdx, data, type }) {
+export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
   const [search, setSearch] = useState('')
   const [filterdData, setFilterdData] = useState(data)
+  const dataMemo = useMemo(() => data, [data])
   const toast = useToastController()
-  const colorScheme = useColorScheme()
-  console.log(data)
-  useEffect(() => {
-    console.log(search)
-
-    if (search === '') {
-      setFilterdData(data)
-    } else {
-      console.log('search')
-      console.log(data)
-      const prevFilterdData = data.filter(
-        (item) =>
-          item.title.includes(search) ||
-          item.description.includes(search) ||
-          item.hashTags.includes(search)
-      )
-      setFilterdData(prevFilterdData)
+  const stringToColor = (str: string) => {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash)
     }
-    console.log(filterdData)
-  }, [search, data])
+    let color = '#'
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff
+      color += value.toString(16).padStart(2, '0')
+    }
+    return color
+  }
+  const colorScheme = useColorScheme()
+  const searchData = useCallback(
+    (data) => {
+      if (search === '') {
+        setFilterdData(dataMemo)
+      } else {
+        const prevFilterdData = dataMemo.filter(
+          (item) =>
+            item.title.includes(search) ||
+            item.description.includes(search) ||
+            item.hashTags.includes(search)
+        )
+        setFilterdData(prevFilterdData)
+      }
+    },
+    [search, dataMemo]
+  )
+  useEffect(() => {
+    searchData(dataMemo)
+  }, [searchData])
 
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
 
   const title =
     type === 'marker' ? '마커' : type === 'route' ? '경로' : type === 'file' ? '파일' : '정보'
-  console.log(colorScheme)
   return (
     <>
       <Button
@@ -99,7 +113,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
             />
           </XStack>
           <ScrollView w="100%">
-            <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+            <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key="current">
               <Button
                 size="$5"
                 circular
@@ -115,11 +129,11 @@ export function SheetDemo({ onChangeIdx, data, type }) {
               </YStack>
             </XStack>
             {filterdData?.map((file, idx) => {
-              const Ad_flag = idx % 2 === 0 && idx !== 0
+              const Ad_flag = idx % 2 === 0 && idx === 0
               return (
-                <>
+                <YStack key={file.id}>
                   {Ad_flag && <NativeComponent />}
-                  <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={idx}>
+                  <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
                     <Button
                       size="$5"
                       circular
@@ -137,10 +151,19 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                     />
                     <YStack gap="$2" ml={20}>
                       <H2>{file['title'] || 'example'}</H2>
-                      <Paragraph>{file['description']}</Paragraph>
+                      <XStack f={1} ai="center" jc="center">
+                        <XStack>
+                          <Text>Tags:</Text>
+                        </XStack>
+                        {file?.hashTags?.map((tag) => (
+                          <XStack key={tag} px="$2" mr="$2">
+                            <Text color={stringToColor(tag)}>{tag}</Text>
+                          </XStack>
+                        ))}
+                      </XStack>
                     </YStack>
                   </XStack>
-                </>
+                </YStack>
               )
             })}
           </ScrollView>
@@ -162,9 +185,14 @@ const NativeComponent = () => {
   const [nativeAd, setNativeAd] = useState<NativeAd>()
 
   useEffect(() => {
-    console.log('NativeAd:', NativeAd) // Check if this logs undefined
     if (NativeAd) {
-      NativeAd.createForAdRequest(TestIds.NATIVE).then(setNativeAd).catch(console.error)
+      NativeAd.createForAdRequest(
+        Platform.OS === 'android'
+          ? 'ca-app-pub-5218306923860994/2487519423'
+          : 'ca-app-pub-5218306923860994/9703664462'
+      )
+        .then(setNativeAd)
+        .catch(console.error)
     }
   }, [])
 

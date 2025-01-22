@@ -1,7 +1,6 @@
 import { Button, XStack, YStack } from '@my/ui'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
-import useBackgroundGeolocation from 'app/services/BackGroundGelocation'
 import { useContext, useEffect, useState } from 'react'
 import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import * as Notifications from 'expo-notifications'

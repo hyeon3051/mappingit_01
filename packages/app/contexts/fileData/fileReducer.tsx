@@ -27,25 +27,30 @@ export async function addMarker(Marker: Marker, db: ReturnType<typeof useSQLiteC
   const { pos, title, description, markerIcon, markerColor, imageUri, parent, hashTags } = Marker
   const stringifyPos = JSON.stringify(pos)
   const stringifyImgUri = JSON.stringify(imageUri)
+  const stringifyHashTags = JSON.stringify(hashTags)
 
-  return await db.runAsync(
-    `INSERT INTO marker (
+  return await db
+    .runAsync(
+      `INSERT INTO marker (
       pos, title, description, markerIcon, markerColor, imageUri, parent, hashTags
     ) VALUES (
-      '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}', ${parent}, '${hashTags}'
+      '${stringifyPos}', '${title}', '${description}', '${markerIcon}', '${markerColor}', '${stringifyImgUri}', ${parent}, '${stringifyHashTags}'
     )`
-  )
+    )
+    .catch((error) => {
+      console.error(error)
+    })
 }
 
 export async function addRoute(Route: Route, db: ReturnType<typeof useSQLiteContext>) {
   const { path, title, description, lineWidth, lineColor, parent, hashTags } = Route
   const stringifyPath = JSON.stringify(path)
-
+  const stringifyHashTags = JSON.stringify(hashTags)
   return await db.runAsync(
     `INSERT INTO route (
       path, title, description, lineWidth, lineColor, parent, hashTags
     ) VALUES (
-      '${stringifyPath}', '${title}', '${description}', '${lineWidth}', '${lineColor}', ${parent}, '${hashTags}'
+      '${stringifyPath}', '${title}', '${description}', '${lineWidth}', '${lineColor}', ${parent}, '${stringifyHashTags}'
     )`
   )
 }

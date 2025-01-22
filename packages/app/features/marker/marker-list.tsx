@@ -12,7 +12,7 @@ import {
 } from '@my/ui'
 import { PlusCircle, FileEdit, X, MonitorSpeaker } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -49,8 +49,9 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = () => {
   const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
+  console.log(marker)
   return (
-    <MapBoxComponent location={marker?.id && marker.pos ? marker.pos : fileInfo?.pos}>
+    <MapBoxComponent location={marker?.pos}>
       <MapboxGL.PointAnnotation
         coordinate={marker?.pos[0]}
         key={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
@@ -70,6 +71,7 @@ const MarkerListView = () => {
   const [idx, setIdx] = useState(0)
   const { location: currLocation } = useBackgroundGeolocation()
   const { marker, updateMarker } = useMarkerState()
+  const [buttonToggle, setButtonToggle] = useState(false)
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -80,17 +82,28 @@ const MarkerListView = () => {
     href: `/marker/selectMarker/?marker=${idx}`,
   })
 
-  const onChageIdx = (index) => {
-    setIdx(index)
-    if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index: index })
-    }
-  }
-  useEffect(() => {
+  const onChangeIdx = useCallback(
+    (index) => {
+      setIdx(index)
+      if (carouselRef.current) {
+        carouselRef.current.scrollTo({ index: index })
+      }
+      setButtonToggle(true)
+    },
+    [carouselRef]
+  )
+
+  const changeMarker = useCallback(() => {
     const markers = fileInfo?.markers || []
     const tempSelectedMarker = idx !== 0 ? markers[idx - 1] : { pos: currLocation }
     updateMarker(tempSelectedMarker as Marker)
-  }, [idx])
+    setButtonToggle(false)
+  }, [idx, currLocation, fileInfo?.markers])
+
+  useEffect(() => {
+    changeMarker()
+  }, [changeMarker])
+
   return (
     <>
       <Stack top={25} flex={1} zIndex={3} pos="absolute" width="100%" ai="center"></Stack>
@@ -114,12 +127,14 @@ const MarkerListView = () => {
               return {
                 ...data,
                 key: data.id,
+                hashTags: data.hashTags || [],
               }
             }) || []),
           ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
             setIdx(index)
+            setButtonToggle(true)
           }}
           renderItem={(data) => {
             const { title, description, markerIcon, markerColor, id } = data.item
@@ -150,7 +165,7 @@ const MarkerListView = () => {
         <Button {...linkProps} icon={PlusCircle}>
           추가
         </Button>
-        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.markers} type="marker" />
+        <SheetDemo onChangeIdx={onChangeIdx} data={fileInfo?.markers} type="marker" />
         {idx !== 0 ? (
           <Button {...editLinkProps} icon={FileEdit}>
             수정
@@ -200,7 +215,7 @@ const MarkerInfoView = () => {
           </Card.Header>
           <XStack ml="$2">
             {hashTags?.map((tag) => (
-              <>
+              <Stack key={tag}>
                 <Text
                   theme="alt2"
                   size="$3"
@@ -212,7 +227,7 @@ const MarkerInfoView = () => {
                   {tag}
                 </Text>
                 <Separator vertical />
-              </>
+              </Stack>
             ))}
           </XStack>
           <Card.Footer>
@@ -253,9 +268,12 @@ export function CardImage({ uri }) {
   )
 }
 
-const MakerImageView = () => {
+const MarkerImageView = () => {
   const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
+  const imageUri =
+    typeof marker?.imageUri === 'string' ? JSON.parse(marker?.imageUri) : marker?.imageUri || []
+  console.log(imageUri)
   return (
     <Stack zIndex={3} pos="absolute" left={0} bottom={20} w="100%" h="100%">
       <Carousel
@@ -268,7 +286,7 @@ const MakerImageView = () => {
         width={420}
         height={324}
         scrollAnimationDuration={100}
-        data={typeof marker?.imageUri === 'string' ? [marker?.imageUri] : marker?.imageUri}
+        data={imageUri}
         renderItem={({ item }) => <CardImage uri={item} />}
       />
     </Stack>
@@ -278,7 +296,7 @@ const MakerImageView = () => {
 const renderScreen = SceneMap({
   markerInfo: MarkerInfoView,
   markerList: MarkerListView,
-  markerImage: MakerImageView,
+  markerImage: MarkerImageView,
 })
 export function MarkerView() {
   const layout = useWindowDimensions()

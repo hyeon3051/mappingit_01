@@ -17,6 +17,12 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   const img_url = user?.imageUrl
 
   useEffect(() => {
+    if (!location) {
+      camera.current?.setCamera({
+        animationDuration: 200,
+        centerCoordinate: currLocation[0],
+      })
+    }
     if (
       (location && location[0][0] !== 0 && location[0][1] !== 0) ||
       (currLocation && currLocation[0][0] !== 0 && currLocation[0][1] !== 0)

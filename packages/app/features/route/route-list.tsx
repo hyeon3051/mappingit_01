@@ -12,7 +12,7 @@ import { Button, XStack, SizableText, Card, Stack, YStack, Paragraph } from '@my
 import { TabView, SceneMap } from 'react-native-tab-view'
 import { useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useColorScheme } from 'react-native'
 
 interface RouteState {
@@ -31,38 +31,48 @@ const RouteOnMap = () => {
   const colorScheme = useColorScheme()
   const fileInfo = useContext(fileState)
   const { idx } = useRouteState()
-  const [idxSet, useIdxSet] = useState({
+  const [routeSet, useRouteSet] = useState({
+    routeId: '',
+    startCoordinate: [0, 0],
+    endCoordinate: [0, 0],
     startIdx: '',
     endIdx: '',
     shapeIdx: '',
     lineIdx: '',
   })
 
-  const routeId = idx !== 0 ? fileInfo?.routes[idx - 1]?.id : 'current'
-  const startCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[0] : fileInfo?.pos
-  const endCoordinate =
-    idx !== 0
-      ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
-      : fileInfo?.pos?.[0]
-
-  useEffect(() => {
-    useIdxSet({
+  const setRouteSet = useCallback(() => {
+    const routeId = idx !== 0 ? fileInfo?.routes[idx - 1]?.id : 'current'
+    const startCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[0] : fileInfo?.pos
+    const endCoordinate =
+      idx !== 0
+        ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
+        : fileInfo?.pos?.[0]
+    useRouteSet({
+      routeId: routeId || '',
+      startCoordinate: startCoordinate,
+      endCoordinate: endCoordinate,
       startIdx: `start-${routeId}`,
       endIdx: `end-${routeId}`,
       shapeIdx: `shape-${routeId}`,
       lineIdx: `line-${routeId}`,
     })
-  }, [idx])
+  }, [idx, fileInfo?.routes, fileInfo?.pos])
+
+  useEffect(() => {
+    setRouteSet()
+    console.log(routeSet)
+  }, [setRouteSet])
 
   if (!fileInfo) {
     return
   }
   return (
-    <MapBoxComponent location={startCoordinate ? startCoordinate : fileInfo.pos}>
+    <MapBoxComponent location={routeSet.startCoordinate}>
       <MapboxGL.PointAnnotation
-        coordinate={startCoordinate?.[0]}
-        key={idxSet.startIdx}
-        id={idxSet.startIdx}
+        coordinate={routeSet.startCoordinate?.[0]}
+        key={routeSet.startIdx}
+        id={routeSet.startIdx}
       >
         <TamaIcon
           iconName="MapPin"
@@ -70,7 +80,11 @@ const RouteOnMap = () => {
           size="$2"
         />
       </MapboxGL.PointAnnotation>
-      <MapboxGL.PointAnnotation coordinate={endCoordinate} key={idxSet.endIdx} id={idxSet.endIdx}>
+      <MapboxGL.PointAnnotation
+        coordinate={routeSet.endCoordinate}
+        key={routeSet.endIdx}
+        id={routeSet.endIdx}
+      >
         <TamaIcon
           iconName="MapPin"
           color={colorScheme === 'dark' ? '$white10' : '$black10'}
