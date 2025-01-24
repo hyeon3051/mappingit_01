@@ -23,7 +23,7 @@ import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
 import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 import { TabView, SceneMap } from 'react-native-tab-view'
-import { useWindowDimensions } from 'react-native'
+import { Dimensions, useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
 import { useColorScheme } from 'react-native'
 
@@ -49,7 +49,6 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = () => {
   const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
-  console.log(marker)
   return (
     <MapBoxComponent location={marker?.pos}>
       <MapboxGL.PointAnnotation
@@ -68,10 +67,8 @@ const MarkerOnMap = () => {
 
 const MarkerListView = () => {
   const carouselRef = useRef(null)
-  const [idx, setIdx] = useState(0)
-  const { location: currLocation } = useBackgroundGeolocation()
+  const [idx, setIdx] = useState(-1)
   const { marker, updateMarker } = useMarkerState()
-  const [buttonToggle, setButtonToggle] = useState(false)
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
@@ -88,17 +85,14 @@ const MarkerListView = () => {
       if (carouselRef.current) {
         carouselRef.current.scrollTo({ index: index })
       }
-      setButtonToggle(true)
     },
-    [carouselRef]
+    [carouselRef, idx]
   )
-
   const changeMarker = useCallback(() => {
     const markers = fileInfo?.markers || []
-    const tempSelectedMarker = idx !== 0 ? markers[idx - 1] : { pos: currLocation }
+    const tempSelectedMarker = idx !== -1 ? markers[idx] : { pos: fileInfo?.pos }
     updateMarker(tempSelectedMarker as Marker)
-    setButtonToggle(false)
-  }, [idx, currLocation, fileInfo?.markers])
+  }, [idx, fileInfo?.pos, fileInfo?.markers])
 
   useEffect(() => {
     changeMarker()
@@ -119,22 +113,21 @@ const MarkerListView = () => {
               id: 'current',
               title: '현재 위치',
               description: '',
-              pos: currLocation,
+              pos: fileInfo?.pos,
               markerIcon: 'PinOff',
-              markerColor: '$black10',
+              markerColor: '$green10',
             },
             ...(fileInfo?.markers.map((data) => {
               return {
                 ...data,
-                key: data.id,
-                hashTags: data.hashTags || [],
+                hashTags: data.hashTags,
               }
             }) || []),
           ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            setIdx(index)
-            setButtonToggle(true)
+            if (index === 0) setIdx(-1)
+            setIdx(index - 1)
           }}
           renderItem={(data) => {
             const { title, description, markerIcon, markerColor, id } = data.item
@@ -143,7 +136,7 @@ const MarkerListView = () => {
                 title={title}
                 description={description}
                 markerIcon={markerIcon}
-                markerColor={markerColor}
+                color={markerColor}
                 key={id}
               />
             )
@@ -162,16 +155,23 @@ const MarkerListView = () => {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}>
+        <Button {...linkProps} icon={PlusCircle} bg="$green10" opacity={0.8}>
           추가
         </Button>
         <SheetDemo onChangeIdx={onChangeIdx} data={fileInfo?.markers} type="marker" />
-        {idx !== 0 ? (
-          <Button {...editLinkProps} icon={FileEdit}>
+        {idx !== -1 ? (
+          <Button
+            {...editLinkProps}
+            icon={FileEdit}
+            bg={marker?.markerColor || '$blue10'}
+            opacity={0.8}
+          >
             수정
           </Button>
         ) : (
-          <Button>현재 마커</Button>
+          <Button bg="$green10" opacity={0.8}>
+            현재 마커
+          </Button>
         )}
       </XStack>
     </>
@@ -184,7 +184,7 @@ const MarkerInfoView = () => {
   const markerDate = new Date(marker?.pos[1]) || new Date()
   const markerTimeStr = markerDate.toLocaleTimeString()
   const markerDateStr = markerDate.toLocaleDateString()
-  const hashTags = marker?.hashTags || []
+  const hashTags = marker?.hashTags
   const stringToColor = (str: string) => {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
@@ -202,7 +202,7 @@ const MarkerInfoView = () => {
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
         <Card
           width="$15"
-          height="$15"
+          height="$20"
           backgroundColor={colorScheme === 'dark' ? '#000000AA' : '#ffffffAA'}
           mx="$2"
           px="$2"
@@ -213,26 +213,27 @@ const MarkerInfoView = () => {
               {marker?.title}
             </SizableText>
           </Card.Header>
-          <XStack ml="$2">
-            {hashTags?.map((tag) => (
-              <Stack key={tag}>
-                <Text
-                  theme="alt2"
-                  size="$3"
-                  key={tag}
-                  mx="$2"
-                  color={stringToColor(tag) + 'AA'}
-                  borderRadius="$10"
-                >
-                  {tag}
-                </Text>
-                <Separator vertical />
-              </Stack>
-            ))}
+          <XStack ml="$2" flexWrap="wrap" gap="$2">
+            {Array.isArray(hashTags) &&
+              hashTags?.map((tag) => (
+                <Stack key={tag}>
+                  <Text
+                    theme="alt2"
+                    size="$3"
+                    key={tag}
+                    mx="$2"
+                    color={stringToColor(tag) + 'AA'}
+                    borderRadius="$10"
+                  >
+                    {tag}
+                  </Text>
+                  <Separator vertical />
+                </Stack>
+              ))}
           </XStack>
           <Card.Footer>
             <XStack gap="$3" ai="flex-start" jc="center">
-              <YStack alignContent="center" w="80%">
+              <YStack alignContent="center" w="80%" flexWrap="wrap">
                 <Paragraph size="$2" fontWeight="light">
                   {marker?.description}
                 </Paragraph>
@@ -257,6 +258,7 @@ export function CardImage({ uri }) {
       backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
       m="$2"
       p="$2"
+      opacity={0.95}
     >
       <Image source={{ uri: uri, width: 420, height: 324 }} />
       <Card.Footer>
@@ -271,11 +273,9 @@ export function CardImage({ uri }) {
 const MarkerImageView = () => {
   const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
-  const imageUri =
-    typeof marker?.imageUri === 'string' ? JSON.parse(marker?.imageUri) : marker?.imageUri || []
-  console.log(imageUri)
+  const imageUri = marker?.imageUri || []
   return (
-    <Stack zIndex={3} pos="absolute" left={0} bottom={20} w="100%" h="100%">
+    <Stack zIndex={3} pos="absolute" left={0} bottom={0} w="100%" h="60%" right={0}>
       <Carousel
         loop={true}
         modeConfig={{
@@ -283,10 +283,10 @@ const MarkerImageView = () => {
           stackInterval: 18,
         }}
         mode="horizontal-stack"
-        width={420}
-        height={324}
+        width={Math.floor(Dimensions.get('window').width * 0.9)}
+        height={300}
         scrollAnimationDuration={100}
-        data={imageUri}
+        data={Array.isArray(imageUri) ? imageUri : []}
         renderItem={({ item }) => <CardImage uri={item} />}
       />
     </Stack>
@@ -322,10 +322,19 @@ export function MarkerView() {
       />
       <Button
         onPress={() => setZIndex(zIndex === 1 ? 10 : 1)}
-        backgroundColor={'$white100'}
         zIndex={10}
+        width="$5"
+        height="$5"
+        circular
+        position="absolute"
+        right={0}
+        top="10%"
       >
-        {zIndex === 1 ? '마커 뷰로 돌아가기' : '맵 뷰로 돌아가기'}
+        {zIndex === 1 ? (
+          <TamaIcon iconName="Info" size="$5" />
+        ) : (
+          <TamaIcon iconName="Map" size="$5" />
+        )}
       </Button>
     </>
   )

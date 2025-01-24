@@ -61,6 +61,8 @@ export function SelectDataView() {
           markers: markers.map((marker) => ({
             ...marker,
             pos: JSON.parse(marker.pos),
+            hashTags: marker.hashTags ? JSON.parse(marker.hashTags) : [],
+            imageUri: marker.imageUri ? JSON.parse(marker.imageUri) : [],
             isSelected: true,
           })),
         }))
@@ -153,11 +155,12 @@ export function SelectDataView() {
     dispatch({ type: 'INIT' })
     router.back()
     router.back()
+    router.back()
   }
 
   const onChangeMarkerSelected = useCallback((idx: number, value: boolean) => {
     const marker = fileInfo?.markers[idx]
-    setCurrentLocation(marker?.pos)
+    setCurrentLocation(marker?.pos || undefined)
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -171,7 +174,7 @@ export function SelectDataView() {
 
   const onChangeRoueSelected = useCallback((idx: number, value: boolean) => {
     const route = fileInfo?.routes[idx]
-    setCurrentLocation(route?.path[0])
+    setCurrentLocation(route?.path[0] || undefined)
     setFileInfo((prev) => {
       if (!prev) return prev
       return {
@@ -182,6 +185,10 @@ export function SelectDataView() {
       }
     })
   }, [])
+
+  useEffect(() => {
+    console.log(currentLocation, 'currentLocation')
+  }, [currentLocation])
 
   return (
     <>
@@ -266,7 +273,7 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
         animation="medium"
         open={open}
         onOpenChange={() => toggleOpen()}
-        snapPoints={[60]}
+        snapPoints={[45]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
@@ -279,7 +286,7 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
           </XStack>
           <ScrollView w="100%" h="90%">
             {markers?.map((marker, idx) => (
-              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={marker.id}>
                 <XStack gap="$2">
                   <Checkbox
                     checked={marker.isSelected}
@@ -301,7 +308,7 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
               </XStack>
             ))}
             {routes?.map((route, idx) => (
-              <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+              <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={route.id}>
                 <XStack gap="$2">
                   <Checkbox
                     checked={route.isSelected}
@@ -311,6 +318,20 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
                     }}
                   />
                 </XStack>
+                <TamaIcon
+                  iconName="Route"
+                  color={route.isSelected ? route.lineColor : '$gray10'}
+                  strokeWidth={
+                    route.lineWidth > 15
+                      ? 4
+                      : route.lineWidth > 10
+                        ? 3
+                        : route.lineWidth > 5
+                          ? 2
+                          : 1
+                  }
+                  size="$6"
+                />
                 <YStack gap="$2" ml={20}>
                   <H2>{route.title}</H2>
                   <Paragraph>{route.description}</Paragraph>

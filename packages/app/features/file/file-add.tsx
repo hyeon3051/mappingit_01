@@ -127,20 +127,20 @@ export function AddFileView() {
       <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">
         <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
           <YStack>
+            <H6>파일 추가</H6>
             <H3>{title || 'example'}</H3>
-            <H6>Lorem ipsum</H6>
           </YStack>
         </XStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>name</H5>
+          <H6>제목</H6>
           <Input onChangeText={onNameChange} value={title} />
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>description</H5>
+          <H6>설명</H6>
           <TextArea onChangeText={onDescriptionChange} value={description} />
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>파일 결합</H5>
+          <H6>파일 결합</H6>
           <XStack gap="$2" jc="space-between">
             <Button icon={<TamaIcon iconName="File" />} onPress={onFileChange}>
               파일 선택
@@ -150,15 +150,25 @@ export function AddFileView() {
         <YStack gap="$4" p="$2" w="80%" ml={20}></YStack>
 
         <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-          <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}>
-            추가
-          </Button>
-          <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
+          <Button
+            icon={<TamaIcon iconName="ChevronLeft" />}
+            onPress={() => router.back()}
+            bg="$gray10"
+          >
             뒤로가기
           </Button>
-          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
-            삭제
+          <Button
+            iconAfter={<TamaIcon iconName="PlusCircle" />}
+            onPress={handleChange}
+            bg="$green10"
+          >
+            추가
           </Button>
+          {fileId !== -1 && fileId ? (
+            <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove} bg="$red10">
+              삭제
+            </Button>
+          ) : null}
         </XStack>
       </YStack>
     </>

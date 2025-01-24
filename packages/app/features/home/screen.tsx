@@ -44,6 +44,7 @@ export function HomeScreen() {
   const changeIsRecordFalse = () => {
     dispatch({ type: 'CHANGE_IS_RECORD_FALSE' })
   }
+
   return (
     <>
       <MapBoxComponent location={fileInfo?.pos}>

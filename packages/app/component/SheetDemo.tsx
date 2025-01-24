@@ -27,11 +27,10 @@ import {
   BannerAdSize,
 } from 'react-native-google-mobile-ads'
 
-export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
+export function SheetDemo({ onChangeIdx, data, type }) {
   const [search, setSearch] = useState('')
   const [filterdData, setFilterdData] = useState(data)
   const dataMemo = useMemo(() => data, [data])
-  const toast = useToastController()
   const stringToColor = (str: string) => {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
@@ -76,6 +75,7 @@ export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
         size="$6"
         circular
         onPress={() => setOpen((x) => !x)}
+        bg="$white5"
         icon={<TamaIcon iconName={open ? 'ChevronDown' : 'ChevronUp'} color="$black10" size="$4" />}
       ></Button>
       <Sheet
@@ -90,6 +90,7 @@ export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
       >
         <Sheet.Frame
           ai="center"
+          opacity={0.95}
           gap="$5"
           bg={colorScheme === 'dark' ? '$black10' : '$white'}
           p="$2"
@@ -117,7 +118,7 @@ export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
               <Button
                 size="$5"
                 circular
-                iconAfter={<TamaIcon iconName="MapPin" color="$black10" size="$2" />}
+                iconAfter={<TamaIcon iconName="MapPin" color="$white10" size="$2" />}
                 onPress={() => {
                   onChangeIdx(0)
                   setOpen(false)
@@ -129,7 +130,9 @@ export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
               </YStack>
             </XStack>
             {filterdData?.map((file, idx) => {
-              const Ad_flag = idx % 2 === 0 && idx === 0
+              const Ad_flag = idx % 4 === 0
+              const hashTags = file?.hashTags || []
+              console.log(hashTags, 'hashTags')
               return (
                 <YStack key={file.id}>
                   {Ad_flag && <NativeComponent />}
@@ -150,16 +153,17 @@ export function SheetDemo({ onChangeIdx, data, type, buttonToggle }) {
                       }
                     />
                     <YStack gap="$2" ml={20}>
-                      <H2>{file['title'] || 'example'}</H2>
+                      <H2 px="$2">{file['title'] || 'example'}</H2>
+                      <Paragraph px="$2">{file['description'] || 'description'}</Paragraph>
                       <XStack f={1} ai="center" jc="center">
-                        <XStack>
-                          <Text>Tags:</Text>
+                        <XStack flexWrap="wrap" gap="$2" w="100%" p="$2">
+                          {Array.isArray(file?.hashTags) &&
+                            file?.hashTags?.map((tag) => (
+                              <XStack key={tag} px="$2" mr="$2">
+                                <Text color={stringToColor(tag)}>{tag}</Text>
+                              </XStack>
+                            ))}
                         </XStack>
-                        {file?.hashTags?.map((tag) => (
-                          <XStack key={tag} px="$2" mr="$2">
-                            <Text color={stringToColor(tag)}>{tag}</Text>
-                          </XStack>
-                        ))}
                       </XStack>
                     </YStack>
                   </XStack>

@@ -9,7 +9,6 @@ import {
   H3,
   Card,
   H6,
-  H5,
   ScrollView,
   Image,
   Separator,
@@ -23,12 +22,13 @@ import { Marker } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import ImagePicker from 'react-native-image-crop-picker'
 import { v4 as uuidv4 } from 'uuid'
-import { Badge } from '@tamagui/lucide-icons'
+import stringToColor from 'packages/app/utils/stringToColor'
 export function AddMarkerView() {
   const fileInfo = useContext(fileState)
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
-  const marker = parseInt(`${params.marker}` || '0')
+  const marker = parseInt(`${params.marker}`)
+  console.log(marker, 'markerId')
   const [markerInfo, setMarkerInfo] = useState<Marker>({
     id: uuidv4(),
     title: '',
@@ -37,9 +37,8 @@ export function AddMarkerView() {
     markerIcon: '',
     imageUri: [],
     hashTags: [],
-    pos: fileInfo?.pos,
+    pos: fileInfo.pos,
   })
-
   useEffect(() => {
     const { icon, color, marker } = params
     setMarkerInfo((prev) => ({
@@ -47,9 +46,9 @@ export function AddMarkerView() {
       markerIcon: icon,
       markerColor: color,
     }))
-    if (marker !== 0 && fileInfo?.markers[marker - 1]) {
-      const selectedMarker = fileInfo?.markers[marker - 1]
-      const { id, title, description, imageUri, hashTags } = selectedMarker
+    if (marker !== -1 && fileInfo?.markers[marker]) {
+      const selectedMarker = fileInfo?.markers[marker]
+      let { id, title, description, imageUri, hashTags } = selectedMarker
       setMarkerInfo((prev) => ({
         ...prev,
         id: id,
@@ -60,8 +59,7 @@ export function AddMarkerView() {
       }))
     }
   }, [params])
-
-  const { title, description, hashTags } = markerInfo
+  let { title, description, hashTags } = markerInfo
 
   const router = useRouter()
 
@@ -78,23 +76,30 @@ export function AddMarkerView() {
     }))
   }
 
-  const onHashTagChange = (text) => {
+  const onHashTagChange = (text: string) => {
     setMarkerInfo((prev) => ({
       ...prev,
       hashTags: [...prev.hashTags, text],
     }))
   }
 
+  const onHashTagRemove = (text: string) => {
+    setMarkerInfo((prev) => ({
+      ...prev,
+      hashTags: prev.hashTags.filter((tag) => tag !== text),
+    }))
+  }
+
   const handleRemove = () => {
-    if (marker === 0) return
+    if (marker === -1) return
     dispatch({
       type: 'REMOVE_MARKER',
-      payload: { markerId: marker - 1 },
+      payload: { markerId: marker },
     })
   }
 
   const handleChange = () => {
-    if (!marker) {
+    if (marker === -1) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
     } else {
       dispatch({
@@ -115,23 +120,23 @@ export function AddMarkerView() {
               size="$7"
               circular
               iconAfter={<TamaIcon iconName={params.icon} size="$6" />}
-              backgroundColor={params.color}
+              color={params.color}
             />
             <YStack>
+              <H6>마커</H6>
               <H3>{title || '제목'}</H3>
-              <H6>제목</H6>
             </YStack>
           </XStack>
           <YStack gap="$4" p="$2" w="80%" m={20}>
-            <H5>"마커 이름"</H5>
-            <Input onChangeText={onNameChange} value={title} />
+            <H6>마커</H6>
+            <Input onChangeText={onNameChange} value={title} focusStyle={{ borderColor: 'blue' }} />
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
-            <H5>설명</H5>
+            <H6>설명</H6>
             <TextArea onChangeText={onDescriptionChange} value={description} />
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
-            <H5>사진</H5>
+            <H6>사진</H6>
             <Button
               onPress={() =>
                 ImagePicker.openPicker({
@@ -149,7 +154,7 @@ export function AddMarkerView() {
             >
               사진 추가
             </Button>
-            {markerInfo?.imageUri && markerInfo.imageUri.length > 0 && (
+            {Array.isArray(markerInfo.imageUri) && (
               <Carousel
                 loop={true}
                 modeConfig={{
@@ -160,29 +165,45 @@ export function AddMarkerView() {
                 width={300}
                 height={300}
                 scrollAnimationDuration={100}
-                data={params.marker ? markerInfo.imageUri : JSON.parse(markerInfo.imageUri)}
+                data={markerInfo.imageUri}
                 renderItem={({ item }) => <CardDemo uri={item} />}
               />
             )}
           </YStack>
           <YStack gap="$4" p="$2" w="80%" m={20}>
-            <H5>해시태그</H5>
-            <HashTagCard hashTags={hashTags} setHashTags={onHashTagChange} />
+            <H6>해시태그</H6>
+            <HashTagCard
+              hashTags={hashTags}
+              setHashTags={onHashTagChange}
+              onHashTagRemove={onHashTagRemove}
+            />
           </YStack>
         </YStack>
       </ScrollView>
 
       <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-        <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}>
-          추가
-        </Button>
-        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
-          뒤로가기
-        </Button>
-        {marker !== 0 ? (
-          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
-            삭제
-          </Button>
+        <Button
+          icon={<TamaIcon iconName="ChevronLeft" />}
+          onPress={() => router.back()}
+          bg="$gray10"
+          opacity={0.8}
+          circular
+        ></Button>
+        <Button
+          icon={<TamaIcon iconName="PlusCircle" />}
+          onPress={handleChange}
+          bg={marker !== 0 ? '$green10' : '$blue10'}
+          opacity={0.8}
+          circular
+        ></Button>
+        {marker !== -1 ? (
+          <Button
+            icon={<TamaIcon iconName="Trash" />}
+            onPress={handleRemove}
+            bg="$red10"
+            opacity={0.8}
+            circular
+          ></Button>
         ) : (
           <Button>현재 위치</Button>
         )}
@@ -207,9 +228,11 @@ export function CardDemo({ uri }) {
 export function HashTagCard({
   hashTags,
   setHashTags,
+  onHashTagRemove,
 }: {
   hashTags: string[]
   setHashTags: (hashTags: string[]) => void
+  onHashTagRemove: (hashTags: string[]) => void
 }) {
   const [hashTag, setHashTag] = useState('')
   const onEnroll = () => {
@@ -220,18 +243,32 @@ export function HashTagCard({
   }
   return (
     <>
-      <XStack flex={1} ai="center" jc="center" flexWrap="wrap" gap="$4" p="$2">
-        {hashTags.map((tag) => (
-          <YStack key={tag} position="relative" backgroundColor="$black0">
-            <Button
-              onPress={() => setHashTags(hashTags.filter((t) => t !== tag))}
-              backgroundColor="$black0"
+      <XStack flex={1} ai="center" jc="flex-start" flexWrap="wrap" gap="$2" p="$2">
+        {hashTags &&
+          hashTags.length > 0 &&
+          hashTags?.map((tag) => (
+            <XStack
+              key={tag}
+              ai="center"
+              jc="center"
+              borderRadius="$3"
+              backgroundColor={stringToColor(tag) + 'CC'}
             >
-              <Text>{tag}</Text>
-              <TamaIcon iconName="X" size="$1" />
-            </Button>
-          </YStack>
-        ))}
+              <Text fontSize="$8" p="$2" color="$white1">
+                {tag}
+              </Text>
+              <Button
+                onPress={() => onHashTagRemove(tag)}
+                circular
+                position="absolute"
+                size="$1"
+                top="-5%"
+                right="-5%"
+              >
+                <TamaIcon iconName="X" size="$1" />
+              </Button>
+            </XStack>
+          ))}
         <Separator />
         <XStack>
           <Input w="80%" placeholder="해시태그" value={hashTag} onChangeText={setHashTag} />

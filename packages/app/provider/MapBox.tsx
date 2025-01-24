@@ -11,28 +11,20 @@ MapboxGL.setAccessToken(
 const MapBoxComponent = ({ location, children }: { location?: Pos; children: React.ReactNode }) => {
   const { user } = useUser()
   const { location: currLocation } = useBackgroundGeolocation()
-  const camera = useRef<Camera>(null) // Corrected here
   const mapRef = useRef<MapboxGL.MapView>(null)
   const zoomLevel = useRef(15)
   const img_url = user?.imageUrl
+  const camera = useRef<Camera>(null)
 
   useEffect(() => {
-    if (!location) {
+    if (location) {
       camera.current?.setCamera({
-        animationDuration: 200,
-        centerCoordinate: currLocation[0],
+        animationDuration: 1000,
+        centerCoordinate: location[0],
+        animationMode: 'easeTo',
       })
     }
-    if (
-      (location && location[0][0] !== 0 && location[0][1] !== 0) ||
-      (currLocation && currLocation[0][0] !== 0 && currLocation[0][1] !== 0)
-    ) {
-      camera.current?.setCamera({
-        animationDuration: 200,
-        centerCoordinate: location ? location[0] : currLocation[0],
-      })
-    }
-  }, [location, currLocation])
+  }, [location])
 
   return (
     <MapboxGL.MapView
@@ -49,7 +41,12 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
       ref={mapRef}
     >
       <MapboxGL.UserLocation visible={true} animated={true} />
-      <MapboxGL.Camera ref={camera} animationMode="easeTo" zoomLevel={zoomLevel.current} />
+      <MapboxGL.Camera
+        animationMode="easeTo"
+        zoomLevel={zoomLevel.current}
+        centerCoordinate={location ? location[0] : currLocation[0]}
+        ref={camera}
+      />
       {children}
     </MapboxGL.MapView>
   )

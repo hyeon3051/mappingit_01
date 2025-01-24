@@ -33,8 +33,8 @@ const RouteOnMap = () => {
   const { idx } = useRouteState()
   const [routeSet, useRouteSet] = useState({
     routeId: '',
-    startCoordinate: [0, 0],
-    endCoordinate: [0, 0],
+    startCoordinate: undefined,
+    endCoordinate: undefined,
     startIdx: '',
     endIdx: '',
     shapeIdx: '',
@@ -47,7 +47,7 @@ const RouteOnMap = () => {
     const endCoordinate =
       idx !== 0
         ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
-        : fileInfo?.pos?.[0]
+        : fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[0]
     useRouteSet({
       routeId: routeId || '',
       startCoordinate: startCoordinate,
@@ -57,11 +57,10 @@ const RouteOnMap = () => {
       shapeIdx: `shape-${routeId}`,
       lineIdx: `line-${routeId}`,
     })
-  }, [idx, fileInfo?.routes, fileInfo?.pos])
+  }, [idx, fileInfo?.routes])
 
   useEffect(() => {
     setRouteSet()
-    console.log(routeSet)
   }, [setRouteSet])
 
   if (!fileInfo) {
@@ -69,54 +68,60 @@ const RouteOnMap = () => {
   }
   return (
     <MapBoxComponent location={routeSet.startCoordinate}>
-      <MapboxGL.PointAnnotation
-        coordinate={routeSet.startCoordinate?.[0]}
-        key={routeSet.startIdx}
-        id={routeSet.startIdx}
-      >
-        <TamaIcon
-          iconName="MapPin"
-          color={colorScheme === 'dark' ? '$white10' : '$black10'}
-          size="$2"
-        />
-      </MapboxGL.PointAnnotation>
-      <MapboxGL.PointAnnotation
-        coordinate={routeSet.endCoordinate}
-        key={routeSet.endIdx}
-        id={routeSet.endIdx}
-      >
-        <TamaIcon
-          iconName="MapPin"
-          color={colorScheme === 'dark' ? '$white10' : '$black10'}
-          size="$2"
-        />
-      </MapboxGL.PointAnnotation>
-      <MapboxGL.ShapeSource
-        id="shapeSource"
-        shape={{
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates:
-              idx === 0
-                ? (fileInfo.currentRoute.length >= 2
-                    ? fileInfo.currentRoute
-                    : [fileInfo.pos, fileInfo.pos]
-                  ).map((route) => route?.[0])
-                : fileInfo.routes[idx - 1]?.path?.map((route) => route?.[0]),
-          },
-        }}
-      >
-        <MapboxGL.LineLayer
-          id="lineIdx"
-          sourceID="shapeSource"
-          style={{
-            lineColor: idx > 0 ? fileInfo.routes[idx - 1]?.lineColor : 'red',
-            lineWidth: idx > 0 ? fileInfo.routes[idx - 1]?.lineWidth : 3,
+      {routeSet.startCoordinate && (
+        <MapboxGL.PointAnnotation
+          coordinate={routeSet.startCoordinate?.[0]}
+          key={routeSet.startIdx}
+          id={routeSet.startIdx}
+        >
+          <TamaIcon
+            iconName="MapPin"
+            color={colorScheme === 'dark' ? '$white10' : '$black10'}
+            size="$2"
+          />
+        </MapboxGL.PointAnnotation>
+      )}
+      {routeSet.endCoordinate && (
+        <MapboxGL.PointAnnotation
+          coordinate={routeSet.endCoordinate}
+          key={routeSet.endIdx}
+          id={routeSet.endIdx}
+        >
+          <TamaIcon
+            iconName="MapPin"
+            color={colorScheme === 'dark' ? '$white10' : '$black10'}
+            size="$2"
+          />
+        </MapboxGL.PointAnnotation>
+      )}
+      {routeSet.startCoordinate && routeSet.endCoordinate && (
+        <MapboxGL.ShapeSource
+          id="shapeSource"
+          shape={{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates:
+                idx === 0
+                  ? (fileInfo.currentRoute.length >= 2
+                      ? fileInfo.currentRoute
+                      : [fileInfo.pos, fileInfo.pos]
+                    ).map((route) => route?.[0])
+                  : fileInfo.routes[idx - 1]?.path?.map((route) => route?.[0]),
+            },
           }}
-        />
-      </MapboxGL.ShapeSource>
+        >
+          <MapboxGL.LineLayer
+            id="lineIdx"
+            sourceID="shapeSource"
+            style={{
+              lineColor: idx > 0 ? fileInfo.routes[idx - 1]?.lineColor : 'red',
+              lineWidth: idx > 0 ? fileInfo.routes[idx - 1]?.lineWidth : 3,
+            }}
+          />
+        </MapboxGL.ShapeSource>
+      )}
     </MapBoxComponent>
   )
 }
@@ -217,8 +222,8 @@ export function RouteListView() {
               title: '현재 위치',
               description: '',
               path: fileInfo?.currentRoute,
-              markerIcon: 'PinOff',
-              markerColor: '$black10',
+              lineWidth: 3,
+              lineColor: '$green10',
             },
             ...(fileInfo?.routes.map((route) => {
               return {
@@ -232,13 +237,14 @@ export function RouteListView() {
             setIdx(index)
           }}
           renderItem={(data) => {
-            const { title, description, id } = data.item
+            const { title, description, id, lineWidth, lineColor } = data.item
             return (
               <CardDemo
                 title={title}
                 description={description}
-                markerIcon="MapPin"
-                markerColor="$black10"
+                color={lineColor}
+                markerIcon="Route"
+                lineWidth={lineWidth}
                 key={id}
               />
             )
@@ -257,16 +263,23 @@ export function RouteListView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}>
+        <Button {...linkProps} icon={PlusCircle} bg="$green10">
           추가
         </Button>
         <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.routes} type="route" />
         {idx !== 0 ? (
-          <Button {...editLinkProps} icon={FileEdit}>
+          <Button
+            {...editLinkProps}
+            icon={FileEdit}
+            backgroundColor={fileInfo?.routes[idx - 1]?.lineColor}
+            opacity={0.8}
+          >
             수정
           </Button>
         ) : (
-          <Button>현재 파일</Button>
+          <Button bg="$green10" opacity={0.8}>
+            현재 파일
+          </Button>
         )}
       </XStack>
     </>
@@ -302,10 +315,19 @@ export function RouteView() {
       />
       <Button
         onPress={() => setZIndex(zIndex === 1 ? 10 : 1)}
-        backgroundColor={'$white100'}
         zIndex={10}
+        width="$5"
+        height="$5"
+        circular
+        position="absolute"
+        right={0}
+        top="10%"
       >
-        {zIndex === 1 ? '루트 뷰로 돌아가기' : '맵 뷰로 돌아가기'}
+        {zIndex === 1 ? (
+          <TamaIcon iconName="Info" size="$5" />
+        ) : (
+          <TamaIcon iconName="Map" size="$5" />
+        )}
       </Button>
     </>
   )

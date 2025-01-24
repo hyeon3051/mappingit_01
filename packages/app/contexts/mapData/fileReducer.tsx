@@ -106,15 +106,17 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.markers.push(action.payload.marker)
         break
       case 'REMOVE_MARKER':
-        draft.markers = draft.markers.filter((marker) => marker.id !== String(action.payload.markerId))
+        draft.markers = draft.markers.filter(
+          (marker) => marker.id !== String(action.payload.markerId)
+        )
         break
       // 마커 수정
       // 1. 마커 이름, 추가 설명, 아이콘, 색상 수정
       // 2. 마커 위치 가상 이동 수정
       case 'EDIT_MARKER':
-        console.log(action.payload.markerId, 'action.payload.markerId')
+        console.log(action.payload.marker, 'action.payload.marker')
         draft.markers = draft.markers.map((marker) =>
-          marker.id === String(action.payload.markerId) ? action.payload.marker : marker
+          marker.id === action.payload.markerId ? action.payload.marker : marker
         )
         break
       case 'ADD_ROUTE':
@@ -143,7 +145,12 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
         draft.isRecord = false
         break
       case 'SET_DATA':
-        return {...draft, ...action.payload.data}
+        return {
+          ...draft,
+          markers: [...draft.markers, ...action.payload.data.markers],
+          routes: [...draft.routes, ...action.payload.data.routes],
+          
+        }
     }
   })
 

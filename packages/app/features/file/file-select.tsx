@@ -7,6 +7,7 @@ import {
   Sheet,
   H2,
   ScrollView,
+  Text,
   Checkbox,
 } from '@my/ui'
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -160,7 +161,7 @@ export function SelectFileView() {
       <XStack
         f={2}
         jc="space-between"
-        gap="$4"
+        gap="$2"
         w="100%"
         zIndex={3}
         pos="absolute"
@@ -169,9 +170,13 @@ export function SelectFileView() {
         p="$4"
         right={0}
       >
-        <Button onPress={() => router.back()} icon={ChevronLeft}></Button>
+        <Button onPress={() => router.back()} icon={ChevronLeft}>
+          <Text>뒤로</Text>
+        </Button>
         <SheetDemo fileList={fileList} onChangeSelected={onChangeSelected} />
-        <Button {...editLinkProps} icon={ChevronRight}></Button>
+        <Button {...editLinkProps} iconAfter={ChevronRight}>
+          <Text>선택</Text>
+        </Button>
       </XStack>
     </>
   )
@@ -194,7 +199,7 @@ function SheetDemo({ fileList, onChangeSelected }) {
         animation="medium"
         open={open}
         onOpenChange={setOpen}
-        snapPoints={[60]}
+        snapPoints={[50]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom

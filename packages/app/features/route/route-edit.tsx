@@ -3,7 +3,7 @@ import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
-import { Route } from 'packages/app/types/type'
+import { Pos, Route } from 'packages/app/types/type'
 import 'react-native-get-random-values'
 import MapBoxComponent from 'packages/app/provider/MapBox'
 import MapboxGL from '@rnmapbox/maps'
@@ -35,17 +35,16 @@ export function EditRoutePathView() {
 
   useEffect(() => {
     async function fetchRouteData() {
-      const selectedRoute = fileInfo?.routes.find((route) => route.id === params.id)
+      const selectedRoute = fileInfo?.routes.find((route) => route.id === Number(params.id))
       if (selectedRoute) {
         setRoute(selectedRoute)
         setEnd(selectedRoute?.path.length - 1 ?? 0)
       }
     }
     fetchRouteData()
-  }, [params.id, fileInfo?.routes])
+  }, [params.id])
 
   if (!route) return null
-
   const handleSave = () => {
     const routePath = route.path.slice(start, end)
     dispatch({
@@ -64,7 +63,7 @@ export function EditRoutePathView() {
 
   return (
     <>
-      <MapBoxComponent location={route.path[0]}>
+      <MapBoxComponent location={route?.path[0]}>
         <MapboxGL.PointAnnotation coordinate={route.path[start][0]} key={'start'} id={'start'}>
           <TamaIcon iconName="MapPin" color="$black10" size="$2" />
         </MapboxGL.PointAnnotation>
@@ -114,7 +113,7 @@ export function EditRoutePathView() {
             router.back()
           }}
         ></Button>
-        <RouteSheet route={route} save={handleSave} />
+        <RouteSheet routeLength={route.path.length - 1} save={handleSave} />
         <Button
           ai="flex-end"
           icon={<TamaIcon iconName="ChevronRight" />}
@@ -125,12 +124,11 @@ export function EditRoutePathView() {
   )
 }
 
-function RouteSheet({ route, save }: { route: Route; save: () => void }) {
+function RouteSheet({ routeLength, save }: { routeLength: number; save: () => void }) {
   const [open, setOpen] = useState(true)
-  const toggleOpen = useCallback(() => setOpen((prev) => !prev), [])
+  const toggleOpen = () => setOpen(!open)
   const [position, setPosition] = useState(0)
   const { start, end, setStart, setEnd } = useRouteState()
-  const max = route?.path.length - 1 ?? 0
   return (
     <>
       <Button
@@ -148,7 +146,6 @@ function RouteSheet({ route, save }: { route: Route; save: () => void }) {
         snapPoints={[30]}
         position={position}
         onPositionChange={setPosition}
-        dismissOnSnapToBottom
       >
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
@@ -157,7 +154,7 @@ function RouteSheet({ route, save }: { route: Route; save: () => void }) {
               customMarkerLeft={() => <ChevronLeft />}
               customMarkerRight={() => <ChevronRight />}
               values={[start, end]} // 초기값을 상태로 동기화
-              max={Math.max(1, max)}
+              max={Math.max(1, routeLength)}
               onValuesChangeFinish={(values) => {
                 setStart(values[0])
                 setEnd(values[1])

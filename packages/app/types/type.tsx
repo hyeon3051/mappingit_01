@@ -42,7 +42,7 @@ export interface LocateFile {
   markers: Marker[]
   isRecord: boolean
   currentRoute: Pos[]
-  pos?: Pos
+  pos: Pos
 }
 
 export interface File {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef, memo } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import BackgroundGeolocation, {
   Location,
   State,
@@ -20,9 +20,8 @@ const useBackgroundGeolocation = () => {
 
       try {
         setLocation([[coords.longitude, coords.latitude], loc.timestamp])
-      } catch (e) {
-        console.log('error', e)
-      }
+        locateLngLat.current = [coords.longitude, coords.latitude]
+      } catch (e) {}
     })
 
     const onMotionChange: Subscription = BackgroundGeolocation.onMotionChange((event) => {})
@@ -34,10 +33,10 @@ const useBackgroundGeolocation = () => {
     BackgroundGeolocation.ready(
       {
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-        distanceFilter: 10,
+        distanceFilter: 5,
+        locationUpdateInterval: 10000,
         startOnBoot: true,
         debug: false,
-        locationUpdateInterval: 1000,
         notification: {
           layout: '맵핑잇',
           title: '위치 정보 수집 중',

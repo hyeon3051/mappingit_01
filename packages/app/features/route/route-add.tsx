@@ -33,7 +33,7 @@ export function AddRouteView() {
     title: '',
     description: '',
     path: fileInfo?.currentRoute || [],
-    lineWidth: 3,
+    lineWidth: 2,
     lineColor: '#fbfbfb',
     hashTags: [],
   })
@@ -53,7 +53,7 @@ export function AddRouteView() {
         hashTags: hashTags,
       }))
     }
-  }, [params])
+  }, [params, fileInfo?.routes])
 
   const { title, description, id: routeId, lineColor, lineWidth, hashTags } = routeInfo
 
@@ -73,6 +73,7 @@ export function AddRouteView() {
   }
 
   const onWidthChange = (value) => {
+    console.log(value)
     setRouteInfo((prev) => ({
       ...prev,
       lineWidth: value[0],
@@ -114,13 +115,17 @@ export function AddRouteView() {
       <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">
         <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
           <YStack>
+            <H6>루트</H6>
             <H3>{title || '제목'}</H3>
-            <H6>제목</H6>
           </YStack>
         </XStack>
-        <XStack gap="$4" p="$2" w="80%" ml={20} ai="center">
+        <YStack gap="$4" p="$2" w="80%" ml={20}>
+          <H6>루트 표시</H6>
+        </YStack>
+
+        <YStack gap="$4" p="$2" w="80%" ml={20} h="10%" jc="center">
           <Separator backgroundColor={lineColor} borderColor={lineColor} borderWidth={lineWidth} />
-        </XStack>
+        </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
           <H5>이름</H5>
           <Input onChangeText={onNameChange} value={title} />
@@ -155,17 +160,38 @@ export function AddRouteView() {
           </XStack>
         </YStack>
         <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>너비</H5>
-          <SimpleSlider onValueChange={onWidthChange} />
+          <H6>너비</H6>
+          <Slider defaultValue={[2]} max={15} step={1} onValueChange={onWidthChange}>
+            <Slider.Track>
+              <Slider.TrackActive backgroundColor={lineColor} />
+            </Slider.Track>
+            <Slider.Thumb size="$2" index={0} circular />
+          </Slider>
         </YStack>
 
         <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-          <Button icon={<TamaIcon iconName="PlusCircle" />} onPress={handleChange}></Button>
-          <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}></Button>
-          <Button icon={<TamaIcon iconName="Check" />} onPress={changeRoutePath}></Button>
+          <Button
+            icon={<TamaIcon iconName="PlusCircle" />}
+            onPress={handleChange}
+            bg="$green10"
+          ></Button>
+          <Button
+            icon={<TamaIcon iconName="ChevronLeft" />}
+            onPress={() => router.back()}
+            bg="$gray10"
+          ></Button>
+          <Button
+            icon={<TamaIcon iconName="Check" />}
+            onPress={changeRoutePath}
+            bg="$blue10"
+          ></Button>
           {routeIdx !== 0 && (
             <>
-              <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}></Button>
+              <Button
+                icon={<TamaIcon iconName="Trash" />}
+                onPress={handleRemove}
+                bg="$red10"
+              ></Button>
             </>
           )}
         </XStack>
@@ -174,11 +200,11 @@ export function AddRouteView() {
   )
 }
 
-function SimpleSlider({ children, ...props }: SliderProps) {
+function SimpleSlider({ defaultValue, children, lineColor, onValueChange }) {
   return (
-    <Slider defaultValue={[2]} max={15} step={1} {...props}>
+    <Slider defaultValue={[defaultValue]} max={15} step={1} onValueChange={onValueChange}>
       <Slider.Track>
-        <Slider.TrackActive />
+        <Slider.TrackActive backgroundColor={lineColor} />
       </Slider.Track>
       <Slider.Thumb size="$2" index={0} circular />
       {children}

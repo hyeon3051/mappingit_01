@@ -1,4 +1,4 @@
-import { Button, Paragraph, XStack, YStack, Stack, Square, ScrollView } from '@my/ui'
+import { Button, Paragraph, XStack, YStack, Stack, Square, ScrollView, H6 } from '@my/ui'
 import { fileDispatch, fileState } from 'packages/app/contexts/mapData/fileReducer'
 import { selectedIcon } from 'packages/app/types/type'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -18,11 +18,10 @@ export function SelectMarkerView() {
   const dispatch = useContext(fileDispatch)
 
   const params = useParams()
-  const marker = parseInt(`${params.marker}` || '-1')
-
+  const marker = parseInt(`${params.marker}`)
   useEffect(() => {
-    if (marker !== -1 && fileInfo?.markers[marker - 1]) {
-      const { markerIcon, markerColor } = fileInfo?.markers[marker - 1]
+    if (marker !== -1 && fileInfo?.markers[marker]) {
+      const { markerIcon, markerColor, id } = fileInfo?.markers[marker]
       setMarkerIcon({
         icon: markerIcon,
         color: markerColor,
@@ -37,7 +36,7 @@ export function SelectMarkerView() {
   })
 
   const handleRemove = () => {
-    if (marker !== -1) return
+    if (!marker) return
     dispatch({
       type: 'REMOVE_MARKER',
       payload: { markerId: marker },
@@ -45,27 +44,12 @@ export function SelectMarkerView() {
     router.back()
   }
 
-
   return (
     <>
       <ScrollView>
-        <YStack f={1} ai="center" gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
+        <YStack f={1} ai="center" gap="$5" w="100%" h="100%" jc="flex-start" p="$2">
           <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
-            <Paragraph>즐겨찾기</Paragraph>
-            <XStack gap="$5" jc="flex-start" flexWrap="wrap">
-              {['PinOff', 'PinOff', 'PinOff', 'PinOff'].map((iconName, index) => (
-                <Button
-                  key={index}
-                  size="$7"
-                  circular
-                  iconAfter={<TamaIcon iconName={iconName} size="$6" />}
-                  onPress={() => setMarkerIcon({ ...markerIcon, icon: iconName })}
-                />
-              ))}
-            </XStack>
-          </Stack>
-          <Stack p="$2" gap="$2" jc="flex-start" mt="$2" w="100%">
-            <Paragraph>마커</Paragraph>
+            <H6>마커</H6>
             <XStack gap="$5" jc="space-around" flexWrap="wrap">
               {icons?.map((iconName: string, index) => (
                 <Button
@@ -85,8 +69,8 @@ export function SelectMarkerView() {
               ))}
             </XStack>
           </Stack>
-          <Stack p="$2" gap="$2" jc="flex-start" mt="$2" w="100%">
-            <Paragraph>색상</Paragraph>
+          <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
+            <H6>색상</H6>
             <XStack gap="$5" jc="flex-start" flexWrap="wrap">
               {colors?.map((color, index) => (
                 <Square
@@ -108,17 +92,44 @@ export function SelectMarkerView() {
       </ScrollView>
       <XStack f={2} jc="space-around" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
         <Button
-          {...(marker !== -1 ? { ...linkProps } : {})}
-          icon={<TamaIcon iconName="PlusCircle" />}
+          icon={<TamaIcon iconName="ChevronLeft" />}
+          onPress={() => router.back()}
+          bg="$gray10"
+          opacity={0.8}
         >
-          정보 입력
+          뒤로
         </Button>
-        <Button icon={<TamaIcon iconName="ChevronLeft" />} onPress={() => router.back()}>
-          돌아가기
-        </Button>
-        {marker !== 0 && (
-          <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove}>
+        {marker !== -1 ? (
+          <Button
+            {...linkProps}
+            icon={<TamaIcon iconName="PlusCircle" />}
+            bg="$blue10"
+            opacity={0.8}
+          >
+            수정
+          </Button>
+        ) : (
+          <Button
+            {...linkProps}
+            bg="$green10"
+            icon={<TamaIcon iconName="PlusCircle" />}
+            opacity={0.8}
+          >
+            추가
+          </Button>
+        )}
+        {marker !== -1 ? (
+          <Button
+            icon={<TamaIcon iconName="Trash" />}
+            onPress={handleRemove}
+            bg="$red10"
+            opacity={0.8}
+          >
             삭제
+          </Button>
+        ) : (
+          <Button bg="$blue10" opacity={0.8}>
+            현재 마커
           </Button>
         )}
       </XStack>

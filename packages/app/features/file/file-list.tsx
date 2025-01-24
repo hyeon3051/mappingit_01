@@ -17,6 +17,7 @@ import {
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
 import { useColorScheme } from 'react-native'
+import stringToColor from 'packages/app/utils/stringToColor'
 
 export function FileView() {
   const colorScheme = useColorScheme()
@@ -65,6 +66,9 @@ export function FileView() {
       const markers: Marker[] = await getMarkerById(result.id, db)
       const routes: Route[] = await getRouteById(result.id, db)
       if (result.id) {
+        markers.forEach((marker) => {
+          console.log(marker.hashTags, 'marker.hashTags')
+        })
         setFileInfo({
           id: id,
           title: title,
@@ -72,16 +76,18 @@ export function FileView() {
           markers: markers.map((marker) => ({
             ...marker,
             pos: JSON.parse(marker.pos),
-            hashTags: JSON.parse(marker.hashTags),
+            hashTags: marker.hashTags ? JSON.parse(marker.hashTags) : [],
+            imageUri: marker.imageUri ? JSON.parse(marker.imageUri) : [],
           })),
           routes: routes.map((route) => ({
             ...route,
             lineWidth: parseInt(route.lineWidth),
             path: JSON.parse(route.path),
-            hashTags: JSON.parse(route.hashTags),
+            hashTags: route.hashTags ? JSON.parse(route.hashTags) : [],
           })),
         })
       }
+      console.log(fileInfo, 'fileInfo')
     }
   }, [idx, check])
 
@@ -111,7 +117,7 @@ export function FileView() {
     <>
       <MapBoxComponent
         location={
-          fileInfo?.routes?.[0]?.path[0] || fileInfo?.markers?.[0]?.pos || currentFileInfo?.pos?.[0]
+          fileInfo?.routes?.[0]?.path[0] || fileInfo?.markers?.[0]?.pos || currentFileInfo?.pos
         }
       >
         {fileInfo?.markers?.map(({ pos, markerIcon, markerColor, id }) => (
@@ -155,14 +161,14 @@ export function FileView() {
             {
               title: '현재 파일',
               description: '현재 저장 중인 파일',
-              markerIcon: 'Globe',
-              markerColor: colorScheme === 'dark' ? '$white10' : '$black10',
+              markerIcon: 'CalendarDays',
+              color: '$green10',
             },
             ...(fileList?.map((file) => ({
               title: file['title'],
               description: file['description'],
-              markerIcon: 'MapPin',
-              markerColor: colorScheme === 'dark' ? '$white10' : '$black10',
+              markerIcon: 'CalendarDays',
+              color: stringToColor(file['title']),
             })) || []),
           ]}
           scrollAnimationDuration={100}
@@ -170,15 +176,15 @@ export function FileView() {
             setIdx(index)
           }}
           renderItem={(data) => {
-            const { title, description, markerIcon, markerColor } = data.item
+            const { title, description, markerIcon, color, id } = data.item
             return (
               <CardDemo
                 title={title}
                 description={description}
                 markerIcon={markerIcon}
-                markerColor={markerColor}
-                key={data.index}
-                onSelect={() => onSelect(data.id)}
+                color={color}
+                key={id}
+                onSelect={() => onSelect(id)}
                 onFileSelect={() => setSave(true)}
               />
             )
@@ -197,14 +203,16 @@ export function FileView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle}>
-          추가
-        </Button>
+        <Button {...linkProps} icon={PlusCircle} bg="$green10" opacity={0.8} circular></Button>
         <SheetDemo onChangeIdx={onChageIdx} data={fileList} type="file" />
         {idx !== 0 ? (
-          <Button {...editLinkProps} icon={FileEdit}>
-            수정
-          </Button>
+          <Button
+            {...editLinkProps}
+            icon={FileEdit}
+            bg={stringToColor(fileList[idx - 1]?.title)}
+            opacity={0.8}
+            circular
+          ></Button>
         ) : (
           <Button>현재 파일</Button>
         )}
