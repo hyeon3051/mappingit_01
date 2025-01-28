@@ -21,7 +21,7 @@ interface RouteState {
 }
 
 const useRouteState = create<RouteState>((set) => ({
-  idx: 0,
+  idx: -1,
   setIdx(idx: number) {
     set({ idx })
   },
@@ -42,12 +42,13 @@ const RouteOnMap = () => {
   })
 
   const setRouteSet = useCallback(() => {
-    const routeId = idx !== 0 ? fileInfo?.routes[idx - 1]?.id : 'current'
-    const startCoordinate = idx !== 0 ? fileInfo?.routes[idx - 1]?.path[0] : fileInfo?.pos
+    const routeId = idx !== -1 ? fileInfo?.routes[idx]?.id : 'current'
+    const startCoordinate =
+      idx !== -1 ? fileInfo?.routes[idx]?.path[0] : fileInfo?.currentRoute?.[0] || fileInfo?.pos
     const endCoordinate =
-      idx !== 0
-        ? fileInfo?.routes[idx - 1]?.path[fileInfo.routes[idx - 1].path.length - 1][0]
-        : fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[0]
+      idx !== -1
+        ? fileInfo?.routes[idx]?.path[fileInfo.routes[idx].path.length - 1][0]
+        : fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[0] || fileInfo?.pos?.[0]
     useRouteSet({
       routeId: routeId || '',
       startCoordinate: startCoordinate,
@@ -67,7 +68,7 @@ const RouteOnMap = () => {
     return
   }
   return (
-    <MapBoxComponent location={routeSet.startCoordinate}>
+    <MapBoxComponent location={[routeSet.endCoordinate, 'end']}>
       {routeSet.startCoordinate && (
         <MapboxGL.PointAnnotation
           coordinate={routeSet.startCoordinate?.[0]}
@@ -94,7 +95,7 @@ const RouteOnMap = () => {
           />
         </MapboxGL.PointAnnotation>
       )}
-      {routeSet.startCoordinate && routeSet.endCoordinate && (
+      {routeSet.endCoordinate && (
         <MapboxGL.ShapeSource
           id="shapeSource"
           shape={{
@@ -103,12 +104,12 @@ const RouteOnMap = () => {
             geometry: {
               type: 'LineString',
               coordinates:
-                idx === 0
+                idx === -1
                   ? (fileInfo.currentRoute.length >= 2
                       ? fileInfo.currentRoute
                       : [fileInfo.pos, fileInfo.pos]
                     ).map((route) => route?.[0])
-                  : fileInfo.routes[idx - 1]?.path?.map((route) => route?.[0]),
+                  : fileInfo.routes[idx]?.path?.map((route) => route?.[0]),
             },
           }}
         >
@@ -116,8 +117,8 @@ const RouteOnMap = () => {
             id="lineIdx"
             sourceID="shapeSource"
             style={{
-              lineColor: idx > 0 ? fileInfo.routes[idx - 1]?.lineColor : 'red',
-              lineWidth: idx > 0 ? fileInfo.routes[idx - 1]?.lineWidth : 3,
+              lineColor: idx > -1 ? fileInfo.routes[idx]?.lineColor : 'black',
+              lineWidth: idx > -1 ? fileInfo.routes[idx]?.lineWidth : 3,
             }}
           />
         </MapboxGL.ShapeSource>
@@ -128,15 +129,15 @@ const RouteOnMap = () => {
 
 const RouteInfoView = () => {
   const { idx } = useRouteState()
-  const colorScheme = useColorScheme()
+  if (idx === -1) return
   const fileInfo = useContext(fileState)
   const start_at = new Date(
-    fileInfo?.routes[idx - 1]?.path?.[0]?.[1] || fileInfo?.currentRoute?.[0]?.[1] || new Date()
+    fileInfo?.routes[idx]?.path?.[0]?.[1] || fileInfo?.currentRoute?.[0]?.[1] || new Date()
   )
   const startDate = start_at.toLocaleDateString()
   const startTime = start_at.toLocaleTimeString()
   const end_at = new Date(
-    fileInfo?.routes[idx - 1]?.path?.[fileInfo?.routes[idx - 1]?.path?.length - 1]?.[1] ||
+    fileInfo?.routes[idx]?.path?.[fileInfo?.routes[idx]?.path?.length - 1]?.[1] ||
       fileInfo?.currentRoute?.[fileInfo?.currentRoute?.length - 1]?.[1] ||
       new Date()
   )
@@ -145,24 +146,15 @@ const RouteInfoView = () => {
   return (
     <>
       <Stack zIndex={3} pos="absolute" left={0} bottom={20}>
-        <Card
-          size="$4"
-          width="100%"
-          height="100%"
-          backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
-          mx="$2"
-          px="$2"
-        >
+        <Card size="$4" width="100%" height="100%" backgroundColor="$black0" mx="$2" px="$2">
           <Card.Header padded>
             <Paragraph></Paragraph>
           </Card.Header>
           <Stack width="$15" height="$20">
             <XStack gap="$3" ai="flex-start" jc="center" px="$4">
               <YStack alignContent="center" w="80%">
-                <SizableText size="$8">{idx !== 0 && fileInfo?.routes[idx - 1]?.title}</SizableText>
-                <Paragraph size="$1">
-                  {idx !== 0 && fileInfo?.routes[idx - 1]?.description}
-                </Paragraph>
+                <SizableText size="$8">{idx !== -1 && fileInfo?.routes[idx]?.title}</SizableText>
+                <Paragraph size="$1">{idx !== -1 && fileInfo?.routes[idx]?.description}</Paragraph>
                 <Paragraph size="$1">{startDate}</Paragraph>
                 <Paragraph size="$1">{startTime}</Paragraph>
                 <Paragraph size="$1">{endDate}</Paragraph>
@@ -178,7 +170,6 @@ const RouteInfoView = () => {
 }
 
 export function RouteListView() {
-  const colorScheme = useColorScheme()
   const carouselRef = useRef(null)
   const { idx, setIdx } = useRouteState()
   const fileInfo = useContext(fileState)
@@ -188,15 +179,18 @@ export function RouteListView() {
   })
 
   const editLinkProps = useLink({
-    href: `/route/addRoute/?routeId=${idx - 1}`,
+    href: `/route/addRoute/?routeId=${idx}`,
   })
 
   const onChageIdx = (index) => {
-    setIdx(index) // 0 is current route
-    if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index: index - 1 })
-    }
+    setIdx(index)
   }
+
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef?.current.scrollTo({ index: idx + 1 })
+    }
+  }, [idx])
 
   return (
     <>
@@ -207,7 +201,7 @@ export function RouteListView() {
         pos="absolute"
         width="100%"
         ai="center"
-        backgroundColor={colorScheme === 'dark' ? '$black10' : '$white10'}
+        backgroundColor="$black0"
       ></Stack>
       <Stack zIndex={3} pos="absolute" left={0} bottom={100}>
         <Carousel
@@ -234,7 +228,7 @@ export function RouteListView() {
           ]}
           scrollAnimationDuration={100}
           onSnapToItem={(index) => {
-            setIdx(index)
+            setIdx(index - 1)
           }}
           renderItem={(data) => {
             const { title, description, id, lineWidth, lineColor } = data.item
@@ -267,7 +261,7 @@ export function RouteListView() {
           추가
         </Button>
         <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.routes} type="route" />
-        {idx !== 0 ? (
+        {idx !== -1 ? (
           <Button
             {...editLinkProps}
             icon={FileEdit}
@@ -292,7 +286,6 @@ const renderScreen = SceneMap({
 })
 export function RouteView() {
   const layout = useWindowDimensions()
-  const colorScheme = useColorScheme()
   const [tabIdx, setTabIdx] = useState(1)
   const [zIndex, setZIndex] = useState(1)
   const [routes] = useState([

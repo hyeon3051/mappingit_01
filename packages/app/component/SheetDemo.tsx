@@ -14,8 +14,7 @@ import {
 import { Cannabis, ChevronDown, Search } from '@tamagui/lucide-icons'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import TamaIcon from '../ui/Icon'
-import { useColorScheme, Image, Platform } from 'react-native'
-
+import { useColorScheme, Image, Platform, Linking, TouchableOpacity, View } from 'react-native'
 import {
   TestIds,
   NativeAd,
@@ -23,8 +22,9 @@ import {
   NativeAsset,
   NativeAssetType,
   NativeMediaView,
-  BannerAd,
-  BannerAdSize,
+  NativeAdEventType,
+  NativeAdChoicesPlacement,
+  NativeMediaAspectRatio,
 } from 'react-native-google-mobile-ads'
 
 export function SheetDemo({ onChangeIdx, data, type }) {
@@ -114,13 +114,13 @@ export function SheetDemo({ onChangeIdx, data, type }) {
             />
           </XStack>
           <ScrollView w="100%">
-            <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key="current">
+            <XStack p="$2" w="90%" mx={20} ai="center" key="current">
               <Button
                 size="$5"
                 circular
                 iconAfter={<TamaIcon iconName="MapPin" color="$white10" size="$2" />}
                 onPress={() => {
-                  onChangeIdx(0)
+                  onChangeIdx(-1)
                   setOpen(false)
                 }}
               />
@@ -130,18 +130,17 @@ export function SheetDemo({ onChangeIdx, data, type }) {
               </YStack>
             </XStack>
             {filterdData?.map((file, idx) => {
-              const Ad_flag = idx % 4 === 0
+              const Ad_flag = false
               const hashTags = file?.hashTags || []
-              console.log(hashTags, 'hashTags')
               return (
                 <YStack key={file.id}>
                   {Ad_flag && <NativeComponent />}
-                  <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
+                  <XStack gap="$2" px="$2" w="90%" m={20} ai="center">
                     <Button
                       size="$5"
                       circular
                       onPress={() => {
-                        onChangeIdx(idx + 1)
+                        onChangeIdx(idx)
                         setOpen(false)
                       }}
                       iconAfter={
@@ -156,7 +155,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                       <H2 px="$2">{file['title'] || 'example'}</H2>
                       <Paragraph px="$2">{file['description'] || 'description'}</Paragraph>
                       <XStack f={1} ai="center" jc="center">
-                        <XStack flexWrap="wrap" gap="$2" w="100%" p="$2">
+                        <XStack flexWrap="wrap" w="100%" px="$2">
                           {Array.isArray(file?.hashTags) &&
                             file?.hashTags?.map((tag) => (
                               <XStack key={tag} px="$2" mr="$2">
@@ -187,18 +186,49 @@ export function SheetDemo({ onChangeIdx, data, type }) {
 
 const NativeComponent = () => {
   const [nativeAd, setNativeAd] = useState<NativeAd>()
-
   useEffect(() => {
     if (NativeAd) {
       NativeAd.createForAdRequest(
         Platform.OS === 'android'
           ? 'ca-app-pub-5218306923860994/2487519423'
-          : 'ca-app-pub-5218306923860994/9703664462'
+          : 'ca-app-pub-5218306923860994/9703664462',
+        {
+          adChoicesPlacement: NativeAdChoicesPlacement.BOTTOM_LEFT,
+          aspectRatio: NativeMediaAspectRatio.PORTRAIT,
+        }
       )
         .then(setNativeAd)
         .catch(console.error)
     }
   }, [])
+
+  useEffect(() => {
+    if (!nativeAd) {
+      return
+    }
+    nativeAd.addAdEventListener(NativeAdEventType.IMPRESSION, () => {
+      console.debug('Native ad impression')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.CLICKED, () => {
+      console.debug('Native ad clicked')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_PLAYED, () => {
+      console.debug('Native ad video played')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_PAUSED, () => {
+      console.debug('Native ad video paused')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_ENDED, () => {
+      console.debug('Native ad video ended')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_MUTED, () => {
+      console.debug('Native ad video muted')
+    })
+    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_UNMUTED, () => {
+      console.debug('Native ad video unmuted')
+    })
+    return () => nativeAd.destroy()
+  }, [nativeAd])
 
   if (!nativeAd) {
     return null
@@ -216,23 +246,53 @@ const NativeComponent = () => {
         paddingRight: 10,
       }}
     >
-      {nativeAd.icon && (
-        <NativeAsset assetType={NativeAssetType.ICON}>
-          <Image
-            source={{ uri: nativeAd.icon.url }}
-            width={60}
-            height={60}
-            style={{ borderRadius: 10, border: '1px solid black' }}
-          />
+      <View style={{ padding: 16, gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {nativeAd.icon && (
+            <NativeAsset assetType={NativeAssetType.ICON}>
+              <Image source={{ uri: nativeAd.icon.url }} width={24} height={24} />
+            </NativeAsset>
+          )}
+          <NativeAsset assetType={NativeAssetType.HEADLINE}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+          </NativeAsset>
+          <Text
+            style={{
+              backgroundColor: '#FBBC04',
+              color: 'white',
+              paddingHorizontal: 2,
+              paddingVertical: 1,
+              fontWeight: 'bold',
+              fontSize: 12,
+              borderRadius: 4,
+            }}
+          >
+            AD
+          </Text>
+        </View>
+        {nativeAd.advertiser && (
+          <NativeAsset assetType={NativeAssetType.ADVERTISER}>
+            <Text>{nativeAd.advertiser}</Text>
+          </NativeAsset>
+        )}
+        <NativeAsset assetType={NativeAssetType.BODY}>
+          <Text>{nativeAd.body}</Text>
         </NativeAsset>
-      )}
-      <NativeAsset assetType={NativeAssetType.HEADLINE}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+      </View>
+      <NativeMediaView />
+      <NativeAsset assetType={NativeAssetType.CALL_TO_ACTION}>
+        <Text
+          style={{
+            color: 'white',
+            fontWeight: 'bold',
+            backgroundColor: '#4285F4',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+          }}
+        >
+          {nativeAd.callToAction}
+        </Text>
       </NativeAsset>
-      <NativeAsset assetType={NativeAssetType.BODY}>
-        <Text style={{ fontSize: 12, fontWeight: 'normal' }}>{nativeAd.body}</Text>
-      </NativeAsset>
-      <Text>Sponsored</Text>
     </NativeAdView>
   )
 }

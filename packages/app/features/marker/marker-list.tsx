@@ -21,7 +21,6 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
-import useBackgroundGeolocation from 'packages/app/services/BackGroundGelocation'
 import { TabView, SceneMap } from 'react-native-tab-view'
 import { Dimensions, useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
@@ -47,7 +46,6 @@ const useMarkerState = create<MarkerState>((set) => ({
 }))
 
 const MarkerOnMap = () => {
-  const fileInfo = useContext(fileState)
   const { marker } = useMarkerState()
   return (
     <MapBoxComponent location={marker?.pos}>
@@ -72,7 +70,7 @@ const MarkerListView = () => {
   const fileInfo = useContext(fileState)
 
   const linkProps = useLink({
-    href: `/marker/selectMarker`,
+    href: `/marker/selectMarker/?marker=-1`,
   })
 
   const editLinkProps = useLink({
@@ -81,22 +79,26 @@ const MarkerListView = () => {
 
   const onChangeIdx = useCallback(
     (index) => {
-      setIdx(index)
       if (carouselRef.current) {
-        carouselRef.current.scrollTo({ index: index })
+        console.log(idx)
+        setIdx(index)
       }
     },
-    [carouselRef, idx]
+    [idx, carouselRef]
   )
-  const changeMarker = useCallback(() => {
-    const markers = fileInfo?.markers || []
-    const tempSelectedMarker = idx !== -1 ? markers[idx] : { pos: fileInfo?.pos }
-    updateMarker(tempSelectedMarker as Marker)
-  }, [idx, fileInfo?.pos, fileInfo?.markers])
 
   useEffect(() => {
-    changeMarker()
-  }, [changeMarker])
+    const tempSelectedMarker =
+      idx !== -1
+        ? fileInfo?.markers[idx]
+        : { pos: fileInfo?.pos, markerIcon: 'PinOff', markerColor: '$black10' }
+    updateMarker(tempSelectedMarker as Marker)
+    console.log(idx)
+    carouselRef?.current?.scrollTo({
+      index: idx + 1,
+      animated: true,
+    })
+  }, [idx])
 
   return (
     <>
@@ -124,20 +126,18 @@ const MarkerListView = () => {
               }
             }) || []),
           ]}
-          scrollAnimationDuration={100}
+          scrollAnimationDuration={500}
           onSnapToItem={(index) => {
-            if (index === 0) setIdx(-1)
             setIdx(index - 1)
           }}
           renderItem={(data) => {
-            const { title, description, markerIcon, markerColor, id } = data.item
             return (
               <CardDemo
-                title={title}
-                description={description}
-                markerIcon={markerIcon}
-                color={markerColor}
-                key={id}
+                title={data.item.title}
+                description={data.item.description}
+                markerIcon={data.item.markerIcon}
+                color={data.item.markerColor}
+                key={data.item.id}
               />
             )
           }}
@@ -271,7 +271,6 @@ export function CardImage({ uri }) {
 }
 
 const MarkerImageView = () => {
-  const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
   const imageUri = marker?.imageUri || []
   return (

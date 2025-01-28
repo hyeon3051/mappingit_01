@@ -114,7 +114,6 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
       // 1. 마커 이름, 추가 설명, 아이콘, 색상 수정
       // 2. 마커 위치 가상 이동 수정
       case 'EDIT_MARKER':
-        console.log(action.payload.marker, 'action.payload.marker')
         draft.markers = draft.markers.map((marker) =>
           marker.id === action.payload.markerId ? action.payload.marker : marker
         )
@@ -149,7 +148,6 @@ const fileReducer = (state: LocateFile, action: LocateFileActions) =>
           ...draft,
           markers: [...draft.markers, ...action.payload.data.markers],
           routes: [...draft.routes, ...action.payload.data.routes],
-          
         }
     }
   })

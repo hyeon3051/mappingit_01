@@ -40,10 +40,7 @@ export function FileView() {
   })
 
   const onChageIdx = (index) => {
-    setIdx(index)
-    if (carouselRef.current) {
-      carouselRef.current.scrollTo({ index })
-    }
+    setIdx(index + 1)
   }
 
   useEffect(() => {
@@ -66,9 +63,6 @@ export function FileView() {
       const markers: Marker[] = await getMarkerById(result.id, db)
       const routes: Route[] = await getRouteById(result.id, db)
       if (result.id) {
-        markers.forEach((marker) => {
-          console.log(marker.hashTags, 'marker.hashTags')
-        })
         setFileInfo({
           id: id,
           title: title,
@@ -105,6 +99,10 @@ export function FileView() {
 
   useEffect(() => {
     setCheck(false)
+
+    carouselRef?.current?.scrollTo({
+      index: idx,
+    })
   }, [idx])
 
   useEffect(() => {
@@ -209,7 +207,7 @@ export function FileView() {
           <Button
             {...editLinkProps}
             icon={FileEdit}
-            bg={stringToColor(fileList[idx - 1]?.title)}
+            bg={stringToColor(idx !== 0 ? fileList[idx - 1]?.title : 'green')}
             opacity={0.8}
             circular
           ></Button>
