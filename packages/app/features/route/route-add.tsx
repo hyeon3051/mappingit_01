@@ -12,6 +12,7 @@ import {
   Slider,
   SliderProps,
   Separator,
+  ScrollView,
 } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
 import { useContext, useEffect, useState } from 'react'
@@ -73,7 +74,6 @@ export function AddRouteView() {
   }
 
   const onWidthChange = (value) => {
-    console.log(value)
     setRouteInfo((prev) => ({
       ...prev,
       lineWidth: value[0],
@@ -112,66 +112,75 @@ export function AddRouteView() {
 
   return (
     <>
-      <YStack f={1} gap="$1" w="100%" h="100%" jc="flex-start" p="$2">
-        <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
-          <YStack>
-            <H6>루트</H6>
-            <H3>{title || '제목'}</H3>
-          </YStack>
-        </XStack>
-        <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H6>루트 표시</H6>
-        </YStack>
-
-        <YStack gap="$4" p="$2" w="80%" ml={20} h="10%" jc="center">
-          <Separator backgroundColor={lineColor} borderColor={lineColor} borderWidth={lineWidth} />
-        </YStack>
-        <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>이름</H5>
-          <Input onChangeText={onNameChange} value={title} />
-        </YStack>
-        <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>설명</H5>
-          <TextArea onChangeText={onDescriptionChange} value={description} />
-        </YStack>
-        <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H5>색상</H5>
-          <XStack gap="$2" jc="space-between">
-            {['#FF0000', '#00FF00', '#0000FF', '#FF00FF'].map((color, index) => (
-              <Square
-                key={index}
-                size="$6"
-                hoverStyle={{
-                  scale: 1.5,
-                }}
-                pressStyle={{
-                  scale: 0.9,
-                }}
-                onPress={() =>
-                  setRouteInfo({
-                    ...routeInfo,
-                    lineColor: color,
-                  })
-                }
-                backgroundColor={color}
-                elevation={color === '$red10' ? '$5' : undefined}
-              />
-            ))}
+      <ScrollView keyboardShouldPersistTaps={true}>
+        <YStack f={1} gap="$3" w="100%" jc="flex-start" p="$2" h="100%" pb="$14">
+          <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
+            <YStack>
+              <H6>루트</H6>
+              <H3>{title || '제목'}</H3>
+            </YStack>
           </XStack>
-        </YStack>
-        <YStack gap="$4" p="$2" w="80%" ml={20}>
-          <H6>너비</H6>
-          <Slider defaultValue={[2]} max={15} step={1} onValueChange={onWidthChange}>
-            <Slider.Track>
-              <Slider.TrackActive backgroundColor={lineColor} />
-            </Slider.Track>
-            <Slider.Thumb size="$2" index={0} circular />
-          </Slider>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H6>루트 표시</H6>
+          </YStack>
+
+          <YStack gap="$4" p="$2" w="80%" ml={20} h="10%" jc="center">
+            <Separator
+              m="$2"
+              pos="absolute"
+              w="100%"
+              borderColor={lineColor}
+              borderWidth={lineWidth}
+            />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H5>이름</H5>
+            <Input onChangeText={onNameChange} value={title} />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H5>설명</H5>
+            <TextArea onChangeText={onDescriptionChange} value={description} />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H5>색상</H5>
+            <XStack gap="$2" jc="space-between">
+              {['#FF0000', '#00FF00', '#0000FF', '#FF00FF'].map((color, index) => (
+                <Square
+                  key={index}
+                  size="$6"
+                  hoverStyle={{
+                    scale: 1.5,
+                  }}
+                  pressStyle={{
+                    scale: 0.9,
+                  }}
+                  onPress={() =>
+                    setRouteInfo({
+                      ...routeInfo,
+                      lineColor: color,
+                    })
+                  }
+                  backgroundColor={color}
+                  elevation={color === '$red10' ? '$5' : undefined}
+                />
+              ))}
+            </XStack>
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" ml={20}>
+            <H6>너비</H6>
+            <Slider defaultValue={[2]} max={15} step={1} onValueChange={onWidthChange}>
+              <Slider.Track>
+                <Slider.TrackActive backgroundColor={lineColor} />
+              </Slider.Track>
+              <Slider.Thumb size="$2" index={0} circular />
+            </Slider>
+          </YStack>
         </YStack>
 
         <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
           <Button
             icon={<TamaIcon iconName="PlusCircle" />}
+            d
             onPress={handleChange}
             bg="$green10"
           ></Button>
@@ -195,7 +204,7 @@ export function AddRouteView() {
             </>
           )}
         </XStack>
-      </YStack>
+      </ScrollView>
     </>
   )
 }

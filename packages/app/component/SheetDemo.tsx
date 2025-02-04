@@ -27,10 +27,8 @@ import {
   NativeMediaAspectRatio,
 } from 'react-native-google-mobile-ads'
 
-export function SheetDemo({ onChangeIdx, data, type }) {
+export function SheetDemo({ onChangeIdx, data, type, selectedIdx }) {
   const [search, setSearch] = useState('')
-  const [filterdData, setFilterdData] = useState(data)
-  const dataMemo = useMemo(() => data, [data])
   const stringToColor = (str: string) => {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
@@ -44,25 +42,13 @@ export function SheetDemo({ onChangeIdx, data, type }) {
     return color
   }
   const colorScheme = useColorScheme()
-  const searchData = useCallback(
-    (data) => {
-      if (search === '') {
-        setFilterdData(dataMemo)
-      } else {
-        const prevFilterdData = dataMemo.filter(
-          (item) =>
-            item.title.includes(search) ||
-            item.description.includes(search) ||
-            item.hashTags.includes(search)
-        )
-        setFilterdData(prevFilterdData)
-      }
-    },
-    [search, dataMemo]
-  )
-  useEffect(() => {
-    searchData(dataMemo)
-  }, [searchData])
+  const isFilterdData = (search, item) => {
+    return (
+      item.title.includes(search) ||
+      item.description.includes(search) ||
+      item?.hashTags?.includes(search)
+    )
+  }
 
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(0)
@@ -90,8 +76,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
       >
         <Sheet.Frame
           ai="center"
-          opacity={0.95}
-          gap="$5"
+          gap="$6"
           bg={colorScheme === 'dark' ? '$black10' : '$white'}
           p="$2"
         >
@@ -102,7 +87,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
               w="90%"
               onChangeText={setSearch}
               bg="#FFFFFFAA"
-              borderRadius="$10"
+              borderRadius="$2"
             />
             <TamaIcon
               iconName="Search"
@@ -114,7 +99,7 @@ export function SheetDemo({ onChangeIdx, data, type }) {
             />
           </XStack>
           <ScrollView w="100%">
-            <XStack p="$2" w="90%" mx={20} ai="center" key="current">
+            <XStack gap="$2" px="$2" w="90%" mx={20} ai="center" key="current">
               <Button
                 size="$5"
                 circular
@@ -124,18 +109,18 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                   setOpen(false)
                 }}
               />
-              <YStack gap="$2" ml={20}>
+              <YStack gap="$2" ml={20} px="$2">
                 <H2>{'현재 ' + title}</H2>
                 <Paragraph>{'description'}</Paragraph>
               </YStack>
             </XStack>
-            {filterdData?.map((file, idx) => {
-              const Ad_flag = false
-              const hashTags = file?.hashTags || []
+            {data?.map((file, idx) => {
+              if (search && !isFilterdData(search, file)) {
+                return
+              }
               return (
-                <YStack key={file.id}>
-                  {Ad_flag && <NativeComponent />}
-                  <XStack gap="$2" px="$2" w="90%" m={20} ai="center">
+                <YStack key={file.id + idx}>
+                  <XStack gap="$2" px="$2" w="90%" mx={20} ai="center">
                     <Button
                       size="$5"
                       circular
@@ -146,8 +131,11 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                       iconAfter={
                         <TamaIcon
                           iconName={file['markerIcon'] || 'PinOff'}
-                          color={file['markerColor'] || '$black10'}
+                          color={idx == selectedIdx ? '$white' : file['markerColor'] || '$black10'}
                           size="$6"
+                          backgroundColor={idx === selectedIdx ? file['markerColor'] : '$white'}
+                          circular
+                          borderRadius="10"
                         />
                       }
                     />
@@ -155,10 +143,10 @@ export function SheetDemo({ onChangeIdx, data, type }) {
                       <H2 px="$2">{file['title'] || 'example'}</H2>
                       <Paragraph px="$2">{file['description'] || 'description'}</Paragraph>
                       <XStack f={1} ai="center" jc="center">
-                        <XStack flexWrap="wrap" w="100%" px="$2">
+                        <XStack flexWrap="wrap" w="100%" gap="$2">
                           {Array.isArray(file?.hashTags) &&
                             file?.hashTags?.map((tag) => (
-                              <XStack key={tag} px="$2" mr="$2">
+                              <XStack key={tag} px="$1">
                                 <Text color={stringToColor(tag)}>{tag}</Text>
                               </XStack>
                             ))}
@@ -186,15 +174,16 @@ export function SheetDemo({ onChangeIdx, data, type }) {
 
 const NativeComponent = () => {
   const [nativeAd, setNativeAd] = useState<NativeAd>()
+
   useEffect(() => {
     if (NativeAd) {
       NativeAd.createForAdRequest(
         Platform.OS === 'android'
-          ? 'ca-app-pub-5218306923860994/2487519423'
+          ? 'ca-app-pub-5218306923860994/1043521337'
           : 'ca-app-pub-5218306923860994/9703664462',
         {
+          aspectRatio: NativeMediaAspectRatio.LANDSCAPE,
           adChoicesPlacement: NativeAdChoicesPlacement.BOTTOM_LEFT,
-          aspectRatio: NativeMediaAspectRatio.PORTRAIT,
         }
       )
         .then(setNativeAd)
@@ -203,31 +192,15 @@ const NativeComponent = () => {
   }, [])
 
   useEffect(() => {
-    if (!nativeAd) {
-      return
+    if (!nativeAd) return
+    const listener = nativeAd.addAdEventListener(NativeAdEventType.CLICKED, () => {
+      console.log('Native ad clicked')
+    })
+    return () => {
+      listener.remove()
+      // or
+      nativeAd.destroy()
     }
-    nativeAd.addAdEventListener(NativeAdEventType.IMPRESSION, () => {
-      console.debug('Native ad impression')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.CLICKED, () => {
-      console.debug('Native ad clicked')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_PLAYED, () => {
-      console.debug('Native ad video played')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_PAUSED, () => {
-      console.debug('Native ad video paused')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_ENDED, () => {
-      console.debug('Native ad video ended')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_MUTED, () => {
-      console.debug('Native ad video muted')
-    })
-    nativeAd.addAdEventListener(NativeAdEventType.VIDEO_UNMUTED, () => {
-      console.debug('Native ad video unmuted')
-    })
-    return () => nativeAd.destroy()
   }, [nativeAd])
 
   if (!nativeAd) {
@@ -246,7 +219,7 @@ const NativeComponent = () => {
         paddingRight: 10,
       }}
     >
-      <View style={{ padding: 16, gap: 8 }}>
+      <View style={{ padding: 8, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {nativeAd.icon && (
             <NativeAsset assetType={NativeAssetType.ICON}>
@@ -254,7 +227,7 @@ const NativeComponent = () => {
             </NativeAsset>
           )}
           <NativeAsset assetType={NativeAssetType.HEADLINE}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
+            <Text style={{ fontSize: 6, fontWeight: 'bold' }}>{nativeAd.headline}</Text>
           </NativeAsset>
           <Text
             style={{
@@ -262,8 +235,7 @@ const NativeComponent = () => {
               color: 'white',
               paddingHorizontal: 2,
               paddingVertical: 1,
-              fontWeight: 'bold',
-              fontSize: 12,
+              fontSize: 6,
               borderRadius: 4,
             }}
           >

@@ -128,9 +128,9 @@ const RouteOnMap = () => {
 }
 
 const RouteInfoView = () => {
+  const fileInfo = useContext(fileState)
   const { idx } = useRouteState()
   if (idx === -1) return
-  const fileInfo = useContext(fileState)
   const start_at = new Date(
     fileInfo?.routes[idx]?.path?.[0]?.[1] || fileInfo?.currentRoute?.[0]?.[1] || new Date()
   )
@@ -260,7 +260,12 @@ export function RouteListView() {
         <Button {...linkProps} icon={PlusCircle} bg="$green10">
           추가
         </Button>
-        <SheetDemo onChangeIdx={onChageIdx} data={fileInfo?.routes} type="route" />
+        <SheetDemo
+          onChangeIdx={onChageIdx}
+          data={fileInfo?.routes}
+          type="route"
+          selectedIdx={idx}
+        />
         {idx !== -1 ? (
           <Button
             {...editLinkProps}

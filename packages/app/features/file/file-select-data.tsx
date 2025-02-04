@@ -186,10 +186,6 @@ export function SelectDataView() {
     })
   }, [])
 
-  useEffect(() => {
-    console.log(currentLocation, 'currentLocation')
-  }, [currentLocation])
-
   return (
     <>
       <MapBoxComponent location={currentLocation || fileInfo?.pos} zoomLevel={3}>

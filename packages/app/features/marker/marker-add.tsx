@@ -28,7 +28,6 @@ export function AddMarkerView() {
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ icon: string; color: string; marker: number }>()
   const marker = parseInt(`${params.marker}`)
-  console.log(marker, 'markerId')
   const [markerInfo, setMarkerInfo] = useState<Marker>({
     id: uuidv4(),
     title: '',
@@ -99,7 +98,6 @@ export function AddMarkerView() {
   }
 
   const handleChange = () => {
-    console.log(marker)
     if (marker === -1) {
       dispatch({ type: 'ADD_MARKER', payload: { marker: markerInfo } })
     } else {
@@ -115,7 +113,7 @@ export function AddMarkerView() {
   return (
     <>
       <ScrollView>
-        <YStack f={1} gap="$0" w="100%" h="100%" jc="flex-start" p="$2">
+        <YStack f={1} gap="$0" w="100%" h="10%" jc="flex-start" p="$2" pb="$14">
           <XStack gap="$4" p="$2" w="100%" m={20} ai="center">
             <Button
               size="$7"
@@ -135,6 +133,14 @@ export function AddMarkerView() {
           <YStack gap="$4" p="$2" w="80%" ml={20}>
             <H6>설명</H6>
             <TextArea onChangeText={onDescriptionChange} value={description} />
+          </YStack>
+          <YStack gap="$4" p="$2" w="80%" m={20}>
+            <H6>해시태그</H6>
+            <HashTagCard
+              hashTags={hashTags}
+              setHashTags={onHashTagChange}
+              onHashTagRemove={onHashTagRemove}
+            />
           </YStack>
           <YStack gap="$4" p="$2" w="80%" ml={20}>
             <H6>사진</H6>
@@ -170,14 +176,6 @@ export function AddMarkerView() {
                 renderItem={({ item }) => <CardDemo uri={item} />}
               />
             )}
-          </YStack>
-          <YStack gap="$4" p="$2" w="80%" m={20}>
-            <H6>해시태그</H6>
-            <HashTagCard
-              hashTags={hashTags}
-              setHashTags={onHashTagChange}
-              onHashTagRemove={onHashTagRemove}
-            />
           </YStack>
         </YStack>
       </ScrollView>

@@ -33,8 +33,8 @@ const useBackgroundGeolocation = () => {
     BackgroundGeolocation.ready(
       {
         desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-        distanceFilter: 5,
-        locationUpdateInterval: 10000,
+        distanceFilter: 20,
+        locationUpdateInterval: 100000,
         startOnBoot: true,
         debug: false,
         notification: {

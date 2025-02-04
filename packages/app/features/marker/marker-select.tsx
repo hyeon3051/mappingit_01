@@ -20,7 +20,6 @@ export function SelectMarkerView() {
   const params = useParams()
   const marker = parseInt(`${params.marker}`)
   useEffect(() => {
-    console.log(marker, 'marker')
     if (marker !== -1 && fileInfo?.markers[marker]) {
       const { markerIcon, markerColor, id } = fileInfo?.markers[marker]
       setMarkerIcon({
@@ -48,7 +47,7 @@ export function SelectMarkerView() {
   return (
     <>
       <ScrollView>
-        <YStack f={1} ai="center" gap="$5" w="100%" h="100%" jc="flex-start" p="$2">
+        <YStack f={1} ai="center" gap="$5" w="100%" h="100%" jc="flex-start" p="$2" pb="$14">
           <Stack p="$2" gap="$5" jc="flex-start" mt="$2" w="100%">
             <H6>마커</H6>
             <XStack gap="$5" jc="space-around" flexWrap="wrap">

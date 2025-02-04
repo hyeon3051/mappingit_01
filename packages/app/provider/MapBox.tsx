@@ -12,14 +12,13 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   const { user } = useUser()
   const { location: currLocation } = useBackgroundGeolocation()
   const mapRef = useRef<MapboxGL.MapView>(null)
-  const zoomLevel = useRef(15)
   const img_url = user?.imageUrl
   const camera = useRef<Camera>(null)
 
   useEffect(() => {
     if (location) {
       camera.current?.setCamera({
-        animationDuration: 1000,
+        animationDuration: 500,
         centerCoordinate: location[0],
         animationMode: 'easeTo',
       })
@@ -35,15 +34,19 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
         width: '100%',
         height: '100%',
       }}
+      styleURL="mapbox://styles/hyeon3051/cm6oge2su005p01sn8q0t5fve"
       logoEnabled={false}
       attributionEnabled={false}
       zoomEnabled={true}
+      localizeLabels={true}
+      accessibilityLanguage="kr"
       ref={mapRef}
     >
       <MapboxGL.UserLocation visible={true} animated={true} />
       <MapboxGL.Camera
         animationMode="easeTo"
-        zoomLevel={zoomLevel.current}
+        minZoomLevel={5}
+        maxZoomLevel={20}
         centerCoordinate={location ? location[0] : currLocation[0]}
         ref={camera}
       />

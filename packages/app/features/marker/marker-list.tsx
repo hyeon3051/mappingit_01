@@ -48,17 +48,19 @@ const useMarkerState = create<MarkerState>((set) => ({
 const MarkerOnMap = () => {
   const { marker } = useMarkerState()
   return (
-    <MapBoxComponent location={marker?.pos}>
-      <MapboxGL.PointAnnotation
-        coordinate={marker?.pos[0]}
-        key={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
-        id={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
-      >
-        <TamaIcon
-          iconName={marker?.markerIcon || 'PinOff'}
-          color={marker?.markerColor || '$black10'}
-        />
-      </MapboxGL.PointAnnotation>
+    <MapBoxComponent location={marker?.pos || undefined}>
+      {!!marker.pos && (
+        <MapboxGL.PointAnnotation
+          coordinate={marker?.pos[0]}
+          key={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
+          id={marker?.id ? 'marker-' + marker.id.toString() : 'current'}
+        >
+          <TamaIcon
+            iconName={marker?.markerIcon || 'PinOff'}
+            color={marker?.markerColor || '$black10'}
+          />
+        </MapboxGL.PointAnnotation>
+      )}
     </MapBoxComponent>
   )
 }
@@ -80,7 +82,6 @@ const MarkerListView = () => {
   const onChangeIdx = useCallback(
     (index) => {
       if (carouselRef.current) {
-        console.log(idx)
         setIdx(index)
       }
     },
@@ -93,7 +94,6 @@ const MarkerListView = () => {
         ? fileInfo?.markers[idx]
         : { pos: fileInfo?.pos, markerIcon: 'PinOff', markerColor: '$black10' }
     updateMarker(tempSelectedMarker as Marker)
-    console.log(idx)
     carouselRef?.current?.scrollTo({
       index: idx + 1,
       animated: true,
@@ -158,7 +158,12 @@ const MarkerListView = () => {
         <Button {...linkProps} icon={PlusCircle} bg="$green10" opacity={0.8}>
           추가
         </Button>
-        <SheetDemo onChangeIdx={onChangeIdx} data={fileInfo?.markers} type="marker" />
+        <SheetDemo
+          onChangeIdx={onChangeIdx}
+          data={fileInfo?.markers}
+          type="marker"
+          selectedIdx={idx}
+        />
         {idx !== -1 ? (
           <Button
             {...editLinkProps}
@@ -181,7 +186,7 @@ const MarkerListView = () => {
 const MarkerInfoView = () => {
   const colorScheme = useColorScheme()
   const { marker } = useMarkerState()
-  const markerDate = new Date(marker?.pos[1]) || new Date()
+  const markerDate = marker.pos ? new Date(marker?.pos[1]) : new Date()
   const markerTimeStr = markerDate.toLocaleTimeString()
   const markerDateStr = markerDate.toLocaleDateString()
   const hashTags = marker?.hashTags

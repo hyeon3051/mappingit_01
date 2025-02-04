@@ -16,6 +16,7 @@ import {
 } from 'packages/app/contexts/fileData/fileReducer'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
+import { v4 as uuidv4 } from 'uuid'
 import { useColorScheme } from 'react-native'
 import stringToColor from 'packages/app/utils/stringToColor'
 
@@ -69,19 +70,20 @@ export function FileView() {
           description: description,
           markers: markers.map((marker) => ({
             ...marker,
+            id: uuidv4(),
             pos: JSON.parse(marker.pos),
             hashTags: marker.hashTags ? JSON.parse(marker.hashTags) : [],
             imageUri: marker.imageUri ? JSON.parse(marker.imageUri) : [],
           })),
           routes: routes.map((route) => ({
             ...route,
+            id: uuidv4(),
             lineWidth: parseInt(route.lineWidth),
             path: JSON.parse(route.path),
             hashTags: route.hashTags ? JSON.parse(route.hashTags) : [],
           })),
         })
       }
-      console.log(fileInfo, 'fileInfo')
     }
   }, [idx, check])
 
