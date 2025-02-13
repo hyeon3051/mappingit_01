@@ -1,6 +1,6 @@
 import { Button, XStack, YStack, Input, TextArea, H3, H6, H5, useToastController } from '@my/ui'
 import TamaIcon from 'packages/app/ui/Icon'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useTransition } from 'react'
 import { useLink, useParams, useRouter } from 'solito/navigation'
 import { fileState, fileDispatch } from 'app/contexts/mapData/fileReducer'
 import { FileState } from 'packages/app/types/type'
@@ -18,6 +18,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 export function AddFileView() {
   const toast = useToastController()
   const fileInfo = useContext(fileState)
+  const [isPending, startTransition] = useTransition()
   const dispatch = useContext(fileDispatch)
   const params = useParams<{ fileId: number }>()
   const [fileId, setFileId] = useState<number>(params.fileId || -1)
@@ -92,24 +93,26 @@ export function AddFileView() {
     router.back()
   }
 
-  const handleChange = async () => {
-    if (fileId !== -1 && fileId) {
-      await updateFile({ title, description }, fileId, db)
-      toast.hide()
-      toast.show('파일 수정이 완료되었습니다.')
-    } else {
-      const file = await addFile({ title, description }, db)
-      const fileId = file.lastInsertRowId
-      for await (let route of fileInfo.routes) {
-        addRoute({ ...route, parent: fileId }, db)
+  const handleChange = () => {
+    startTransition(async () => {
+      if (fileId !== -1 && fileId) {
+        await updateFile({ title, description }, fileId, db)
+        toast.hide()
+        toast.show('파일 수정이 완료되었습니다.')
+      } else {
+        const file = await addFile({ title, description }, db)
+        const fileId = file.lastInsertRowId
+        for await (let route of fileInfo.routes) {
+          addRoute({ ...route, parent: fileId }, db)
+        }
+        for await (let marker of fileInfo.markers) {
+          addMarker({ ...marker, parent: fileId }, db)
+        }
+        toast.hide()
+        toast.show('파일 추가가 완료되었습니다.')
+        dispatch({ type: 'INIT' })
       }
-      for await (let marker of fileInfo.markers) {
-        addMarker({ ...marker, parent: fileId }, db)
-      }
-      toast.hide()
-      toast.show('파일 추가가 완료되었습니다.')
-      dispatch({ type: 'INIT' })
-    }
+    })
     /*
       sqlite3 => insert into file (id, title, description) values (fileId, title, description)
       batch = []
@@ -165,7 +168,12 @@ export function AddFileView() {
             추가
           </Button>
           {fileId !== -1 && fileId ? (
-            <Button icon={<TamaIcon iconName="Trash" />} onPress={handleRemove} bg="$red10">
+            <Button
+              icon={<TamaIcon iconName="Trash" />}
+              onPress={handleRemove}
+              bg="$red10"
+              disabled={isPending}
+            >
               삭제
             </Button>
           ) : null}

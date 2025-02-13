@@ -10,7 +10,6 @@ import {
   useToastController,
   Square,
   Slider,
-  SliderProps,
   Separator,
   ScrollView,
 } from '@my/ui'
@@ -90,6 +89,11 @@ export function AddRouteView() {
   }
 
   const handleChange = () => {
+    console.log(routeInfo.path.length)
+    if (routeInfo.path.length <= 1) {
+      toast.show('경로 정보가 없습니다')
+      return router.back()
+    }
     if (routeIdx !== undefined) {
       dispatch({ type: 'EDIT_ROUTE', payload: { routeId: routeId, route: routeInfo } })
     } else {
@@ -109,6 +113,7 @@ export function AddRouteView() {
   const changeRoutePath = () => {
     linkProps.onPress()
   }
+  console.log(routeIdx)
 
   return (
     <>
@@ -176,35 +181,34 @@ export function AddRouteView() {
             </Slider>
           </YStack>
         </YStack>
-
-        <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
-          <Button
-            icon={<TamaIcon iconName="PlusCircle" />}
-            d
-            onPress={handleChange}
-            bg="$green10"
-          ></Button>
-          <Button
-            icon={<TamaIcon iconName="ChevronLeft" />}
-            onPress={() => router.back()}
-            bg="$gray10"
-          ></Button>
-          <Button
-            icon={<TamaIcon iconName="Check" />}
-            onPress={changeRoutePath}
-            bg="$blue10"
-          ></Button>
-          {routeIdx !== 0 && (
-            <>
-              <Button
-                icon={<TamaIcon iconName="Trash" />}
-                onPress={handleRemove}
-                bg="$red10"
-              ></Button>
-            </>
-          )}
-        </XStack>
       </ScrollView>
+
+      <XStack f={1} jc="space-between" ai="flex-end" gap="$4" p={2} w="100%" m={2}>
+        <Button
+          icon={<TamaIcon iconName="PlusCircle" />}
+          onPress={handleChange}
+          bg="$white1"
+        ></Button>
+        <Button
+          icon={<TamaIcon iconName="ChevronLeft" />}
+          onPress={() => router.back()}
+          bg="$gray10"
+        ></Button>
+        {routeIdx && (
+          <>
+            <Button
+              icon={<TamaIcon iconName="Check" />}
+              onPress={changeRoutePath}
+              bg="$blue10"
+            ></Button>
+            <Button
+              icon={<TamaIcon iconName="Trash" />}
+              onPress={handleRemove}
+              bg="$red10"
+            ></Button>
+          </>
+        )}
+      </XStack>
     </>
   )
 }

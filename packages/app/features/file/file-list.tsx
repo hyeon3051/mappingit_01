@@ -1,7 +1,7 @@
-import { Button, XStack, SizableText, Separator, Stack } from '@my/ui'
+import { Button, XStack, SizableText, Separator, Stack, useToastController } from '@my/ui'
 import { PlusCircle, FileEdit } from '@tamagui/lucide-icons'
 import MapBoxComponent from 'packages/app/provider/MapBox'
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState, useTransition } from 'react'
 import { useLink } from 'solito/navigation'
 import MapboxGL from '@rnmapbox/maps'
 import TamaIcon from 'packages/app/ui/Icon'
@@ -22,6 +22,8 @@ import stringToColor from 'packages/app/utils/stringToColor'
 
 export function FileView() {
   const colorScheme = useColorScheme()
+  const [isPending, startTransition] = useTransition()
+  const toast = useToastController()
   const carouselRef = useRef(null)
   const db = useSQLiteContext()
   const [idx, setIdx] = useState(0)
@@ -52,39 +54,44 @@ export function FileView() {
       }
     }
     setup()
-  }, [currentFileInfo?.title, idx])
+  }, [currentFileInfo, idx])
 
-  const setupData = useCallback(async () => {
-    let { id, title, description } = fileList[idx - 1]
-    const result = await getFileDataById(id, db)
-    if (!result) {
-      return
-    }
-    if (idx && check) {
-      const markers: Marker[] = await getMarkerById(result.id, db)
-      const routes: Route[] = await getRouteById(result.id, db)
-      if (result.id) {
-        setFileInfo({
-          id: id,
-          title: title,
-          description: description,
-          markers: markers.map((marker) => ({
-            ...marker,
-            id: uuidv4(),
-            pos: JSON.parse(marker.pos),
-            hashTags: marker.hashTags ? JSON.parse(marker.hashTags) : [],
-            imageUri: marker.imageUri ? JSON.parse(marker.imageUri) : [],
-          })),
-          routes: routes.map((route) => ({
-            ...route,
-            id: uuidv4(),
-            lineWidth: parseInt(route.lineWidth),
-            path: JSON.parse(route.path),
-            hashTags: route.hashTags ? JSON.parse(route.hashTags) : [],
-          })),
-        })
+  const setupData = useCallback(() => {
+    startTransition(async () => {
+      let { id, title, description } = fileList[idx - 1]
+      const result = await getFileDataById(id, db)
+      if (!result) {
+        return
       }
-    }
+      if (idx && check) {
+        const markers: Marker[] = await getMarkerById(result.id, db)
+        const routes: Route[] = await getRouteById(result.id, db)
+        if (result.id) {
+          setFileInfo({
+            id: id,
+            title: title,
+            description: description,
+            markers: markers.map((marker) => ({
+              ...marker,
+              id: uuidv4(),
+              pos: JSON.parse(marker.pos),
+              hashTags: marker.hashTags ? JSON.parse(marker.hashTags) : [],
+              imageUri: marker.imageUri ? JSON.parse(marker.imageUri) : [],
+            })),
+            routes: routes.map((route) => ({
+              ...route,
+              id: uuidv4(),
+              lineWidth: parseInt(route.lineWidth),
+              path: JSON.parse(route.path),
+              hashTags: route.hashTags ? JSON.parse(route.hashTags) : [],
+            })),
+          })
+        }
+      }
+      toast.show('정보 불러옴', {
+        message: '정보를 지도에 불러왔습니다',
+      })
+    })
   }, [idx, check])
 
   useEffect(() => {
@@ -96,6 +103,7 @@ export function FileView() {
   }, [setupData])
 
   const onSelect = () => {
+    if (isPending) return
     setCheck(!check)
   }
 
@@ -109,7 +117,12 @@ export function FileView() {
 
   useEffect(() => {
     if (save) {
-      dispatch({ type: 'SET_DATA', payload: { data: fileInfo } })
+      startTransition(() => {
+        dispatch({ type: 'SET_DATA', payload: { data: fileInfo } })
+        toast.show('데이터 저장 완료', {
+          message: `현재 파일에 ${fileInfo?.title} 파일 정보를 가져왔습니다.`,
+        })
+      })
       setSave(false)
     }
   }, [save])
@@ -171,7 +184,7 @@ export function FileView() {
               color: stringToColor(file['title']),
             })) || []),
           ]}
-          scrollAnimationDuration={100}
+          scrollAnimationDuration={5}
           onSnapToItem={(index) => {
             setIdx(index)
           }}

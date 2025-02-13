@@ -269,18 +269,19 @@ function SheetDemo({ markers, routes, onChangeMarkerSelected, onChangeRoueSelect
         animation="medium"
         open={open}
         onOpenChange={() => toggleOpen()}
-        snapPoints={[45]}
+        snapPoints={[30, 50, 70]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
       >
+        <Sheet.Handle />
         <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
           <XStack gap="$4">
             <Paragraph ta="center">
               <H2>MarkerList</H2>
             </Paragraph>
           </XStack>
-          <ScrollView w="100%" h="90%">
+          <ScrollView w="100%" h="100%">
             {markers?.map((marker, idx) => (
               <XStack gap="$2" p="$2" w="90%" m={20} ai="center" key={marker.id}>
                 <XStack gap="$2">

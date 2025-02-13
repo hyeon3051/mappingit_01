@@ -9,7 +9,7 @@ import Carousel from 'react-native-reanimated-carousel'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
 import { Button, XStack, SizableText, Card, Stack, YStack, Paragraph } from '@my/ui'
-import { TabView, SceneMap } from 'react-native-tab-view'
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
 import { useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
 import { useEffect, useCallback } from 'react'
@@ -257,7 +257,7 @@ export function RouteListView() {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle} bg="$green10">
+        <Button {...linkProps} icon={PlusCircle} bg="$white1">
           추가
         </Button>
         <SheetDemo
@@ -289,6 +289,25 @@ const renderScreen = SceneMap({
   first: RouteInfoView,
   second: RouteListView,
 })
+
+const renderTabBar = (props) => (
+  <TabBar
+    {...props}
+    activeColor="red"
+    inactiveColor="black"
+    indicatorStyle={{ display: 'none' }}
+    style={{
+      backgroundColor: 'white',
+      borderColor: 'black',
+      borderRadius: 50,
+      width: '80%',
+      position: 'absolute',
+      left: '10%',
+      right: '10%',
+      top: '5%',
+    }}
+  />
+)
 export function RouteView() {
   const layout = useWindowDimensions()
   const [tabIdx, setTabIdx] = useState(1)
@@ -306,6 +325,7 @@ export function RouteView() {
           index: tabIdx,
           routes,
         }}
+        renderTabBar={renderTabBar}
         style={{ width: '100%', height: '100%', zIndex: zIndex }}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}

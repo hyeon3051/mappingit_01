@@ -32,10 +32,10 @@ export function CardDemo({
     }
   }, [lineWidth])
   return (
-    <Card size="$4" width="80%" height="90%" backgroundColor={color} m="$2" p="$2" opacity={0.8}>
+    <Card size="$4" width="80%" height="90%" backgroundColor="white" m="$2" p="$2" opacity={0.8}>
       <Stack alignSelf="flex-start" py="$4" width="$15" height="$20">
         <XStack gap="$3" ai="flex-start" jc="center" px="$4">
-          <TamaIcon iconName={markerIcon} size="$3" color="$white1" strokeWidth={strokeWidth} />
+          <TamaIcon iconName={markerIcon} size="$3" color={color} strokeWidth={strokeWidth} />
           <YStack alignContent="center" w="80%">
             <SizableText size="$8">{title}</SizableText>
             <Paragraph size="$1">{description}</Paragraph>
@@ -43,22 +43,22 @@ export function CardDemo({
         </XStack>
       </Stack>
       <Card.Footer>
-        <XStack flex={1} m="$2" jc="flex-end" pos="absolute" bottom={20} left={0} right={0}>
-          <Button
-            size="$3"
-            icon={<TamaIcon iconName="Check" size="$2" />}
-            px="$4"
-            onPress={onSelect}
-          />
-          {onFileSelect && (
+        {onFileSelect && (
+          <XStack flex={1} m="$2" jc="flex-end" pos="absolute" bottom={20} left={0} right={0}>
+            <Button
+              size="$3"
+              icon={<TamaIcon iconName="Check" size="$2" />}
+              px="$4"
+              onPress={onSelect}
+            />
             <Button
               size="$3"
               icon={<TamaIcon iconName="PlusCircle" size="$2" />}
               px="$4"
               onPress={onFileSelect}
             />
-          )}
-        </XStack>
+          </XStack>
+        )}
       </Card.Footer>
     </Card>
   )

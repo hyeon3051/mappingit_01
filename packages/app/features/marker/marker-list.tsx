@@ -21,7 +21,7 @@ import Carousel from 'react-native-reanimated-carousel'
 import { Marker } from 'packages/app/types/type'
 import { CardDemo } from 'packages/app/component/CardDemo'
 import { SheetDemo } from 'packages/app/component/SheetDemo'
-import { TabView, SceneMap } from 'react-native-tab-view'
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
 import { Dimensions, useWindowDimensions } from 'react-native'
 import { create } from 'zustand'
 import { useColorScheme } from 'react-native'
@@ -155,7 +155,7 @@ const MarkerListView = () => {
         p="$4"
         right={0}
       >
-        <Button {...linkProps} icon={PlusCircle} bg="$green10" opacity={0.8}>
+        <Button {...linkProps} icon={PlusCircle} bg="$white1" opacity={0.8}>
           추가
         </Button>
         <SheetDemo
@@ -210,29 +210,21 @@ const MarkerInfoView = () => {
           height="$20"
           backgroundColor={colorScheme === 'dark' ? '#000000AA' : '#ffffffAA'}
           mx="$2"
-          px="$2"
-          py="$2"
+          p="$2"
         >
           <Card.Header>
             <SizableText size="$5" weight="bold">
               {marker?.title}
             </SizableText>
           </Card.Header>
-          <XStack ml="$2" flexWrap="wrap" gap="$2">
+          <XStack ml="$4" flexWrap="wrap" gap="$2">
             {Array.isArray(hashTags) &&
               hashTags?.map((tag) => (
-                <Stack key={tag}>
-                  <Text
-                    theme="alt2"
-                    size="$3"
-                    key={tag}
-                    mx="$2"
-                    color={stringToColor(tag) + 'AA'}
-                    borderRadius="$10"
-                  >
+                <Stack key={tag} px="$2">
+                  <Text theme="alt2" size="$3" key={tag} color={stringToColor(tag) + 'AA'}>
                     {tag}
                   </Text>
-                  <Separator vertical />
+                  <Separator vertical borderColor="$black1" />
                 </Stack>
               ))}
           </XStack>
@@ -302,6 +294,25 @@ const renderScreen = SceneMap({
   markerList: MarkerListView,
   markerImage: MarkerImageView,
 })
+
+const renderTabBar = (props) => (
+  <TabBar
+    {...props}
+    activeColor="green"
+    inactiveColor="black"
+    indicatorStyle={{ display: 'none' }}
+    style={{
+      backgroundColor: 'white',
+      borderColor: 'black',
+      borderRadius: 50,
+      width: '80%',
+      position: 'absolute',
+      left: '10%',
+      right: '10%',
+      top: '5%',
+    }}
+  />
+)
 export function MarkerView() {
   const layout = useWindowDimensions()
   const [tabIdx, setTabIdx] = useState(1)
@@ -319,6 +330,7 @@ export function MarkerView() {
           index: tabIdx,
           routes,
         }}
+        renderTabBar={renderTabBar}
         style={{ width: '100%', height: '90%', zIndex: zIndex }}
         renderScene={renderScreen}
         onIndexChange={setTabIdx}

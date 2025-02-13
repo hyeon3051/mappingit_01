@@ -191,7 +191,7 @@ export function AddMarkerView() {
         <Button
           icon={<TamaIcon iconName="PlusCircle" />}
           onPress={handleChange}
-          bg={marker !== 0 ? '$green10' : '$blue10'}
+          bg={marker !== 0 ? '$white' : '$blue10'}
           opacity={0.8}
           circular
         ></Button>

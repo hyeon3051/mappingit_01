@@ -199,18 +199,18 @@ function SheetDemo({ fileList, onChangeSelected }) {
         animation="medium"
         open={open}
         onOpenChange={setOpen}
-        snapPoints={[50]}
+        snapPoints={[50, 70, 100]}
         position={position}
         onPositionChange={setPosition}
         dismissOnSnapToBottom
       >
-        <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2">
+        <Sheet.Frame ai="center" gap="$5" bg="$color2" p="$2" height={'100%'}>
           <XStack gap="$4">
             <Paragraph ta="center">
               <H2>MarkerList</H2>
             </Paragraph>
           </XStack>
-          <ScrollView w="100%" h="90%">
+          <ScrollView w="100%" h="100%">
             <XStack gap="$2" p="$2" w="90%" m={20} ai="center">
               <Button
                 size="$5"
@@ -245,6 +245,8 @@ function SheetDemo({ fileList, onChangeSelected }) {
             ))}
           </ScrollView>
           <Button
+            position="absolute"
+            bottom={0}
             size="$3"
             circular
             icon={ChevronDown}
