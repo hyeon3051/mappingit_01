@@ -1,16 +1,13 @@
 {
   "expo": {
-    "name": "mappingit_02",
-    "slug": "mappingit_02",
+    "name": "mappingit",
+    "slug": "mappingit",
     "version": "1.0.0",
     "sdkVersion": "51.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "android": {
-      "package": "com.anonymous.mappingit_02"
-    }
+      "package": "com.hyeon3051.mappingit"
+    },
+    "plugins": ["react-native-google-mobile-ads"]
   }
 }

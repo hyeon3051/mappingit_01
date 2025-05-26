@@ -28,7 +28,11 @@ export default function Screen() {
   return (
     <>
       <BannerAd
-        unitId={'ca-app-pub-5218306923860994/7176917638'}
+        unitId={
+          Platform.OS === 'android'
+            ? 'ca-app-pub-5218306923860994/2970041329'
+            : 'ca-app-pub-5218306923860994/7176917638'
+        }
         size={`${width}x75`}
         ref={bannerRef}
       />

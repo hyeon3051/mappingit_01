@@ -3,6 +3,8 @@ module.exports = function (api) {
   return {
     presets: [['babel-preset-expo', { jsxRuntime: 'automatic' }]],
     plugins: [
+      ['react-native-reanimated/plugin'],
+      ['@babel/plugin-proposal-decorators', { legacy: true }],
       [
         require.resolve('babel-plugin-module-resolver'),
         {
@@ -15,8 +17,6 @@ module.exports = function (api) {
           extensions: ['.js', '.jsx', '.tsx', '.ios.js', '.android.js'],
         },
       ],
-      // if you want reanimated support
-      // 'react-native-reanimated/plugin',
       ...(process.env.EAS_BUILD_PLATFORM === 'android'
         ? []
         : [

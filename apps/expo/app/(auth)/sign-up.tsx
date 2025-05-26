@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, Input, Button, View, YStack } from '@my/ui'
-import { useSignUp, useOAuth} from '@clerk/clerk-expo'
+import { useSignUp, useOAuth } from '@clerk/clerk-expo'
 import { useRouter } from 'expo-router'
 
 export default function SignUpScreen() {
@@ -16,8 +16,6 @@ export default function SignUpScreen() {
   const [password, setPassword] = React.useState('')
   const [pendingVerification, setPendingVerification] = React.useState(false)
   const [code, setCode] = React.useState('')
-
-
 
   const onGoogleOAuthPress = React.useCallback(async () => {
     try {
@@ -118,16 +116,16 @@ export default function SignUpScreen() {
         value={emailAddress}
         placeholder="Enter email"
         onChangeText={(email) => setEmailAddress(email)}
-        />
-        <Input
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-        <Button onPress={onSignUpPress}>Continue</Button>
-        <Button onPress={onGoogleOAuthPress}>Continue with Google</Button>
-        <Button onPress={onAppleOAuthPress}>Continue with Apple</Button>
-      </YStack>
+      />
+      <Input
+        value={password}
+        placeholder="Enter password"
+        secureTextEntry={true}
+        onChangeText={(password) => setPassword(password)}
+      />
+      <Button onPress={onSignUpPress}>Continue</Button>
+      <Button onPress={onGoogleOAuthPress}>Continue with Google</Button>
+      <Button onPress={onAppleOAuthPress}>Continue with Apple</Button>
+    </YStack>
   )
 }

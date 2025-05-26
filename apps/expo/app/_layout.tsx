@@ -5,12 +5,13 @@ import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
 import { Provider } from 'app/provider'
 import { NativeToast } from '@my/ui/src/NativeToast'
-import { AvatarFallback, Avatar, Text, AvatarImage, Button } from '@my/ui'
+import { AvatarFallback, Avatar, Text, AvatarImage, Button, Theme, TamaguiProvider } from '@my/ui'
 import { UserCircle } from '@tamagui/lucide-icons'
-
+import { config } from 'packages/config/src'
 import { ClerkProvider, SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
 import { useLink } from 'solito/navigation'
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated'
+import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads'
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
@@ -49,12 +50,15 @@ export default function App() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme()
+  mobileAds().initialize()
   return (
     <Provider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <NativeToast />
-        <StackComponent />
-      </ThemeProvider>
+      <TamaguiProvider config={config} defaultTheme={colorScheme!}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <NativeToast />
+          <StackComponent />
+        </ThemeProvider>
+      </TamaguiProvider>
     </Provider>
   )
 }
@@ -69,25 +73,27 @@ function StackComponent() {
   })
   const { isLoaded, isSignedIn, user } = useUser()
   return (
-    <Stack
-      screenOptions={{
-        headerRight: () => (
-          <>
-            <SignedIn>
-              <Button {...userLink} className="flex-row items-center" circular>
-                <Avatar>
-                  <AvatarImage src={user?.imageUrl} />
-                </Avatar>
-              </Button>
-            </SignedIn>
-            <SignedOut>
-              <Button {...signInLink} variant="outlined">
-                <UserCircle />
-              </Button>
-            </SignedOut>
-          </>
-        ),
-      }}
-    />
+    <>
+      <Stack
+        screenOptions={{
+          headerRight: () => (
+            <>
+              <SignedIn>
+                <Button {...userLink} className="flex-row items-center" circular>
+                  <Avatar>
+                    <AvatarImage src={user?.imageUrl} />
+                  </Avatar>
+                </Button>
+              </SignedIn>
+              <SignedOut>
+                <Button {...signInLink} variant="outlined">
+                  <UserCircle />
+                </Button>
+              </SignedOut>
+            </>
+          ),
+        }}
+      />
+    </>
   )
 }

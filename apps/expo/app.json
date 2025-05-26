@@ -5,36 +5,27 @@
     "scheme": "mappingit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/mappingit_icon.jpg",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "infoPlist": {
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "[CHANGEME] This app requires location always, even when the app is in the background",
-        "NSLocationWhenInUseUsageDescription": "[CHANGEME] This app requires location while in use",
-        "NSMotionUsageDescription": "[CHANGEME] This app uses motion-detection to determine the motion-activity of the device (walking, vehicle, bicycle, etc)",
-        "UIBackgroundModes": [
-          "location",
-          "fetch",
-          "processing"
-        ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "앱이 항상 위치 정보를 수집할 수 있도록 하기 위해 필요합니다. (경로 추적, 실시간 위치 업데이트, 마커 등록)",
+        "NSLocationWhenInUseUsageDescription": "앱 사용 중에 위치 정보를 수집하기 위해 필요합니다. (현재 위치 기반의 주변 정보 표시 등)",
+        "NSMotionUsageDescription": "앱이 사용자의 활동 상태(걷기, 달리기, 이동 수단 등)를 인식하여 보다 사용자 위치 정보를 정확히 추적하기 위해 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "앱 내에서 사진 라이브러리에 저장된 이미지나 미디어를 불러와 사용할 수 있도록 하기 위해 필요합니다.",
+        "NSPhotoLibraryAddUsageDescription": "앱에서 생성된 이미지나 기록된 스크린샷 등을 사진 라이브러리에 저장하기 위해 필요합니다.",
+        "UIBackgroundModes": ["location", "fetch", "processing"],
         "BGTaskSchedulerPermittedIdentifiers": [
           "com.transistorsoft.fetch",
           "com.transistorsoft.customtask"
         ]
       },
       "supportsTablet": true,
-      "bundleIdentifier": "com.mappingit.app"
+      "bundleIdentifier": "com.hyeon3051.mappingit"
     },
     "android": {
       "permissions": [
@@ -46,17 +37,24 @@
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/mappingit_icon.jpg",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.mappingit.app"
+      "package": "com.hyeon3051.mappingit"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/mappingit_icon.jpg"
     },
     "plugins": [
       "expo-router",
       "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/mappingit_icon.jpg"
+        }
+      ],
       [
         "react-native-background-geolocation",
         {
@@ -77,7 +75,16 @@
           "RNMapboxMapsImpl": "mapbox",
           "accessToken": "sk.eyJ1IjoiaHllb24zMDUxIiwiYSI6ImNsa3YwM3BhcjBneGEzbHIweGFuNTgzZXoifQ.uvJeaDq7NLN0HyOENlWUcA"
         }
-      ]
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5218306923860994~3451642656",
+          "iosAppId": "ca-app-pub-5218306923860994~8210797708"
+        }
+      ],
+      "expo-secure-store",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
@@ -87,8 +94,12 @@
         "origin": false
       },
       "eas": {
-        "projectId": "c8c7105f-eb06-46cf-8636-bb08d28a2c54"
+        "projectId": "d9fd323a-ea5b-408a-961b-a10911c41582"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5218306923860994~3451642656",
+    "ios_app_id": "ca-app-pub-5218306923860994~8210797708"
   }
 }

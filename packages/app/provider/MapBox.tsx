@@ -12,7 +12,6 @@ const MapBoxComponent = ({ location, children }: { location?: Pos; children: Rea
   const { user } = useUser()
   const { location: currLocation } = useBackgroundGeolocation()
   const mapRef = useRef<MapboxGL.MapView>(null)
-  const img_url = user?.imageUrl
   const camera = useRef<Camera>(null)
 
   useEffect(() => {

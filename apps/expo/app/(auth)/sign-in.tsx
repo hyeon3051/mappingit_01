@@ -1,6 +1,6 @@
 import { useSignIn, useOAuth } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-import { Text, Input, Button, YStack } from '@my/ui'
+import { Text, Input, Button, YStack, ButtonIcon, Image } from '@my/ui'
 import React from 'react'
 
 export default function Page() {
@@ -74,22 +74,29 @@ export default function Page() {
 
   return (
     <YStack>
-      <Input
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-      />
-      <Input
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <Button onPress={onSignInPress}>Sign in</Button>
-      <YStack>
-        <Button onPress={onGoogleOAuthPress}>Google</Button>
-        <Button onPress={onAppleOAuthPress}>Apple</Button>
+      <YStack f={1} alignItems="center">
+        <Button onPress={onGoogleOAuthPress} variant="outlined" w="80%">
+          <Image
+            source={{
+              uri: 'https://cdn.pixabay.com/photo/2021/05/24/09/15/google-logo-6278331_1280.png',
+              width: 40,
+              height: 40,
+            }}
+            h="100%"
+          />
+          <Text>Sign in Google</Text>
+        </Button>
+        <Button onPress={onAppleOAuthPress}>
+          <Image
+            source={{
+              uri: 'https://cdn-icons-png.flaticon.com/512/0/747.png',
+              width: 40,
+              height: 40,
+            }}
+            h="100%"
+          />
+          <Text>Sign in Apple</Text>
+        </Button>
         <Button onPress={() => router.replace('/sign-up')}>Sign up</Button>
       </YStack>
     </YStack>
